@@ -1,0 +1,470 @@
+/* ─── Outer wrapper — full height, no scroll ─────────────── */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ─── Header bar ──────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 10px var(--space-6);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.backBtn:hover { background: var(--color-surface-2); color: var(--color-accent); border-color: var(--color-accent); }
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.dot       { width: 7px; height: 7px; border-radius: 50%; background: var(--color-border); flex-shrink: 0; transition: background 0.2s, transform 0.2s; }
+.dotDone   { background: var(--color-accent); opacity: 0.5; }
+.dotActive { background: var(--color-accent); transform: scale(1.4); }
+
+.headerEnd { display: flex; align-items: center; gap: var(--space-3); flex-shrink: 0; }
+.headerPos { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-tertiary); letter-spacing: 0.04em; }
+
+.doneBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+  border-radius: 99px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ─── Slide area — vertically centered, no scroll ────────── */
+.slide {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* center content block vertically */
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-8);
+  overflow: hidden;
+}
+
+/* ─── Top: breadcrumb + title + intro ────────────────────── */
+.slideTop {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.slideBreadcrumb {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.slideTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin: var(--space-1) 0;
+}
+
+.slideIntro {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  border-left: 3px solid var(--color-accent);
+  padding-left: var(--space-4);
+  margin: 0;
+  /* clamp to 2 lines so it never pushes the grid off-screen */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ─── 2×2 grid: 3 concepts + key takeaways ──────────────── */
+.slideGrid {
+  flex-shrink: 0;           /* don't stretch to fill remaining space */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;   /* rows size to content, not to 1fr */
+  gap: var(--space-3);
+}
+
+.slideCard {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: 120px;
+}
+
+.slideCardTakeaways {
+  border-color: color-mix(in srgb, #10b981 35%, transparent);
+}
+
+.slideCardAccent {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--accent, #e5ff00);
+}
+
+.slideCardBody {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: hidden;
+  flex: 1;
+}
+
+.slideCardTitle {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.slideCardText {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ─── Key takeaways list ─────────────────────────────────── */
+.takeawayList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+/* Use padding-left + ::before (no flex/webkit-box conflict) */
+.takeawayItem {
+  position: relative;
+  padding-left: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.takeawayItem::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #10b981;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* ─── Tip bar ────────────────────────────────────────────── */
+.tipBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: color-mix(in srgb, #e5ff00 8%, var(--color-bg));
+  border: 1px solid color-mix(in srgb, #e5ff00 30%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-5);
+}
+
+.tipIcon { color: var(--color-accent); flex-shrink: 0; margin-top: 1px; }
+
+.tipText {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ─── Loading skeleton ───────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeletonLine,
+.skeletonCard,
+.skeletonTip {
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--color-surface-2) 25%, var(--color-surface-3) 50%, var(--color-surface-2) 75%);
+  background-size: 1200px 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+.skeletonBreadcrumb { height: 10px; width: 160px; }
+.skeletonTitle      { height: 34px; width: 55%; margin: var(--space-2) 0; }
+.skeletonIntro      { height: 14px; width: 80%; }
+.skeletonCard       { border-radius: var(--radius-lg); min-height: 120px; }
+.skeletonTip        { height: 44px; }
+
+/* ─── Footer nav ─────────────────────────────────────────── */
+.footerNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-8);
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+  flex-shrink: 0;
+  gap: var(--space-4);
+}
+
+.footerBack {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.footerBack:hover { background: var(--color-surface-2); border-color: var(--color-accent); color: var(--color-accent); }
+
+.completeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-6);
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #111111;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  letter-spacing: -0.01em;
+  box-shadow: var(--glow-sm);
+}
+.completeBtn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--glow-md); }
+
+.nextBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-6);
+  background: transparent;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  color: var(--color-accent);
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.nextBtn:hover { background: var(--color-accent); color: #fff; }
+
+/* ─── Shared variant helpers ─────────────────────────────── */
+.slideCardSm { min-height: 90px; }
+
+.slideIntroExpanded {
+  -webkit-line-clamp: 4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.slideIntroOne {
+  -webkit-line-clamp: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.slideTitleMd {
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+}
+
+/* ─── Variant 1: two-column split ───────────────────────── */
+.v1Layout {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.v1Left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.v1Right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.v1Takeaways {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.v1TakeawaysLabel {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ─── Variant 2: three-column row ───────────────────────── */
+.v2Top {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.v2Grid {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.v2Chips {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.v2ChipsLabel {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.v2Chip {
+  padding: 4px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  word-break: break-word;
+}
+
+/* ─── Variant 3: header row + 2-col + full-width card ───── */
+.v3Top {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.v3TopText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.v3Chips {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-4);
+  width: 200px;
+}
+
+.v3Grid {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.slideCardFull {
+  grid-column: 1 / -1;
+  flex-direction: column;
+  min-height: 80px;
+}
+
+.slideCardAccentTop {
+  height: 4px;
+  width: 100%;
+  flex-shrink: 0;
+  background: var(--accent, #e5ff00);
+}
+
+.slideCardTextFull {
+  -webkit-line-clamp: 2;
+}

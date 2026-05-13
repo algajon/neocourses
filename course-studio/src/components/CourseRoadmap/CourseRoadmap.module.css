@@ -1,0 +1,364 @@
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ─── Overall progress ──────────────────────────────────── */
+.overallProgress {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.overallTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.overallLabel {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.overallPct {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.progressTrack {
+  height: 8px;
+  background: var(--color-surface-3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e5ff00, #c8df00);
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.progressCount {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Chapter list ───────────────────────────────────────── */
+.chapterList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chapter {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.chapterComplete {
+  border-color: var(--color-success);
+}
+
+/* Chapter header */
+.chapterHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.chapterHeader:hover {
+  background: var(--color-surface-2);
+}
+
+.chapterHeader:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.chapterNum {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-surface-3);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  transition: all 0.2s;
+}
+
+.chapterNumDone {
+  background: var(--color-success-subtle);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.chapterInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chapterTag {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-tertiary);
+}
+
+.chapterName {
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chapterRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.chapterPct {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.chapterArrow {
+  color: var(--color-text-tertiary);
+  transition: transform 0.2s;
+  display: flex;
+}
+
+.chapterArrowOpen {
+  transform: rotate(180deg);
+}
+
+/* ─── Lesson list ────────────────────────────────────────── */
+.lessonList {
+  padding: var(--space-2) var(--space-5) var(--space-4) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.lessonRow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-4);
+  min-height: 44px;
+}
+
+/* Connector track */
+.lessonConnector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.connLine {
+  flex: 1;
+  width: 2px;
+  background: var(--color-border);
+  min-height: 12px;
+}
+
+.connLineFirst {
+  background: transparent;
+}
+
+.connLineDone {
+  background: var(--color-accent);
+}
+
+.lessonNode {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.lessonNode:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-subtle);
+}
+
+.lessonNodeDone {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.lessonNodeNext {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px var(--color-accent-subtle);
+}
+
+.lessonNode:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Lesson content */
+.lessonContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  padding: var(--space-3) var(--space-3) var(--space-3) 0;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  gap: var(--space-2);
+  transition: background 0.12s;
+}
+
+.lessonContent:not(:disabled):hover {
+  background: var(--color-surface-2);
+}
+
+.lessonContent:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.lessonArrow {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s;
+}
+
+.lessonContent:not(:disabled):hover .lessonArrow {
+  opacity: 1;
+  color: var(--color-accent);
+}
+
+.lessonLabel {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.lessonDone .lessonLabel {
+  color: var(--color-text-tertiary);
+  text-decoration: line-through;
+}
+
+.lessonNext .lessonLabel {
+  font-weight: 500;
+}
+
+.nextBadge {
+  display: inline-block;
+  padding: 1px 6px;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 4px;
+}
+
+.noLessons {
+  padding: var(--space-3) 0;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+/* ─── Chapter quiz button ────────────────────────────────── */
+.quizBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: color-mix(in srgb, #e5ff00 12%, transparent);
+  border: 1px solid color-mix(in srgb, #e5ff00 45%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  flex-shrink: 0;
+}
+
+.quizBtn:hover {
+  background: #e5ff00;
+  border-color: #e5ff00;
+  color: #111111;
+}
+
+.quizBtnPassed {
+  background: var(--color-success-subtle);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.quizBtnPassed:hover {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #fff;
+}

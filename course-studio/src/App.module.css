@@ -1,0 +1,28 @@
+.app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--color-bg);
+  position: relative;
+}
+
+/* Subtle noise grain overlay */
+.texture {
+  position: fixed;
+  inset: 0;
+  background-image: var(--noise);
+  opacity: var(--noise-opacity, 0.025);
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: overlay;
+}
+
+.content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-image: var(--orb-1), var(--orb-2);
+  background-attachment: fixed;
+}

@@ -1,0 +1,20 @@
+# Build artifacts
+course-studio/dist/
+course-studio/node_modules/
+course-studio/src-tauri/target/
+course-studio/src-tauri/WixTools/
+course-studio/src-tauri/gen/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.*
+*.pem
+
+# Editor
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,976 @@
+/* ─── Screen wrapper & slide animations ───────────────────── */
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(28px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-28px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.slideInRight { animation: slideInRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.slideInLeft  { animation: slideInLeft  0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+/* ─── Top bar ─────────────────────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-8);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.greeting {}
+.greetingTitle {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+.greetingSubtitle {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+/* ─── Tabs ────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 3px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 450;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.tab:hover { color: var(--color-text-primary); }
+
+.tabActive {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.tabCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: var(--gradient-accent);
+  color: #111111;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 9px;
+}
+
+/* ─── Filter bar ──────────────────────────────────────────── */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-2) var(--space-3) var(--space-2) calc(var(--space-3) + 20px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-subtle);
+}
+.searchInput::placeholder { color: var(--color-text-tertiary); }
+
+.filterDropdowns {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.filterSelect {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  cursor: pointer;
+}
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+/* ─── Grid ────────────────────────────────────────────────── */
+.grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-8);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-5);
+  align-content: start;
+}
+
+/* ─── Empty state ─────────────────────────────────────────── */
+.emptyState {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-12);
+  text-align: center;
+}
+
+.emptyIcon { font-size: 40px; line-height: 1; }
+.emptyTitle {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.emptySub {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  max-width: 320px;
+}
+.goToCatalog {
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #111111;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ─── Catalog card ────────────────────────────────────────── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.cardBanner {
+  height: 80px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-3);
+  gap: var(--space-2);
+}
+
+.cardLevel {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(4px);
+}
+
+.cardDone {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(22,163,74,0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.cardBody {
+  padding: var(--space-4);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.cardAudience {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.cardGoal {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardFooter {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.enrollBtn {
+  flex: 1;
+  padding: var(--space-2) var(--space-4);
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #111111;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: var(--glow-sm);
+}
+.enrollBtn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--glow-md); }
+
+.enrolledFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.openCourseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 10px var(--space-4);
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #111111;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  letter-spacing: -0.01em;
+  box-shadow: var(--glow-sm);
+}
+.openCourseBtn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--glow-md); }
+.openCourseBtn:active { transform: translateY(0); }
+
+.openCourseBtnDone {
+  background: linear-gradient(135deg, #16a34a, #0ea5e9);
+}
+
+.miniProgress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.miniTrack {
+  flex: 1;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.miniFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e5ff00, #c8df00);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.miniPct {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ─── My Learning cards ───────────────────────────────────── */
+.learningCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+  text-align: left;
+  grid-column: 1 / -1;
+}
+
+.learningCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(3px);
+  border-color: var(--color-accent);
+}
+
+.learningCard:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.learningCardDone {
+  border-color: var(--color-success);
+}
+.learningCardDone:hover { border-color: var(--color-success); }
+
+.learningCardBanner {
+  width: 6px;
+  flex-shrink: 0;
+}
+
+.learningCardBody {
+  flex: 1;
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.learningCardTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.learningLevel {
+  display: inline-block;
+  padding: 2px 7px;
+  background: color-mix(in srgb, var(--lc, #d97706) 12%, transparent);
+  color: var(--lc, #d97706);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+}
+
+.donePill {
+  display: inline-block;
+  padding: 2px 7px;
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.learningTitle {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.learningAudience {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.learningStats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statDivider {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border);
+}
+
+.learningProgress {
+  margin-top: var(--space-2);
+}
+
+.learningCardArrow {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: color 0.15s, transform 0.15s;
+}
+
+.learningCard:hover .learningCardArrow {
+  color: var(--color-accent);
+  transform: translateX(3px);
+}
+
+/* ─── Course view ─────────────────────────────────────────── */
+.courseHeader {
+  flex-shrink: 0;
+}
+
+.courseBanner {
+  position: relative;
+  padding: var(--space-6) var(--space-8) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow: hidden;
+}
+
+.courseBannerOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.45) 100%);
+}
+
+.courseBannerContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-sm);
+  color: rgba(255,255,255,0.9);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  cursor: pointer;
+  width: fit-content;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+}
+.backBtn:hover { background: rgba(255,255,255,0.25); }
+
+.courseMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.courseLevelBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: capitalize;
+  backdrop-filter: blur(4px);
+}
+
+.completedPill {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(22,163,74,0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+}
+
+.courseTitle {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.courseAudience {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+}
+
+.progressRing {
+  position: absolute;
+  right: var(--space-8);
+  bottom: var(--space-5);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progressRingPct {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+/* Complete bar */
+.completeBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-success-subtle);
+  border-bottom: 1px solid var(--color-success);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.completeMsg {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+.completeBtn {
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-success);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.completeBtn:hover { opacity: 0.9; }
+
+/* Course body */
+.courseBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-8);
+}
+
+.outlineFallback {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.outlinePre {
+  padding: var(--space-5) var(--space-6);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  color: var(--color-text-primary);
+}
+
+/* ─── Chapter quiz screen ─────────────────────────────────── */
+.quizWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.quizHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 10px var(--space-6);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.quizBackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.quizBackBtn:hover { background: var(--color-surface-2); color: var(--color-accent); border-color: var(--color-accent); }
+
+.quizMeta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+
+.quizChapterTag {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b45309;
+}
+
+.quizChapterName {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quizPassedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+  border-radius: 99px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.quizBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-8) max(var(--space-8), calc(50% - 380px));
+}
+
+.quizIntro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border-subtle);
+}
+
+.quizTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.03em;
+}
+
+.quizSubtitle {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  color: var(--color-text-secondary);
+}
+
+.quizQuestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.quizQ {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  transition: border-color 0.15s;
+}
+.quizQCorrect { border-color: var(--color-success); background: rgba(22,163,74,0.03); }
+.quizQWrong   { border-color: var(--color-error);   background: rgba(220,38,38,0.03); }
+
+.quizQText {
+  font-family: var(--font-ui);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.quizQNum {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.quizQContent {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.quizOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.quizOpt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.quizOpt:hover:not(:has(input:disabled)) { background: var(--color-surface-2); border-color: var(--color-accent); }
+.quizOptSel   { background: var(--color-accent-subtle); border-color: var(--color-accent); }
+.quizOptRight { background: var(--color-success-subtle) !important; border-color: var(--color-success) !important; }
+.quizOptWrong { background: var(--color-error-subtle) !important; border-color: var(--color-error) !important; }
+
+.quizRadio { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.quizOptMark {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.12s;
+}
+.quizOptSel .quizOptMark   { border-color: var(--color-accent); background: var(--color-accent); box-shadow: inset 0 0 0 3px var(--color-surface); }
+.quizOptRight .quizOptMark { border-color: var(--color-success); background: var(--color-success); box-shadow: inset 0 0 0 3px var(--color-surface); }
+.quizOptWrong .quizOptMark { border-color: var(--color-error); background: var(--color-error); box-shadow: inset 0 0 0 3px var(--color-surface); }
+
+.quizOptText {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+  line-height: 1.45;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.quizOptRight .quizOptText { color: var(--color-success); font-weight: 500; }
+.quizOptWrong .quizOptText { color: var(--color-error); }
+.quizOptIcon { flex-shrink: 0; margin-top: 2px; }
+.quizOptRight .quizOptIcon { color: var(--color-success); }
+.quizOptWrong .quizOptIcon { color: var(--color-error); }
+
+.quizSubmit {
+  padding: 12px var(--space-6);
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #111111;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  align-self: flex-start;
+  box-shadow: var(--glow-md);
+}
+.quizSubmit:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--glow-lg); }
+.quizSubmit:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+
+.quizResults {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-8);
+}
+.quizResultsPass { background: var(--color-success-subtle); border: 1px solid var(--color-success); }
+.quizResultsFail { background: var(--color-error-subtle); border: 1px solid var(--color-error); }
+
+.quizScore { display: flex; align-items: baseline; flex-shrink: 0; }
+.quizScoreNum {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.quizResultsPass .quizScoreNum { color: var(--color-success); }
+.quizResultsFail .quizScoreNum { color: var(--color-error); }
+.quizScoreDen { font-family: var(--font-display); font-size: 1.2rem; font-weight: 600; color: var(--color-text-tertiary); }
+
+.quizResultsText { flex: 1; min-width: 0; }
+.quizResultsHeading { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--color-text-primary); letter-spacing: -0.01em; }
+.quizResultsSub { font-family: var(--font-ui); font-size: 12.5px; color: var(--color-text-secondary); margin-top: 2px; }
+
+.quizResultsActions { display: flex; gap: var(--space-3); flex-shrink: 0; flex-wrap: wrap; }
+
+.quizRetry {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.quizRetry:hover { background: var(--color-error); color: #fff; }
+
+.quizDone {
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-success);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.quizDone:hover { opacity: 0.88; }
