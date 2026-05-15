@@ -109,9 +109,8 @@
   border-left: 3px solid var(--color-accent);
   padding-left: var(--space-4);
   margin: 0;
-  /* clamp to 2 lines so it never pushes the grid off-screen */
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -194,9 +193,6 @@
   font-size: 12px;
   line-height: 1.55;
   color: var(--color-text-secondary);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .takeawayItem::before {
@@ -327,7 +323,7 @@
 }
 
 .slideIntroOne {
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
