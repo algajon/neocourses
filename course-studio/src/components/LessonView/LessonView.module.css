@@ -63,16 +63,15 @@
   font-weight: 600;
 }
 
-/* ─── Slide area — vertically centered, no scroll ────────── */
+/* ─── Slide area ─────────────────────────────────────────── */
 .slide {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* center content block vertically */
   gap: var(--space-4);
   padding: var(--space-5) var(--space-8);
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* ─── Top: breadcrumb + title + intro ────────────────────── */
