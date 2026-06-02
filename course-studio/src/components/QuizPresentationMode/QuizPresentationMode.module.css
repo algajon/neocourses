@@ -3,11 +3,11 @@
   position: fixed;
   inset: 0;
   z-index: 9000;
-  background: #0d0d0d;
+  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #f0f0f0;
+  color: var(--color-text-primary);
   font-family: var(--font-ui);
 }
 
@@ -17,9 +17,9 @@
   align-items: center;
   gap: var(--space-4);
   padding: 12px 28px;
-  background: rgba(0, 0, 0, 0.75);
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
   z-index: 2;
 }
@@ -44,12 +44,12 @@
   font-family: var(--font-ui);
   font-size: 14.5px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-text-primary);
   letter-spacing: -0.025em;
 }
 
 .logoAccent {
-  color: #e5ff00;
+  color: var(--color-accent);
 }
 
 /* Progress dots row */
@@ -65,17 +65,17 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--color-border);
   transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
   flex-shrink: 0;
 }
 
 .dotDone {
-  background: rgba(229, 255, 0, 0.45);
+  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
 }
 
 .dotActive {
-  background: #e5ff00;
+  background: var(--color-accent);
   transform: scale(1.4);
   box-shadow: 0 0 8px rgba(229, 255, 0, 0.65);
 }
@@ -91,7 +91,7 @@
 .qCounter {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-text-tertiary);
   letter-spacing: 0.04em;
 }
 
@@ -100,10 +100,10 @@
   align-items: center;
   gap: 5px;
   padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--color-text-tertiary);
   font-family: var(--font-mono);
   font-size: 10px;
   cursor: pointer;
@@ -111,17 +111,17 @@
 }
 
 .fsBtn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  color: rgba(255, 255, 255, 0.7);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .closeBtn {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.45);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,9 +131,9 @@
 }
 
 .closeBtn:hover {
-  background: rgba(220, 38, 38, 0.3);
-  border-color: rgba(220, 38, 38, 0.5);
-  color: #fff;
+  background: var(--color-error-subtle);
+  border-color: var(--color-error);
+  color: var(--color-error);
 }
 
 /* ─── Image panel ────────────────────────────────────────── */
@@ -142,7 +142,7 @@
   flex-shrink: 0;
   height: clamp(130px, 28vh, 250px);
   overflow: hidden;
-  background: #111;
+  background: var(--color-surface-2);
 }
 
 .image {
@@ -160,22 +160,22 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  background: linear-gradient(135deg, #141414 0%, #1c1c1c 100%);
-  color: rgba(255, 255, 255, 0.1);
+  background: var(--color-surface-2);
+  color: var(--color-border);
   font-family: var(--font-ui);
   font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-/* Bottom gradient so text above reads on image */
+/* Gradient scrim so question text reads on top of image */
 .imageScrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(13, 13, 13, 0.1) 0%,
-    rgba(13, 13, 13, 0.65) 100%
+    color-mix(in srgb, var(--color-bg) 10%, transparent) 0%,
+    color-mix(in srgb, var(--color-bg) 65%, transparent) 100%
   );
 }
 
@@ -185,16 +185,16 @@
   bottom: 12px;
   left: 20px;
   padding: 3px 10px;
-  background: rgba(0, 0, 0, 0.55);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(229, 255, 0, 0.25);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
   border-radius: 99px;
   font-family: var(--font-ui);
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(229, 255, 0, 0.75);
+  color: var(--color-accent);
 }
 
 /* ─── Question text ──────────────────────────────────────── */
@@ -209,7 +209,7 @@
   font-family: var(--font-display);
   font-size: clamp(1rem, 2.2vw, 1.55rem);
   font-weight: 700;
-  color: #f0f0f0;
+  color: var(--color-text-primary);
   line-height: 1.35;
   letter-spacing: -0.02em;
   max-width: 860px;
@@ -237,21 +237,21 @@
   align-items: flex-start;
   gap: 12px;
   padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: background 0.45s, border-color 0.45s, opacity 0.45s, box-shadow 0.45s;
   min-height: 58px;
 }
 
 .optionCorrect {
-  background: rgba(16, 185, 129, 0.16) !important;
-  border-color: #10b981 !important;
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.22), inset 0 0 0 1px rgba(16, 185, 129, 0.15);
+  background: var(--color-success-subtle) !important;
+  border-color: var(--color-success) !important;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--color-success) 22%, transparent);
 }
 
 .optionDim {
-  opacity: 0.25;
+  opacity: 0.3;
 }
 
 /* Letter badge (A B C D) */
@@ -260,42 +260,42 @@
   width: 26px;
   height: 26px;
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.09);
+  background: var(--color-surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--color-text-secondary);
   transition: all 0.45s;
   margin-top: 1px;
 }
 
 .optionBadgeCorrect {
-  background: #10b981;
+  background: var(--color-success);
   color: #fff;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-success) 50%, transparent);
 }
 
 .optionText {
   font-family: var(--font-ui);
   font-size: clamp(11.5px, 1.4vw, 14px);
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--color-text-primary);
   flex: 1;
   overflow-wrap: break-word;
   transition: color 0.45s;
 }
 
 .optionCorrect .optionText {
-  color: #fff;
+  color: var(--color-success);
   font-weight: 500;
 }
 
 .checkIcon {
   flex-shrink: 0;
-  color: #10b981;
+  color: var(--color-success);
   margin-top: 3px;
 }
 
@@ -305,8 +305,8 @@
   align-items: center;
   gap: 14px;
   padding: 9px 28px;
-  background: rgba(0, 0, 0, 0.55);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  border-top: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
 }
 
@@ -319,14 +319,14 @@
 }
 
 .timerIcon {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-text-tertiary);
   flex-shrink: 0;
 }
 
 .timerDigit {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--color-text-tertiary);
   width: 30px;
   flex-shrink: 0;
 }
@@ -334,7 +334,7 @@
 .timerTrack {
   flex: 1;
   height: 3px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-surface-3);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -350,16 +350,16 @@
 .holdLabel {
   font-family: var(--font-ui);
   font-size: 11.5px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-text-tertiary);
   flex-shrink: 0;
 }
 
 .skipBtn {
   padding: 6px 16px;
-  background: rgba(229, 255, 0, 0.1);
-  border: 1px solid rgba(229, 255, 0, 0.3);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
   border-radius: 6px;
-  color: #e5ff00;
+  color: var(--color-accent);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 600;
@@ -369,6 +369,6 @@
 }
 
 .skipBtn:hover {
-  background: rgba(229, 255, 0, 0.2);
-  border-color: rgba(229, 255, 0, 0.55);
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
 }

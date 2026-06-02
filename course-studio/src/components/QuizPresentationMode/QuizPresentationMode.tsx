@@ -43,6 +43,10 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
   const [imgFailed, setImgFailed] = useState(false);
   const [isFS, setIsFS]           = useState(false);
 
+  // Inherit the active app theme so CSS custom properties cascade correctly
+  // (critical when the element goes fullscreen and detaches from the root context)
+  const theme = document.documentElement.dataset.theme ?? 'white';
+
   const q = questions[idx];
 
   /* ── Fullscreen ──────────────────────────────────────────── */
@@ -114,7 +118,7 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
   const timerPct = revealed ? 0 : (timeLeft / TIMER_SECONDS) * 100;
 
   return (
-    <div ref={overlayRef} className={styles.overlay}>
+    <div ref={overlayRef} className={styles.overlay} data-theme={theme}>
 
       {/* ── Header ─────────────────────────────────────────── */}
       <div className={styles.header}>
