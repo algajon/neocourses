@@ -1,0 +1,374 @@
+/* ─── Overlay — covers the entire app window ────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #f0f0f0;
+  font-family: var(--font-ui);
+}
+
+/* ─── Header bar ─────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 12px 28px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+  z-index: 2;
+}
+
+/* neoCourses logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.logoDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e5ff00;
+  box-shadow: 0 0 10px rgba(229, 255, 0, 0.75), 0 0 24px rgba(229, 255, 0, 0.3);
+}
+
+.logoText {
+  font-family: var(--font-ui);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.025em;
+}
+
+.logoAccent {
+  color: #e5ff00;
+}
+
+/* Progress dots row */
+.progressDots {
+  display: flex;
+  gap: 7px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  flex-shrink: 0;
+}
+
+.dotDone {
+  background: rgba(229, 255, 0, 0.45);
+}
+
+.dotActive {
+  background: #e5ff00;
+  transform: scale(1.4);
+  box-shadow: 0 0 8px rgba(229, 255, 0, 0.65);
+}
+
+/* Header right cluster */
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.qCounter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.04em;
+}
+
+.fsBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fsBtn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.closeBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.closeBtn:hover {
+  background: rgba(220, 38, 38, 0.3);
+  border-color: rgba(220, 38, 38, 0.5);
+  color: #fff;
+}
+
+/* ─── Image panel ────────────────────────────────────────── */
+.imageWrap {
+  position: relative;
+  flex-shrink: 0;
+  height: clamp(130px, 28vh, 250px);
+  overflow: hidden;
+  background: #111;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.imageFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: linear-gradient(135deg, #141414 0%, #1c1c1c 100%);
+  color: rgba(255, 255, 255, 0.1);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Bottom gradient so text above reads on image */
+.imageScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 13, 13, 0.1) 0%,
+    rgba(13, 13, 13, 0.65) 100%
+  );
+}
+
+/* Chapter badge pinned bottom-left on image */
+.chapterBadge {
+  position: absolute;
+  bottom: 12px;
+  left: 20px;
+  padding: 3px 10px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(229, 255, 0, 0.25);
+  border-radius: 99px;
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(229, 255, 0, 0.75);
+}
+
+/* ─── Question text ──────────────────────────────────────── */
+.questionWrap {
+  padding: 16px 40px 6px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.questionText {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2.2vw, 1.55rem);
+  font-weight: 700;
+  color: #f0f0f0;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  max-width: 860px;
+  margin: 0;
+  text-align: center;
+}
+
+/* ─── 2 × 2 options grid ─────────────────────────────────── */
+.optionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 10px 40px 10px;
+  flex: 1;
+  min-height: 0;
+  align-content: start;
+  max-width: 940px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  transition: background 0.45s, border-color 0.45s, opacity 0.45s, box-shadow 0.45s;
+  min-height: 58px;
+}
+
+.optionCorrect {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.22), inset 0 0 0 1px rgba(16, 185, 129, 0.15);
+}
+
+.optionDim {
+  opacity: 0.25;
+}
+
+/* Letter badge (A B C D) */
+.optionBadge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.45s;
+  margin-top: 1px;
+}
+
+.optionBadgeCorrect {
+  background: #10b981;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.optionText {
+  font-family: var(--font-ui);
+  font-size: clamp(11.5px, 1.4vw, 14px);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+  flex: 1;
+  overflow-wrap: break-word;
+  transition: color 0.45s;
+}
+
+.optionCorrect .optionText {
+  color: #fff;
+  font-weight: 500;
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  color: #10b981;
+  margin-top: 3px;
+}
+
+/* ─── Footer ─────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 28px;
+  background: rgba(0, 0, 0, 0.55);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.timerGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.timerIcon {
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.timerDigit {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.45);
+  width: 30px;
+  flex-shrink: 0;
+}
+
+.timerTrack {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.timerFill {
+  height: 100%;
+  background: #e5ff00;
+  border-radius: 2px;
+  transition: width 1s linear;
+  box-shadow: 0 0 8px rgba(229, 255, 0, 0.55);
+}
+
+.holdLabel {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.skipBtn {
+  padding: 6px 16px;
+  background: rgba(229, 255, 0, 0.1);
+  border: 1px solid rgba(229, 255, 0, 0.3);
+  border-radius: 6px;
+  color: #e5ff00;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.skipBtn:hover {
+  background: rgba(229, 255, 0, 0.2);
+  border-color: rgba(229, 255, 0, 0.55);
+}

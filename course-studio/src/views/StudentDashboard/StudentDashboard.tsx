@@ -6,6 +6,7 @@ import { CourseRoadmap, RoadmapModule } from '../../components/CourseRoadmap/Cou
 import { LessonView } from '../../components/LessonView/LessonView';
 import { generateChapterQuiz, generateLessonContent, cleanForProse, LessonContent, QuizQuestion } from '../../lib/contentGenerator';
 import { generateLessonContentAI } from '../../lib/modelClient';
+import { QuizPresentationMode } from '../../components/QuizPresentationMode/QuizPresentationMode';
 import styles from './StudentDashboard.module.css';
 
 type Tab = 'catalog' | 'my-learning';
@@ -599,6 +600,7 @@ function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, al
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [justPassed, setJustPassed] = useState(false);
+  const [presentMode, setPresentMode] = useState(false);
 
   const allAnswered = questions.every(q => q.id in answers);
   const score = questions.filter(q => answers[q.id] === q.correctIndex).length;
@@ -622,6 +624,15 @@ function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, al
 
   return (
     <div className={styles.quizWrapper}>
+      {/* Presentation mode overlay */}
+      {presentMode && (
+        <QuizPresentationMode
+          questions={questions}
+          chapterName={chapterName}
+          onClose={() => setPresentMode(false)}
+        />
+      )}
+
       {/* Header */}
       <div className={styles.quizHeader}>
         <button className={styles.quizBackBtn} onClick={onBack}>
@@ -642,6 +653,13 @@ function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, al
             Passed
           </span>
         )}
+        <button className={styles.quizPresentBtn} onClick={() => setPresentMode(true)} title="Presentation mode (F11 for fullscreen)">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <rect x="1" y="2" width="11" height="7" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M4 11h5M6.5 9v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          Present
+        </button>
       </div>
 
       {/* Body */}

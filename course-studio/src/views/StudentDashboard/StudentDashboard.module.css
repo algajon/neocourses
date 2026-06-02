@@ -737,6 +737,26 @@
 }
 .quizBackBtn:hover { background: var(--color-surface-2); color: var(--color-accent); border-color: var(--color-accent); }
 
+.quizPresentBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #111111;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: var(--glow-sm);
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+  margin-left: auto;
+}
+.quizPresentBtn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--glow-md); }
+
 .quizMeta { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
 
 .quizChapterTag {
