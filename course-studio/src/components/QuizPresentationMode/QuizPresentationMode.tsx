@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { invoke } from '@tauri-apps/api/core';
 import { QuizQuestion } from '../../lib/contentGenerator';
 import styles from './QuizPresentationMode.module.css';
 
@@ -53,34 +54,42 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
 
   const q = questions[idx];
 
-  /* ── Fullscreen (DOM API — works in Tauri's WebView on all platforms) ── */
+  /* ── Fullscreen (Tauri native command — works on all platforms) ──────── */
   const enterFS = useCallback(async () => {
-    try { await document.documentElement.requestFullscreen(); } catch { /* WebView may restrict; ignore */ }
+    await invoke('set_fullscreen', { fullscreen: true });
+    setIsFS(true);
   }, []);
 
   const exitFS = useCallback(async () => {
-    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { /* ignore */ }
+    await invoke('set_fullscreen', { fullscreen: false });
+    setIsFS(false);
   }, []);
 
   const toggleFS = useCallback(() => {
-    document.fullscreenElement ? exitFS() : enterFS();
-  }, [enterFS, exitFS]);
+    isFS ? exitFS() : enterFS();
+  }, [isFS, enterFS, exitFS]);
 
-  // Sync isFS with the real DOM fullscreen state
+  // Auto-enter on mount; exit when the overlay unmounts
   useEffect(() => {
-    const onChange = () => setIsFS(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', onChange);
-    return () => document.removeEventListener('fullscreenchange', onChange);
+    enterFS();
+    return () => { invoke('set_fullscreen', { fullscreen: false }); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync if user exits fullscreen via OS (e.g. Escape or green button on Mac)
+  useEffect(() => {
+    let active = true;
+    const poll = setInterval(async () => {
+      const fs = await invoke<boolean>('is_fullscreen');
+      if (active) setIsFS(fs);
+    }, 800);
+    return () => { active = false; clearInterval(poll); };
   }, []);
 
-  // Auto-enter on mount
-  useEffect(() => { enterFS(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Platform-aware hotkeys: ⌃⌘F (Mac) or F11 (Win/Linux). Escape is handled by the browser.
+  // Platform-aware hotkeys: ⌃⌘F (Mac) or F11 (Win/Linux)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const macFS  = isMac  && e.metaKey && e.ctrlKey && (e.key === 'f' || e.key === 'F');
-      const winFS  = !isMac && e.key === 'F11';
+      const macFS = isMac  && e.metaKey && e.ctrlKey && (e.key === 'f' || e.key === 'F');
+      const winFS = !isMac && e.key === 'F11';
       if (macFS || winFS) { e.preventDefault(); toggleFS(); }
     };
     window.addEventListener('keydown', onKey);

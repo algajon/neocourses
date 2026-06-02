@@ -22,6 +22,8 @@ pub fn run() {
             commands::model::test_model_endpoint,
             commands::jobs::generate_outline_with_model,
             commands::jobs::cancel_job,
+            commands::window::set_fullscreen,
+            commands::window::is_fullscreen,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
