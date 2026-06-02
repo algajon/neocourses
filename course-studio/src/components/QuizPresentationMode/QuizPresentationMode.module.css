@@ -1,4 +1,4 @@
-/* ─── Overlay — covers the entire app window ────────────── */
+/* ─── Overlay ────────────────────────────────────────────── */
 .overlay {
   position: fixed;
   inset: 0;
@@ -11,88 +11,86 @@
   font-family: var(--font-ui);
 }
 
-/* ─── Header bar ─────────────────────────────────────────── */
+/* ─── Header: 3-column grid ──────────────────────────────── */
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px; /* close | logo | right-controls */
   align-items: center;
-  gap: var(--space-4);
-  padding: 12px 28px;
-  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
-  backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
-  z-index: 2;
+  /* right column is wider to fit counter + fsBtn */
+  grid-template-columns: minmax(40px, auto) 1fr minmax(120px, auto);
+  gap: var(--space-3);
 }
 
-/* neoCourses logo */
+/* ── Close button (left) ── */
+.closeBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.closeBtn:hover {
+  background: var(--color-error-subtle);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+/* ── Logo (center) ── */
 .logo {
   display: flex;
   align-items: center;
-  gap: 9px;
-  flex-shrink: 0;
+  justify-content: center;
+  gap: 10px;
 }
 
 .logoDot {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: #e5ff00;
-  box-shadow: 0 0 10px rgba(229, 255, 0, 0.75), 0 0 24px rgba(229, 255, 0, 0.3);
+  box-shadow: 0 0 10px rgba(229,255,0,0.8), 0 0 28px rgba(229,255,0,0.35);
+  flex-shrink: 0;
 }
 
 .logoText {
   font-family: var(--font-ui);
-  font-size: 14.5px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--color-text-primary);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
 }
 
 .logoAccent {
   color: var(--color-accent);
 }
 
-/* Progress dots row */
-.progressDots {
-  display: flex;
-  gap: 7px;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-border);
-  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
-  flex-shrink: 0;
-}
-
-.dotDone {
-  background: color-mix(in srgb, var(--color-accent) 55%, transparent);
-}
-
-.dotActive {
-  background: var(--color-accent);
-  transform: scale(1.4);
-  box-shadow: 0 0 8px rgba(229, 255, 0, 0.65);
-}
-
-/* Header right cluster */
+/* ── Right controls ── */
 .headerRight {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
-  flex-shrink: 0;
 }
 
 .qCounter {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-text-tertiary);
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .fsBtn {
@@ -108,39 +106,18 @@
   font-size: 10px;
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 }
-
 .fsBtn:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
-}
-
-.closeBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-
-.closeBtn:hover {
-  background: var(--color-error-subtle);
-  border-color: var(--color-error);
-  color: var(--color-error);
 }
 
 /* ─── Image panel ────────────────────────────────────────── */
 .imageWrap {
   position: relative;
   flex-shrink: 0;
-  height: clamp(130px, 28vh, 250px);
+  height: clamp(200px, 38vh, 360px);
   overflow: hidden;
   background: var(--color-surface-2);
 }
@@ -149,6 +126,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 30%; /* bias toward upper portion for natural framing */
   display: block;
 }
 
@@ -156,38 +134,30 @@
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-3);
   background: var(--color-surface-2);
   color: var(--color-border);
-  font-family: var(--font-ui);
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
-/* Gradient scrim so question text reads on top of image */
 .imageScrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--color-bg) 10%, transparent) 0%,
-    color-mix(in srgb, var(--color-bg) 65%, transparent) 100%
+    color-mix(in srgb, var(--color-bg) 5%, transparent)  0%,
+    color-mix(in srgb, var(--color-bg) 55%, transparent) 100%
   );
 }
 
-/* Chapter badge pinned bottom-left on image */
 .chapterBadge {
   position: absolute;
-  bottom: 12px;
-  left: 20px;
-  padding: 3px 10px;
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  backdrop-filter: blur(6px);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+  bottom: 14px;
+  left: 22px;
+  padding: 4px 12px;
+  background: color-mix(in srgb, var(--color-surface) 75%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
   border-radius: 99px;
   font-family: var(--font-ui);
   font-size: 10.5px;
@@ -195,11 +165,88 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-accent);
+  max-width: calc(100% - 44px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* ─── Question text ──────────────────────────────────────── */
+/* ─── Fuse timer ─────────────────────────────────────────── */
+.fuseWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 22px;
+  height: 22px;     /* enough room for the glow tip to breathe */
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.fuseTrack {
+  flex: 1;
+  height: 7px;
+  background: var(--color-surface-3);
+  border-radius: 4px;
+  overflow: visible;
+  position: relative;
+}
+
+.fuseBar {
+  height: 100%;
+  background: linear-gradient(90deg, #15803d 0%, #22c55e 60%, #4ade80 100%);
+  border-radius: 4px;
+  position: relative;
+  transition: width 1s linear;
+  min-width: 0;
+}
+
+/* Glowing orb at the burning tip */
+.fuseTip {
+  position: absolute;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: fuseFlicker 0.35s ease-in-out infinite alternate;
+  z-index: 2;
+}
+
+@keyframes fuseFlicker {
+  0% {
+    box-shadow:
+      0 0 0 3px rgba(74,222,128,0.20),
+      0 0 10px 4px rgba(74,222,128,0.65),
+      0 0 22px 8px rgba(74,222,128,0.35);
+  }
+  100% {
+    box-shadow:
+      0 0 0 4px rgba(74,222,128,0.30),
+      0 0 14px 6px rgba(74,222,128,0.90),
+      0 0 30px 12px rgba(74,222,128,0.50);
+  }
+}
+
+/* When answer is revealed — snap bar to zero */
+.fuseBarDone {
+  transition: width 0.25s ease-out;
+}
+
+.fuseCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  width: 30px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ─── Question ───────────────────────────────────────────── */
 .questionWrap {
-  padding: 16px 40px 6px;
+  padding: 14px 40px 4px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -207,25 +254,23 @@
 
 .questionText {
   font-family: var(--font-display);
-  font-size: clamp(1rem, 2.2vw, 1.55rem);
+  font-size: clamp(1.05rem, 2.1vw, 1.5rem);
   font-weight: 700;
   color: var(--color-text-primary);
   line-height: 1.35;
   letter-spacing: -0.02em;
-  max-width: 860px;
+  max-width: 820px;
   margin: 0;
   text-align: center;
 }
 
-/* ─── 2 × 2 options grid ─────────────────────────────────── */
+/* ─── Options 2 × 2 ──────────────────────────────────────── */
 .optionsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding: 10px 40px 10px;
-  flex: 1;
-  min-height: 0;
-  align-content: start;
+  padding: 10px 40px 14px;
+  flex-shrink: 0;         /* size to content, no stretching */
   max-width: 940px;
   width: 100%;
   margin: 0 auto;
@@ -236,12 +281,11 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 14px 18px;
+  padding: 13px 16px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: background 0.45s, border-color 0.45s, opacity 0.45s, box-shadow 0.45s;
-  min-height: 58px;
 }
 
 .optionCorrect {
@@ -250,11 +294,8 @@
   box-shadow: 0 0 24px color-mix(in srgb, var(--color-success) 22%, transparent);
 }
 
-.optionDim {
-  opacity: 0.3;
-}
+.optionDim { opacity: 0.28; }
 
-/* Letter badge (A B C D) */
 .optionBadge {
   flex-shrink: 0;
   width: 26px;
@@ -278,13 +319,15 @@
   box-shadow: 0 0 10px color-mix(in srgb, var(--color-success) 50%, transparent);
 }
 
+/* No clamping, no ellipsis — let the text wrap freely */
 .optionText {
   font-family: var(--font-ui);
-  font-size: clamp(11.5px, 1.4vw, 14px);
+  font-size: 13.5px;
   line-height: 1.5;
   color: var(--color-text-primary);
   flex: 1;
   overflow-wrap: break-word;
+  word-break: break-word;
   transition: color 0.45s;
 }
 
@@ -303,59 +346,31 @@
 .footer {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 9px 28px;
+  gap: 12px;
+  padding: 8px 22px;
   background: color-mix(in srgb, var(--color-surface) 80%, transparent);
   border-top: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
 }
 
-.timerGroup {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
-
-.timerIcon {
-  color: var(--color-text-tertiary);
-  flex-shrink: 0;
-}
-
-.timerDigit {
+.fsHint {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 10px;
   color: var(--color-text-tertiary);
-  width: 30px;
   flex-shrink: 0;
-}
-
-.timerTrack {
-  flex: 1;
-  height: 3px;
-  background: var(--color-surface-3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.timerFill {
-  height: 100%;
-  background: #e5ff00;
-  border-radius: 2px;
-  transition: width 1s linear;
-  box-shadow: 0 0 8px rgba(229, 255, 0, 0.55);
 }
 
 .holdLabel {
   font-family: var(--font-ui);
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--color-text-tertiary);
-  flex-shrink: 0;
+  flex: 1;
+  text-align: center;
 }
 
 .skipBtn {
-  padding: 6px 16px;
+  margin-left: auto;
+  padding: 6px 18px;
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
   border-radius: 6px;
@@ -367,7 +382,6 @@
   transition: all 0.15s;
   flex-shrink: 0;
 }
-
 .skipBtn:hover {
   background: color-mix(in srgb, var(--color-accent) 22%, transparent);
   border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
