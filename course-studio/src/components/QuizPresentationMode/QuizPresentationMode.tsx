@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { QuizQuestion } from '../../lib/contentGenerator';
 import styles from './QuizPresentationMode.module.css';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 
 const TIMER_SECONDS = 10;
 const REVEAL_HOLD   = 3;   // seconds to hold the revealed answer before advancing
@@ -50,32 +51,38 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
   const q = questions[idx];
 
   /* ── Fullscreen ──────────────────────────────────────────── */
-  const enterFS = useCallback(() => overlayRef.current?.requestFullscreen?.(), []);
-  const exitFS  = useCallback(() => { if (document.fullscreenElement) document.exitFullscreen(); }, []);
+  const enterFS = useCallback(async () => {
+    await getCurrentWindow().setFullscreen(true);
+    setIsFS(true);
+  }, []);
+
+  const exitFS = useCallback(async () => {
+    await getCurrentWindow().setFullscreen(false);
+    setIsFS(false);
+  }, []);
+
   const toggleFS = useCallback(() => {
-    document.fullscreenElement ? exitFS() : enterFS();
-  }, [enterFS, exitFS]);
+    isFS ? exitFS() : enterFS();
+  }, [isFS, enterFS, exitFS]);
 
   useEffect(() => {
-    const onChange = () => setIsFS(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', onChange);
     enterFS();
-    return () => document.removeEventListener('fullscreenchange', onChange);
-  }, [enterFS]);
+  }, []);  // auto-enter on mount; deps intentionally empty
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'F11') { e.preventDefault(); toggleFS(); }
+      if (e.key === 'Escape' && isFS) { exitFS(); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggleFS]);
+  }, [toggleFS, isFS, exitFS]);
 
   /* ── Image ───────────────────────────────────────────────── */
   useEffect(() => {
     setImgFailed(false);
     const kw = extractKeywords(q.question, chapterName);
-    setImgSrc(`https://source.unsplash.com/featured/1400x560/?${kw}&sig=${idx}`);
+    setImgSrc(`https://loremflickr.com/1400/560/${kw}?lock=${idx}`);
   }, [idx, q.question, chapterName]);
 
   /* ── Countdown ───────────────────────────────────────────── */
@@ -94,7 +101,7 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
       else setHoldLeft(n => n - 1);
     }, 1000);
     return () => clearTimeout(t);
-  });
+  }, [revealed, holdLeft]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function advance() {
     if (idx < questions.length - 1) {

@@ -183,7 +183,7 @@
 
 .themeBtnActive {
   background: var(--sidebar-item-active-bg);
-  border-color: rgba(229,255,0,0.35);
+  border-color: color-mix(in srgb, var(--sidebar-accent) 45%, transparent);
 }
 
 .themeBtn:focus-visible {

@@ -69,6 +69,7 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
   const [activeCourse, setActiveCourse] = useState<SavedCourse | null>(null);
   const [activeLessonTitle, setActiveLessonTitle] = useState<string | null>(null);
   const [activeQuiz, setActiveQuiz] = useState<{ moduleIndex: number; moduleName: string; lessons: string[] } | null>(null);
+  const [presentationQuiz, setPresentationQuiz] = useState<{ moduleName: string; lessons: string[] } | null>(null);
   const [passedQuizzes, setPassedQuizzes] = useState<Set<string>>(new Set());
   const [lessonContents, setLessonContents] = useState<Map<string, LessonContent>>(new Map());
   const fetchingRef = useRef<Set<string>>(new Set());
@@ -156,27 +157,39 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
 
   const animClass = animDir === 'right' ? styles.slideInRight : styles.slideInLeft;
 
+  /* ───── Presentation mode overlay (accessible from roadmap) ─ */
+  const presentationOverlay = presentationQuiz && activeCourse ? (
+    <QuizPresentationMode
+      questions={generateChapterQuiz(presentationQuiz.moduleName, presentationQuiz.lessons, activeCourse.topic, lessonContents)}
+      chapterName={presentationQuiz.moduleName}
+      onClose={() => setPresentationQuiz(null)}
+    />
+  ) : null;
+
   /* ───── Chapter quiz ────────────────────────────────── */
   if (screen === 'quiz' && activeCourse && activeQuiz) {
     const questions = generateChapterQuiz(activeQuiz.moduleName, activeQuiz.lessons, activeQuiz.moduleName, lessonContents);
     const quizModules = parseModules(activeCourse.outline);
     const nextChapterFirst = quizModules[activeQuiz.moduleIndex + 1]?.lessons[0] ?? null;
     return (
-      <div key="quiz" className={`${styles.screen} ${animClass}`}>
-        <ChapterQuizScreen
-          chapterName={activeQuiz.moduleName}
-          chapterNum={activeQuiz.moduleIndex + 1}
-          courseTopic={activeCourse.topic}
-          questions={questions}
-          alreadyPassed={passedQuizzes.has(activeQuiz.moduleName)}
-          onPass={() => setPassedQuizzes(prev => new Set(prev).add(activeQuiz!.moduleName))}
-          onBack={() => navigate('course')}
-          onContinue={nextChapterFirst ? () => {
-            setActiveLessonTitle(nextChapterFirst);
-            navigate('lesson');
-          } : undefined}
-        />
-      </div>
+      <>
+        {presentationOverlay}
+        <div key="quiz" className={`${styles.screen} ${animClass}`}>
+          <ChapterQuizScreen
+            chapterName={activeQuiz.moduleName}
+            chapterNum={activeQuiz.moduleIndex + 1}
+            courseTopic={activeCourse.topic}
+            questions={questions}
+            alreadyPassed={passedQuizzes.has(activeQuiz.moduleName)}
+            onPass={() => setPassedQuizzes(prev => new Set(prev).add(activeQuiz!.moduleName))}
+            onBack={() => navigate('course')}
+            onContinue={nextChapterFirst ? () => {
+              setActiveLessonTitle(nextChapterFirst);
+              navigate('lesson');
+            } : undefined}
+          />
+        </div>
+      </>
     );
   }
 
@@ -262,6 +275,8 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
     const pct = lessons.length > 0 ? Math.round((done.length / lessons.length) * 100) : 0;
 
     return (
+      <>
+        {presentationOverlay}
       <div key="course" className={`${styles.screen} ${animClass}`}>
         {/* Course header */}
         <div className={styles.courseHeader}>
@@ -333,6 +348,9 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
                 setActiveQuiz({ moduleIndex: mi, moduleName: modules[mi].module, lessons: modules[mi].lessons });
                 navigate('quiz');
               }}
+              onOpenPresentation={mi => {
+                setPresentationQuiz({ moduleName: modules[mi].module, lessons: modules[mi].lessons });
+              }}
               passedQuizModules={passedQuizzes}
             />
           ) : (
@@ -342,6 +360,7 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
           )}
         </div>
       </div>
+      </>
     );
   }
 
@@ -642,8 +661,11 @@ function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, al
           Back to course
         </button>
         <div className={styles.quizMeta}>
-          <span className={styles.quizChapterTag}>Chapter {chapterNum} quiz</span>
-          <span className={styles.quizChapterName}>{chapterName}</span>
+          <div className={styles.quizChapterNum}>{chapterNum}</div>
+          <div className={styles.quizMetaText}>
+            <span className={styles.quizChapterTag}>Chapter Quiz</span>
+            <span className={styles.quizChapterName}>{chapterName}</span>
+          </div>
         </div>
         {nowPassed && (
           <span className={styles.quizPassedBadge}>

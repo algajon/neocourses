@@ -68,17 +68,17 @@
   --orb-1: none;
   --orb-2: none;
 
-  /* Sidebar — always dark regardless of theme */
-  --sidebar-bg:              #111111;
-  --sidebar-border:          rgba(255,255,255,0.06);
-  --sidebar-text:            #e8e8e8;
-  --sidebar-text-secondary:  #666666;
-  --sidebar-item-hover:      rgba(255,255,255,0.06);
-  --sidebar-item-active-bg:  rgba(229,255,0,0.12);
-  --sidebar-item-active-text:#e5ff00;
-  --sidebar-accent:          #e5ff00;
-  --sidebar-badge-bg:        rgba(229,255,0,0.16);
-  --sidebar-badge-text:      #e5ff00;
+  /* Sidebar — light-aware in light theme */
+  --sidebar-bg:              #f8f8f8;
+  --sidebar-border:          rgba(0,0,0,0.07);
+  --sidebar-text:            #111111;
+  --sidebar-text-secondary:  #888888;
+  --sidebar-item-hover:      rgba(0,0,0,0.04);
+  --sidebar-item-active-bg:  rgba(109,118,0,0.09);
+  --sidebar-item-active-text:#4a5200;
+  --sidebar-accent:          #6d7600;
+  --sidebar-badge-bg:        rgba(109,118,0,0.12);
+  --sidebar-badge-text:      #4a5200;
   --sidebar-gradient:        none;
 }
 

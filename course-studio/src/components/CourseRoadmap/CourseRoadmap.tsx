@@ -12,10 +12,11 @@ type Props = {
   onToggleLesson: (lesson: string) => void;
   onOpenLesson?: (lesson: string) => void;
   onOpenQuiz?: (moduleIndex: number) => void;
+  onOpenPresentation?: (moduleIndex: number) => void;
   passedQuizModules?: Set<string>;
 };
 
-export function CourseRoadmap({ modules, completedLessons, onToggleLesson, onOpenLesson, onOpenQuiz, passedQuizModules }: Props) {
+export function CourseRoadmap({ modules, completedLessons, onToggleLesson, onOpenLesson, onOpenQuiz, onOpenPresentation, passedQuizModules }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   const allLessons = modules.flatMap(m => m.lessons);
@@ -78,6 +79,19 @@ export function CourseRoadmap({ modules, completedLessons, onToggleLesson, onOpe
 
                 <div className={styles.chapterRight}>
                   <span className={styles.chapterPct}>{modPct}%</span>
+                  {onOpenPresentation && (
+                    <button
+                      className={styles.presentBtn}
+                      onClick={e => { e.stopPropagation(); onOpenPresentation(mi); }}
+                      title="Presentation mode"
+                    >
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                        <rect x="0.75" y="1.75" width="9.5" height="6.5" rx="1.25" stroke="currentColor" strokeWidth="1.4"/>
+                        <path d="M3.5 10h4M5.5 8.25V10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                      </svg>
+                      Present
+                    </button>
+                  )}
                   {isComplete && onOpenQuiz && (
                     <button
                       className={`${styles.quizBtn} ${passedQuizModules?.has(mod.module) ? styles.quizBtnPassed : ''}`}
