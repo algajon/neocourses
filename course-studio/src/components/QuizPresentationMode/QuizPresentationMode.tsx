@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { QuizQuestion } from '../../lib/contentGenerator';
 import styles from './QuizPresentationMode.module.css';
-import { getCurrentWindow } from '@tauri-apps/api/window';
 
 const TIMER_SECONDS = 10;
 const REVEAL_HOLD   = 3;   // seconds to hold the revealed answer before advancing
@@ -48,35 +47,45 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
   // (critical when the element goes fullscreen and detaches from the root context)
   const theme = document.documentElement.dataset.theme ?? 'white';
 
+  // Platform detection for hotkey label
+  const isMac = navigator.platform.toUpperCase().includes('MAC');
+  const fsKey = isMac ? '⌃⌘F' : 'F11';
+
   const q = questions[idx];
 
-  /* ── Fullscreen ──────────────────────────────────────────── */
+  /* ── Fullscreen (DOM API — works in Tauri's WebView on all platforms) ── */
   const enterFS = useCallback(async () => {
-    await getCurrentWindow().setFullscreen(true);
-    setIsFS(true);
+    try { await document.documentElement.requestFullscreen(); } catch { /* WebView may restrict; ignore */ }
   }, []);
 
   const exitFS = useCallback(async () => {
-    await getCurrentWindow().setFullscreen(false);
-    setIsFS(false);
+    try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { /* ignore */ }
   }, []);
 
   const toggleFS = useCallback(() => {
-    isFS ? exitFS() : enterFS();
-  }, [isFS, enterFS, exitFS]);
+    document.fullscreenElement ? exitFS() : enterFS();
+  }, [enterFS, exitFS]);
 
+  // Sync isFS with the real DOM fullscreen state
   useEffect(() => {
-    enterFS();
-  }, []);  // auto-enter on mount; deps intentionally empty
+    const onChange = () => setIsFS(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
 
+  // Auto-enter on mount
+  useEffect(() => { enterFS(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Platform-aware hotkeys: ⌃⌘F (Mac) or F11 (Win/Linux). Escape is handled by the browser.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'F11') { e.preventDefault(); toggleFS(); }
-      if (e.key === 'Escape' && isFS) { exitFS(); }
+      const macFS  = isMac  && e.metaKey && e.ctrlKey && (e.key === 'f' || e.key === 'F');
+      const winFS  = !isMac && e.key === 'F11';
+      if (macFS || winFS) { e.preventDefault(); toggleFS(); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggleFS, isFS, exitFS]);
+  }, [isMac, toggleFS]);
 
   /* ── Image ───────────────────────────────────────────────── */
   useEffect(() => {
@@ -122,7 +131,7 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
 
   function handleClose() { exitFS(); onClose(); }
 
-  const timerPct = revealed ? 0 : (timeLeft / TIMER_SECONDS) * 100;
+  const timerPct  = revealed ? 0 : (timeLeft / TIMER_SECONDS) * 100;
 
   return (
     <div ref={overlayRef} className={styles.overlay} data-theme={theme}>
@@ -147,7 +156,7 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
 
         <div className={styles.headerRight}>
           <span className={styles.qCounter}>{idx + 1} / {questions.length}</span>
-          <button className={styles.fsBtn} onClick={toggleFS} title={isFS ? 'Exit fullscreen (F11)' : 'Fullscreen (F11)'}>
+          <button className={styles.fsBtn} onClick={toggleFS} title={isFS ? `Exit fullscreen (${fsKey})` : `Fullscreen (${fsKey})`}>
             {isFS ? (
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                 <path d="M8 1h4v4M5 1H1v4M8 12h4V8M5 12H1V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
@@ -157,7 +166,7 @@ export function QuizPresentationMode({ questions, chapterName, onClose }: Props)
                 <path d="M1 5V1h4M8 1h4v4M12 8v4H8M5 12H1V8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             )}
-            <span>F11</span>
+            <span>{fsKey}</span>
           </button>
           <button className={styles.closeBtn} onClick={handleClose} title="Exit presentation">
             <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
