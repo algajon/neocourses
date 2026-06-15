@@ -32,6 +32,83 @@
   margin: 0;
 }
 
+/* Filter bar */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.search {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.search::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.search:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--glow-sm);
+}
+
+.filters {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.select {
+  padding: 10px 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.select:focus {
+  border-color: var(--color-accent);
+}
+
+.resultCount {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--space-4) 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -132,6 +209,46 @@
   color: var(--color-text-tertiary);
 }
 
+.enrolledTag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-success);
+  margin-left: auto;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-1);
+}
+
+.progressBar {
+  flex: 1;
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.progressLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  min-width: 32px;
+  text-align: right;
+}
+
 .cardFooter {
   padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--color-border-subtle);
@@ -207,4 +324,22 @@
   font-size: 14px;
   color: var(--color-text-tertiary);
   margin: 0;
+}
+
+.clearBtn {
+  margin-top: var(--space-6);
+  padding: 8px 20px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clearBtn:hover {
+  background: var(--color-surface-3);
 }

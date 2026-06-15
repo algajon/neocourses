@@ -37,14 +37,71 @@
   padding-top: 28px;
 }
 
-.pasteCard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+.segmented {
+  display: inline-flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  align-self: flex-start;
 }
 
-.pasteTitle {
+.segment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.segment:hover {
+  color: var(--color-text-primary);
+}
+
+.segmentActive {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.sourceCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sourceCardTitle {
   margin-bottom: var(--space-1);
+}
+
+.sourceCardHint {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.urlRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+.urlRow .input {
+  flex: 1;
+}
+
+.sourceError {
+  font-size: 13px;
+  color: var(--color-error);
 }
 
 .pasteActions {

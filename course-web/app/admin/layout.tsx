@@ -23,10 +23,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className={styles.shell}>
+      <a href="#main" className="skip-link">Skip to main content</a>
       <aside className={styles.sidebar}>
         <AdminSidebar user={session.user} />
       </aside>
-      <main className={styles.main}>{children}</main>
+      <main id="main" role="main" className={styles.main}>{children}</main>
       <OnboardingTour role={session.user.role} />
     </div>
   )

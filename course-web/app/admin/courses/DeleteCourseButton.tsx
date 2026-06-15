@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/Toast/ToastProvider'
+import { useConfirm } from '@/components/ConfirmDialog'
 
 interface DeleteCourseButtonProps {
   courseId: string
@@ -11,16 +13,21 @@ interface DeleteCourseButtonProps {
 
 export function DeleteCourseButton({ courseId, className, redirectTo }: DeleteCourseButtonProps) {
   const [deleting, setDeleting] = useState(false)
-  const [error, setError] = useState('')
   const router = useRouter()
+  const { toast } = useToast()
+  const confirm = useConfirm()
 
   async function handleDelete() {
-    if (!window.confirm('Delete this course? This action cannot be undone.')) {
-      return
-    }
+    const ok = await confirm({
+      title: 'Delete this course?',
+      message: 'This action cannot be undone. All modules, lessons, and source materials will be removed.',
+      confirmLabel: 'Delete course',
+      cancelLabel: 'Cancel',
+      danger: true,
+    })
+    if (!ok) return
 
     setDeleting(true)
-    setError('')
 
     try {
       const response = await fetch(`/api/courses/${courseId}`, {
@@ -32,29 +39,32 @@ export function DeleteCourseButton({ courseId, className, redirectTo }: DeleteCo
         throw new Error(result?.error ?? 'Delete failed')
       }
 
+      toast({ type: 'success', title: 'Course deleted' })
+
       if (redirectTo) {
         router.push(redirectTo)
       } else {
         router.refresh()
       }
-    } catch (err) {
-      setError('Could not delete course. Please try again.')
+    } catch {
+      toast({
+        type: 'error',
+        title: 'Could not delete course',
+        description: 'Please try again.',
+      })
     } finally {
       setDeleting(false)
     }
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-      <button
-        type="button"
-        className={className}
-        disabled={deleting}
-        onClick={handleDelete}
-      >
-        {deleting ? 'Deleting…' : 'Delete'}
-      </button>
-      {error ? <div style={{ color: 'var(--color-danger, #d31f1f)', fontSize: '13px' }}>{error}</div> : null}
-    </div>
+    <button
+      type="button"
+      className={className}
+      disabled={deleting}
+      onClick={handleDelete}
+    >
+      {deleting ? 'Deleting…' : 'Delete'}
+    </button>
   )
 }

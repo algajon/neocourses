@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback, FormEvent } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { Icon } from '@/components/Icon'
 import styles from './page.module.css'
 
 interface Message {
@@ -10,11 +11,14 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   createdAt: string
+  references?: string[]
 }
 
 interface CourseInfo {
   title: string
   lessonTitles: string[]
+  grounded?: boolean
+  sourceFiles?: string[]
 }
 
 export default function TutorPage() {
@@ -83,6 +87,7 @@ export default function TutorPage() {
         role: 'assistant',
         content: data.content ?? 'Sorry, I could not generate a response.',
         createdAt: new Date().toISOString(),
+        references: Array.isArray(data.references) ? data.references : [],
       }
       setMessages(prev => [
         ...prev.filter(m => m.id !== userMsg.id),
@@ -124,6 +129,13 @@ export default function TutorPage() {
         </div>
         <div className={styles.topBadge}>Powered by AI</div>
       </div>
+
+      {courseInfo?.grounded !== false && (
+        <div className={styles.groundedHint}>
+          <Icon name="book" size={13} />
+          <span>Grounded in this course&rsquo;s material{courseInfo?.sourceFiles?.length ? ` — including ${courseInfo.sourceFiles.length} source file${courseInfo.sourceFiles.length > 1 ? 's' : ''}` : ''}. Answers cite the lessons they draw from.</span>
+        </div>
+      )}
 
       <div className={styles.messages}>
         {loadingHistory && (
@@ -182,6 +194,16 @@ export default function TutorPage() {
                   </span>
                 ))}
               </div>
+              {msg.role === 'assistant' && msg.references && msg.references.length > 0 && (
+                <div className={styles.references}>
+                  {msg.references.map((ref, i) => (
+                    <span key={i} className={styles.refChip}>
+                      <Icon name="book" size={11} />
+                      {ref}
+                    </span>
+                  ))}
+                </div>
+              )}
               <span className={styles.timestamp}>
                 {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
+import { useToast } from '@/components/Toast/ToastProvider'
 import styles from './page.module.css'
 
 interface Lesson {
@@ -40,6 +41,7 @@ export default function OutlinePage() {
   const [savingId, setSavingId] = useState<string | null>(null)
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
+  const { toast } = useToast()
   const [addingModule, setAddingModule] = useState(false)
   const [newModuleTitle, setNewModuleTitle] = useState('')
 
@@ -133,7 +135,13 @@ export default function OutlinePage() {
       const res = await fetch(`/api/courses/${courseId}/publish`, { method: 'POST' })
       if (res.ok) {
         setCourse(prev => prev ? { ...prev, status: 'published' } : prev)
+        toast({ type: 'success', title: 'Course published', description: 'Learners can now enroll from the catalog.' })
+      } else {
+        const data = await res.json().catch(() => null)
+        toast({ type: 'error', title: 'Could not publish course', description: data?.error ?? 'Please try again.' })
       }
+    } catch {
+      toast({ type: 'error', title: 'Could not publish course', description: 'Please try again.' })
     } finally {
       setPublishing(false)
     }

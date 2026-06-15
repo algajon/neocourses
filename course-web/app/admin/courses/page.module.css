@@ -29,38 +29,68 @@
 .filterBar {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-6);
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
   flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.tabs :global(.pill) {
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: filter 0.15s;
+}
+
+.tabs :global(.pill):hover {
+  filter: brightness(0.97);
+}
+
+.searchWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 220px;
+  max-width: 320px;
+  flex: 1;
+  padding: 0 var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-tertiary);
+  transition: border-color 0.15s;
+}
+
+.searchWrap:focus-within {
+  border-color: var(--color-accent);
 }
 
 .searchInput {
   flex: 1;
-  min-width: 200px;
-  max-width: 360px;
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  min-width: 0;
+  padding: var(--space-2) 0;
+  background: transparent;
+  border: none;
   font-size: 13.5px;
   color: var(--color-text-primary);
   outline: none;
-  transition: border-color 0.15s;
 }
 
-.searchInput:focus {
-  border-color: var(--color-accent);
+.searchInput::placeholder {
+  color: var(--color-text-tertiary);
 }
 
-.statusFilter {
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+.resultMeta {
   font-size: 13px;
-  color: var(--color-text-secondary);
-  outline: none;
-  cursor: pointer;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-5);
 }
 
 .grid {
@@ -114,12 +144,17 @@
   gap: var(--space-1);
 }
 
+.updatedAt {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
 .cardActions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   margin-top: auto;
-  padding-top: var(--space-2);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--color-border-subtle);
 }
 
@@ -145,6 +180,10 @@
 
 .emptyState {
   grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
   padding: var(--space-12);
   text-align: center;
   color: var(--color-text-tertiary);
@@ -153,6 +192,19 @@
   border-radius: var(--radius-lg);
 }
 
+.emptyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  color: var(--color-text-tertiary);
+}
+
 .emptyState p {
-  margin-bottom: var(--space-4);
+  font-size: 14px;
+  max-width: 380px;
+  margin: 0;
 }

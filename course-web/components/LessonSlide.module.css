@@ -5,7 +5,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-3);
 }
 
 /* ─── Top: breadcrumb + title + intro ────────────────────── */
@@ -26,36 +26,36 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+  font-size: 3.05rem;
   font-weight: 800;
   color: var(--color-text-primary);
   letter-spacing: -0.035em;
-  line-height: 1.15;
+  line-height: 1.1;
   margin: 0;
 }
 
 .titleMd {
-  font-size: clamp(1.6rem, 2.9vw, 2.4rem);
+  font-size: 2.5rem;
 }
 
 .intro {
   font-family: var(--font-ui);
-  font-size: clamp(15px, 1.4vw, 18px);
-  line-height: 1.7;
+  font-size: 25px;
+  line-height: 1.55;
   color: var(--color-text-secondary);
   margin: 0;
-  max-width: 80ch;
+  max-width: 68ch;
 }
 
 /* ─── Concept cards ──────────────────────────────────────── */
 .conceptCard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--space-4) var(--space-5);
   box-shadow: var(--shadow-sm);
   transition: box-shadow 0.15s, transform 0.15s;
 }
@@ -66,7 +66,7 @@
 }
 
 .conceptCardSm {
-  padding: var(--space-5);
+  padding: var(--space-3) var(--space-4);
 }
 
 .conceptCardFull {
@@ -78,7 +78,7 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-display);
-  font-size: clamp(15px, 1.4vw, 17px);
+  font-size: 22px;
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
@@ -98,8 +98,8 @@
 
 .conceptBody {
   font-family: var(--font-ui);
-  font-size: clamp(13.5px, 1.2vw, 15.5px);
-  line-height: 1.65;
+  font-size: 19.5px;
+  line-height: 1.45;
   color: var(--color-text-secondary);
   margin: 0;
 }
@@ -112,7 +112,7 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: start;
 }
 
@@ -132,10 +132,10 @@
 
 .takeawayItem {
   position: relative;
-  padding-left: 18px;
+  padding-left: 20px;
   font-family: var(--font-ui);
-  font-size: clamp(13.5px, 1.2vw, 15px);
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.5;
   color: var(--color-text-secondary);
 }
 
@@ -163,18 +163,18 @@
 .calloutRow {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .callout {
   --callout: #0ea5e9;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 5px;
   background: color-mix(in srgb, var(--callout) 7%, var(--color-surface));
   border: 1px solid color-mix(in srgb, var(--callout) 22%, transparent);
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  padding: var(--space-3) var(--space-4);
 }
 
 .calloutTrivia { --callout: #a855f7; }
@@ -185,7 +185,7 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-ui);
-  font-size: 11.5px;
+  font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -205,8 +205,8 @@
 
 .calloutText {
   font-family: var(--font-ui);
-  font-size: clamp(13px, 1.2vw, 15px);
-  line-height: 1.65;
+  font-size: 18px;
+  line-height: 1.45;
   color: var(--color-text-secondary);
   margin: 0;
 }
@@ -215,7 +215,7 @@
 .v1Layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-6);
+  gap: var(--space-5);
   align-items: start;
 }
 
@@ -228,7 +228,7 @@
 .v1Right {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .v1Takeaways {
@@ -238,9 +238,40 @@
   gap: var(--space-3);
 }
 
+/* Horizontal takeaway chips — one short row instead of a tall stacked list. */
+.takeawayChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.takeawayChip {
+  flex: 1 1 300px;
+  position: relative;
+  padding: 11px 16px 11px 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.takeawayChip::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 17px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
 .v1TakeawaysLabel {
   font-family: var(--font-display);
-  font-size: clamp(13px, 1.2vw, 15px);
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
@@ -251,14 +282,14 @@
 .v2Grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: start;
 }
 
 .v2Takeaways {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .numberedList {
@@ -267,7 +298,7 @@
   padding: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .numberedItem {
@@ -294,8 +325,8 @@
 
 .numberedText {
   font-family: var(--font-ui);
-  font-size: clamp(13.5px, 1.2vw, 15px);
-  line-height: 1.55;
+  font-size: 17px;
+  line-height: 1.5;
   color: var(--color-text-secondary);
   padding-top: 3px;
 }
@@ -329,7 +360,7 @@
   border: 1px solid var(--color-border);
   border-radius: 99px;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--color-text-secondary);
   word-break: break-word;
@@ -338,7 +369,7 @@
 .v3Grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: start;
 }
 
@@ -346,6 +377,7 @@
 @media (max-width: 720px) {
   .grid,
   .v1Layout,
+  .v1Right,
   .v2Grid,
   .v3Grid,
   .numberedList {
@@ -354,7 +386,7 @@
 
   .v3Top {
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .v3Chips {

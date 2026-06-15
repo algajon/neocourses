@@ -19,6 +19,7 @@ export default async function LearnerLayout({ children }: LearnerLayoutProps) {
 
   return (
     <div className={styles.shell}>
+      <a href="#main" className="skip-link">Skip to main content</a>
       <LearnerNav
         user={{
           name: session.user.name ?? 'Learner',
@@ -26,7 +27,7 @@ export default async function LearnerLayout({ children }: LearnerLayoutProps) {
           role: session.user.role,
         }}
       />
-      <main className={styles.main}>{children}</main>
+      <main id="main" role="main" className={styles.main}>{children}</main>
       <OnboardingTour role={session.user.role} />
     </div>
   )

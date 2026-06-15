@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { ThemeToggle } from './ThemeToggle'
+import { NotificationBell } from './NotificationBell'
+import { Icon } from './Icon'
 import styles from './AdminSidebar.module.css'
 
 interface AdminSidebarUser {
@@ -40,6 +42,16 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Teams',
+    href: '/admin/teams',
+    icon: <Icon name="users" size={16} />,
+  },
+  {
+    label: 'Team Progress',
+    href: '/admin/team',
+    icon: <Icon name="barChart" size={16} />,
+  },
+  {
     label: 'Members',
     href: '/admin/members',
     icon: (
@@ -52,7 +64,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Settings',
+    label: 'Organization',
     href: '/admin/org',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
@@ -74,18 +86,19 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         </span>
       </div>
 
-      <div className={styles.navSection}>Workspace</div>
-      <nav className={styles.nav}>
+      <div className={styles.navSection} id="admin-nav-label">Workspace</div>
+      <nav className={styles.nav} aria-labelledby="admin-nav-label">
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.href === '/admin/dashboard'
               ? pathname === item.href
-              : pathname.startsWith(item.href)
+              : pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <Link
               key={item.href}
               href={item.href}
               className={`${styles.navItem} ${isActive ? styles.active : ''}`}
+              aria-current={isActive ? 'page' : undefined}
             >
               <span className={styles.navIcon}>{item.icon}</span>
               {item.label}
@@ -96,10 +109,19 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
       <div className={styles.footer}>
         <div className={styles.userInfo}>
-          <span className={styles.userName}>{user.name ?? user.email}</span>
-          <span className={styles.userRole}>{user.role}</span>
+          <div className={styles.userTop}>
+            <div className={styles.userIdentity}>
+              <span className={styles.userName}>{user.name ?? user.email}</span>
+              <span className={styles.userRole}>{user.role}</span>
+            </div>
+            <NotificationBell />
+          </div>
           <ThemeToggle className={styles.themeToggle} />
         </div>
+        <Link href="/settings" className={styles.settingsLink}>
+          <Icon name="key" size={14} />
+          Settings
+        </Link>
         <button
           className={styles.signOutBtn}
           onClick={() => signOut({ callbackUrl: '/login' })}

@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { Providers } from './providers'
+import { ToastProvider } from '@/components/Toast/ToastProvider'
+import { ConfirmProvider } from '@/components/ConfirmDialog'
 import './globals.css'
 
 export const metadata = {
@@ -20,7 +22,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ToastProvider>
+            <ConfirmProvider>{children}</ConfirmProvider>
+          </ToastProvider>
+        </Providers>
       </body>
     </html>
   )

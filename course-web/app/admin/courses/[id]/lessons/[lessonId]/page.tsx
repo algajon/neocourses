@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import type { LessonContent } from '@/lib/ai/types'
 import { Icon } from '@/components/Icon'
+import { LessonComments } from '@/components/LessonComments'
 import styles from './page.module.css'
 
 interface LessonData {
@@ -528,6 +529,8 @@ export default function LessonEditorPage() {
                 </ul>
               </div>
             )}
+
+            <LessonComments courseId={courseId} lessonId={lessonId} />
           </div>
         </aside>
       </div>

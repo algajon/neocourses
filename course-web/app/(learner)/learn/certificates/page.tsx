@@ -68,6 +68,13 @@ export default async function CertificatesPage() {
                   View certificate
                   <Icon name="arrowRight" size={14} />
                 </Link>
+                <Link
+                  href={`/verify/${certificate.verificationCode}`}
+                  className={styles.verifyLink}
+                >
+                  <Icon name="eye" size={14} />
+                  Public link
+                </Link>
               </div>
             </div>
           ))}

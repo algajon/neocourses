@@ -94,6 +94,20 @@
   margin-bottom: var(--space-3);
 }
 
+.userTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.userIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .userName {
   font-size: 13px;
   font-weight: 600;
@@ -109,6 +123,7 @@
   text-transform: capitalize;
 }
 
+.settingsLink,
 .signOutBtn {
   display: flex;
   align-items: center;
@@ -125,6 +140,12 @@
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
+.settingsLink {
+  text-decoration: none;
+  margin-bottom: var(--space-2);
+}
+
+.settingsLink:hover,
 .signOutBtn:hover {
   color: var(--sidebar-text);
   border-color: rgba(255, 255, 255, 0.15);

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { Icon, type IconName } from '@/components/Icon'
+import { useToast } from '@/components/Toast/ToastProvider'
 import styles from './page.module.css'
 
 interface SourceMaterial {
@@ -17,15 +18,20 @@ interface SourceMaterial {
 export default function UploadPage() {
   const params = useParams()
   const router = useRouter()
+  const { toast } = useToast()
   const courseId = params.id as string
 
   const [materials, setMaterials] = useState<SourceMaterial[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [uploads, setUploads] = useState<Record<string, { progress: number; error?: string }>>({})
-  const [showPasteMode, setShowPasteMode] = useState(false)
+  const [addMode, setAddMode] = useState<'file' | 'url' | 'text'>('file')
+  const [urlValue, setUrlValue] = useState('')
+  const [isSubmittingUrl, setIsSubmittingUrl] = useState(false)
+  const [urlError, setUrlError] = useState<string | null>(null)
   const [pasteText, setPasteText] = useState('')
   const [pasteTitle, setPasteTitle] = useState('')
   const [isSubmittingText, setIsSubmittingText] = useState(false)
+  const [textError, setTextError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -107,21 +113,58 @@ export default function UploadPage() {
     e.target.value = ''
   }, [uploadFile])
 
+  const handleUrlSubmit = async () => {
+    if (!urlValue.trim()) return
+    setIsSubmittingUrl(true)
+    setUrlError(null)
+    try {
+      const res = await fetch(`/api/courses/${courseId}/ingest-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: urlValue.trim() }),
+      })
+      if (res.ok) {
+        setUrlValue('')
+        await loadMaterials()
+        toast({ type: 'success', title: 'Source added from URL' })
+      } else {
+        const data = await res.json().catch(() => null)
+        const msg = data?.error ?? 'Could not add from URL'
+        setUrlError(msg)
+        toast({ type: 'error', title: 'Could not add from URL', description: msg })
+      }
+    } catch {
+      setUrlError('Network error')
+      toast({ type: 'error', title: 'Could not add from URL', description: 'Network error' })
+    } finally {
+      setIsSubmittingUrl(false)
+    }
+  }
+
   const handlePasteSubmit = async () => {
     if (!pasteText.trim()) return
     setIsSubmittingText(true)
+    setTextError(null)
     try {
-      const res = await fetch(`/api/courses/${courseId}/upload`, {
+      const res = await fetch(`/api/courses/${courseId}/ingest-url`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: pasteText, fileName: pasteTitle || 'Pasted text' }),
+        body: JSON.stringify({ text: pasteText, title: pasteTitle.trim() || undefined }),
       })
       if (res.ok) {
         setPasteText('')
         setPasteTitle('')
-        setShowPasteMode(false)
         await loadMaterials()
+        toast({ type: 'success', title: 'Text source added' })
+      } else {
+        const data = await res.json().catch(() => null)
+        const msg = data?.error ?? 'Could not add text'
+        setTextError(msg)
+        toast({ type: 'error', title: 'Could not add text', description: msg })
       }
+    } catch {
+      setTextError('Network error')
+      toast({ type: 'error', title: 'Could not add text', description: 'Network error' })
     } finally {
       setIsSubmittingText(false)
     }
@@ -155,6 +198,8 @@ export default function UploadPage() {
   }
 
   const fileIcon = (type: string): IconName => {
+    if (type === 'url') return 'arrowRight'
+    if (type === 'text') return 'edit'
     if (type === 'pdf' || type === 'docx' || type === 'txt') return 'file'
     return 'folder'
   }
@@ -167,21 +212,93 @@ export default function UploadPage() {
         <div>
           <p className={styles.breadcrumb}>Course Setup</p>
           <h1 className={styles.title}>Source Materials</h1>
-          <p className={styles.subtitle}>Upload PDFs, Word docs, or text files. The AI will use these to generate your course.</p>
-        </div>
-        <div className={styles.headerActions}>
-          <button
-            className="btn-secondary"
-            onClick={() => setShowPasteMode(v => !v)}
-          >
-            {showPasteMode ? <><Icon name="arrowRight" size={15} style={{ transform: 'rotate(-90deg)' }} /> Hide text input</> : <><Icon name="edit" size={15} /> Paste text</>}
-          </button>
+          <p className={styles.subtitle}>Add reference material from a file, a URL, or pasted text. The AI will use these to generate your course.</p>
         </div>
       </header>
 
-      {showPasteMode && (
-        <div className={`card ${styles.pasteCard}`}>
-          <h3 className={styles.pasteTitle}>Paste text content</h3>
+      <div className={styles.segmented} role="tablist" aria-label="Source type">
+        <button
+          className={`${styles.segment} ${addMode === 'file' ? styles.segmentActive : ''}`}
+          onClick={() => setAddMode('file')}
+          role="tab"
+          aria-selected={addMode === 'file'}
+        >
+          <Icon name="upload" size={15} /> Upload file
+        </button>
+        <button
+          className={`${styles.segment} ${addMode === 'url' ? styles.segmentActive : ''}`}
+          onClick={() => setAddMode('url')}
+          role="tab"
+          aria-selected={addMode === 'url'}
+        >
+          <Icon name="arrowRight" size={15} /> Add from URL
+        </button>
+        <button
+          className={`${styles.segment} ${addMode === 'text' ? styles.segmentActive : ''}`}
+          onClick={() => setAddMode('text')}
+          role="tab"
+          aria-selected={addMode === 'text'}
+        >
+          <Icon name="edit" size={15} /> Paste text
+        </button>
+      </div>
+
+      {addMode === 'file' && (
+        <div
+          className={`${styles.dropzone} ${isDragging ? styles.dragging : ''}`}
+          onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click() }}
+          aria-label="Upload files"
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept=".pdf,.txt,.docx"
+            onChange={handleFileChange}
+            style={{ display: 'none' }}
+          />
+          <div className={styles.dropzoneIcon}><Icon name="upload" size={32} /></div>
+          <p className={styles.dropzoneMain}>
+            {isDragging ? 'Drop files here' : 'Drop files here or click to browse'}
+          </p>
+          <p className={styles.dropzoneSub}>PDF, TXT, DOCX — up to 50 MB each</p>
+        </div>
+      )}
+
+      {addMode === 'url' && (
+        <div className={`card ${styles.sourceCard}`}>
+          <h3 className={styles.sourceCardTitle}>Add from URL</h3>
+          <p className={styles.sourceCardHint}>We'll fetch the page and extract its readable text.</p>
+          <div className={styles.urlRow}>
+            <input
+              className="input"
+              type="url"
+              placeholder="https://example.com/article"
+              value={urlValue}
+              onChange={e => { setUrlValue(e.target.value); setUrlError(null) }}
+              onKeyDown={e => { if (e.key === 'Enter') handleUrlSubmit() }}
+            />
+            <button
+              className="btn-primary"
+              onClick={handleUrlSubmit}
+              disabled={!urlValue.trim() || isSubmittingUrl}
+            >
+              {isSubmittingUrl ? 'Adding...' : 'Add'}
+            </button>
+          </div>
+          {urlError && <p className={styles.sourceError}>{urlError}</p>}
+        </div>
+      )}
+
+      {addMode === 'text' && (
+        <div className={`card ${styles.sourceCard}`}>
+          <h3 className={styles.sourceCardTitle}>Paste text content</h3>
           <div className="form-group" style={{ marginBottom: 12 }}>
             <label className="label">Title (optional)</label>
             <input
@@ -197,48 +314,22 @@ export default function UploadPage() {
               className="textarea"
               placeholder="Paste your text content here..."
               value={pasteText}
-              onChange={e => setPasteText(e.target.value)}
+              onChange={e => { setPasteText(e.target.value); setTextError(null) }}
               rows={8}
             />
           </div>
+          {textError && <p className={styles.sourceError}>{textError}</p>}
           <div className={styles.pasteActions}>
-            <button className="btn-secondary" onClick={() => setShowPasteMode(false)}>Cancel</button>
             <button
               className="btn-primary"
               onClick={handlePasteSubmit}
               disabled={!pasteText.trim() || isSubmittingText}
             >
-              {isSubmittingText ? 'Saving...' : 'Save text'}
+              {isSubmittingText ? 'Saving...' : 'Add text'}
             </button>
           </div>
         </div>
       )}
-
-      <div
-        className={`${styles.dropzone} ${isDragging ? styles.dragging : ''}`}
-        onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-        role="button"
-        tabIndex={0}
-        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click() }}
-        aria-label="Upload files"
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept=".pdf,.txt,.docx"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
-        <div className={styles.dropzoneIcon}><Icon name="upload" size={32} /></div>
-        <p className={styles.dropzoneMain}>
-          {isDragging ? 'Drop files here' : 'Drop files here or click to browse'}
-        </p>
-        <p className={styles.dropzoneSub}>PDF, TXT, DOCX — up to 50 MB each</p>
-      </div>
 
       {activeUploads.length > 0 && (
         <div className={styles.uploadList}>

@@ -19,17 +19,42 @@
 
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--space-4);
   margin-bottom: var(--space-8);
+}
+
+@media (max-width: 920px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .statCard {
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-5) var(--space-5);
   box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.statCard:hover {
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.statWarning {
+  border-color: color-mix(in srgb, var(--color-warning) 35%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-warning) 5%, var(--color-surface));
+}
+
+.statTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .statLabel {
@@ -38,7 +63,23 @@
   color: var(--color-text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: var(--space-2);
+}
+
+.statIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.statWarning .statIcon {
+  background: var(--color-warning-subtle);
+  color: var(--color-warning);
 }
 
 .statValue {
@@ -53,6 +94,19 @@
   font-size: 12px;
   color: var(--color-text-tertiary);
   margin-top: var(--space-1);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .columns {
+    grid-template-columns: 1fr;
+  }
 }
 
 .section {
@@ -72,8 +126,15 @@
 }
 
 .sectionHeader h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: 1rem;
   color: var(--color-text-primary);
+}
+
+.sectionHeader h2 svg {
+  color: var(--color-text-tertiary);
 }
 
 .courseList {
@@ -121,8 +182,118 @@
 }
 
 .emptyState {
-  padding: var(--space-12) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-6);
   text-align: center;
   color: var(--color-text-tertiary);
   font-size: 14px;
+}
+
+.emptyState svg {
+  color: var(--color-success);
+}
+
+.attentionList,
+.courseList {
+  list-style: none;
+}
+
+.attentionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.attentionRow:last-child {
+  border-bottom: none;
+}
+
+.attentionInfo {
+  min-width: 0;
+}
+
+.attentionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attentionMeta {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attentionRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-tertiary);
+  border: 1px solid var(--color-border-subtle);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.linkBtn:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-tertiary);
+}
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-12) var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.welcomeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-text);
+  margin-bottom: var(--space-2);
+}
+
+.welcome h2 {
+  font-size: 1.25rem;
+  color: var(--color-text-primary);
+}
+
+.welcome p {
+  max-width: 460px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-3);
 }

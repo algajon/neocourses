@@ -106,16 +106,16 @@ Return this exact JSON with no other text:
 {
   "intro": "An engaging 2-3 sentence hook that draws the reader in — open with a vivid question, a surprising fact, a concrete real-world scenario, or a striking stake. Make it specific to ${lessonTitle}. Do NOT begin with 'This lesson', 'In this lesson', 'Welcome', or 'Understanding'",
   "concepts": [
-    {"title": "Concept title", "body": "2-3 sentences of factual, specific educational content about ${lessonTitle}"},
-    {"title": "Concept title", "body": "2-3 sentences of factual, specific educational content about ${lessonTitle}"},
-    {"title": "Concept title", "body": "2-3 sentences of factual, specific educational content about ${lessonTitle}"}
+    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 tight, factual sentences of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing"},
+    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 tight, factual sentences of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing"},
+    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 tight, factual sentences of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing"}
   ],
   "keyPoints": [
     "Short factual bullet point about ${lessonTitle}",
     "Short factual bullet point about ${lessonTitle}",
     "Short factual bullet point about ${lessonTitle}"
   ],
-  "example": "One concrete real-world example or scenario demonstrating ${lessonTitle} in practice (2-3 sentences)",
+  "example": "One concrete real-world example or scenario demonstrating ${lessonTitle} in practice (1-2 sentences)",
   "trivia": "One surprising fact, piece of history, or interesting bit of context about ${lessonTitle} that makes it more memorable (1-2 sentences)",
   "tip": "One specific, actionable insight or practical tip about ${lessonTitle}"
 }`

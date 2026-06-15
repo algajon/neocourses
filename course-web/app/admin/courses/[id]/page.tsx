@@ -105,6 +105,9 @@ export default async function CourseOverviewPage({ params }: PageProps) {
           </div>
         </div>
         <div className={styles.headerActions}>
+          <Link href={`/admin/courses/${id}/assign`} className="btn-secondary">
+            <Icon name="users" size={15} /> Assign learners
+          </Link>
           <Link href={`/admin/courses/${id}/analytics`} className="btn-secondary">Analytics</Link>
           {course.status === 'published' ? (
             <Link href={`/admin/courses/${id}/preview`} className="btn-secondary">Preview</Link>

@@ -6,8 +6,27 @@ import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 import { LessonSlide } from '@/components/LessonSlide'
 import { FitSlide } from '@/components/FitSlide'
+import { ListenButton } from '@/components/ListenButton'
+import { LessonNotes } from '@/components/LessonNotes'
 import type { LessonContent } from '@/lib/ai/types'
 import styles from './page.module.css'
+
+function buildListenText(title: string, content: LessonContent | null): string {
+  if (!content) return title
+  const parts: string[] = [title]
+  if (content.intro) parts.push(content.intro)
+  for (const concept of content.concepts ?? []) {
+    if (concept.title) parts.push(concept.title)
+    if (concept.body) parts.push(concept.body)
+  }
+  for (const callout of content.callouts ?? []) {
+    if (callout.text) parts.push(`${callout.title}. ${callout.text}`)
+  }
+  if (content.keyTakeaways?.length) {
+    parts.push('Key takeaways.', ...content.keyTakeaways)
+  }
+  return parts.filter(Boolean).join('. ')
+}
 
 interface LessonData {
   id: string
@@ -66,6 +85,37 @@ export default function LessonPage({ params }: PageProps) {
     setMarking(false)
   }, [lesson, router])
 
+  const goPrev = useCallback(() => {
+    if (lesson?.prevLessonId) {
+      router.push(`/learn/${lesson.courseId}/lessons/${lesson.prevLessonId}`)
+    }
+  }, [lesson, router])
+
+  useEffect(() => {
+    if (!lesson) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      const target = e.target as HTMLElement | null
+      const tag = target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable) {
+        return
+      }
+      if (e.key === 'ArrowLeft') {
+        if (lesson.prevLessonId) {
+          e.preventDefault()
+          goPrev()
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (!marking) {
+          e.preventDefault()
+          handleNext()
+        }
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [lesson, marking, goPrev, handleNext])
+
   if (loading) return <LessonSkeleton />
 
   if (!lesson) {
@@ -87,8 +137,17 @@ export default function LessonPage({ params }: PageProps) {
             <Link href={`/learn/${lesson.courseId}`} className={styles.backBtn}><Icon name="arrowLeft" size={15} /> Course</Link>
             <span className={styles.moduleLabel}>{lesson.moduleTitle}</span>
           </div>
-          <div className={styles.lessonNum}>
-            {lesson.lessonNumber} / {lesson.totalLessons}
+          <div className={styles.headerRight}>
+            <ListenButton text={buildListenText(lesson.title, content)} />
+            <LessonNotes courseId={lesson.courseId} lessonId={lesson.id} />
+            <span className={styles.kbdHint} aria-hidden="true">
+              <kbd className={styles.kbd}>←</kbd>
+              <kbd className={styles.kbd}>→</kbd>
+              to navigate
+            </span>
+            <div className={styles.lessonNum}>
+              {lesson.lessonNumber} / {lesson.totalLessons}
+            </div>
           </div>
         </header>
 

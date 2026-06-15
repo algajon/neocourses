@@ -106,28 +106,26 @@ export function LessonSlide({ content, lessonTitle, moduleTitle, chapterNum }: P
   if (variant === 1) {
     return (
       <div className={styles.slide}>
-        <div className={styles.v1Layout}>
-          <div className={styles.v1Left}>
-            {breadcrumb}
-            <h1 className={styles.title}>{lessonTitle}</h1>
-            {content.intro && <p className={styles.intro}>{content.intro}</p>}
-            {takeaways.length > 0 && (
-              <div className={styles.v1Takeaways}>
-                <p className={styles.v1TakeawaysLabel}>Key Takeaways</p>
-                <ul className={styles.takeawayList}>
-                  {takeaways.slice(0, 4).map((kp, i) => (
-                    <li key={i} className={styles.takeawayItem}>{kp}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-          <div className={styles.v1Right}>
-            {concepts.slice(0, 4).map((c, i) => (
-              <ConceptCard key={i} title={c.title} body={c.body} index={i} variant="sm" />
-            ))}
-          </div>
+        <div className={styles.slideTop}>
+          {breadcrumb}
+          <h1 className={styles.title}>{lessonTitle}</h1>
+          {content.intro && <p className={styles.intro}>{content.intro}</p>}
         </div>
+        <div className={styles.v2Grid}>
+          {concepts.slice(0, 3).map((c, i) => (
+            <ConceptCard key={i} title={c.title} body={c.body} index={i} variant="sm" />
+          ))}
+        </div>
+        {takeaways.length > 0 && (
+          <div className={styles.v1Takeaways}>
+            <p className={styles.v1TakeawaysLabel}>Key Takeaways</p>
+            <div className={styles.takeawayChipRow}>
+              {takeaways.slice(0, 3).map((kp, i) => (
+                <span key={i} className={styles.takeawayChip}>{kp}</span>
+              ))}
+            </div>
+          </div>
+        )}
         <Callouts content={content} />
       </div>
     )
@@ -150,7 +148,7 @@ export function LessonSlide({ content, lessonTitle, moduleTitle, chapterNum }: P
           <div className={styles.v2Takeaways}>
             <span className={styles.takeawaysLabel}>Key takeaways</span>
             <ol className={styles.numberedList}>
-              {takeaways.slice(0, 4).map((kp, i) => (
+              {takeaways.slice(0, 3).map((kp, i) => (
                 <li key={i} className={styles.numberedItem}>
                   <span className={styles.numberedBadge}>{i + 1}</span>
                   <span className={styles.numberedText}>{kp}</span>
@@ -210,7 +208,7 @@ export function LessonSlide({ content, lessonTitle, moduleTitle, chapterNum }: P
           <div className={`${styles.conceptCard} ${styles.takeawayCard}`} style={accentStyle(2)}>
             <h3 className={styles.conceptTitle}>Key Takeaways</h3>
             <ul className={styles.takeawayList}>
-              {takeaways.slice(0, 4).map((kp, i) => (
+              {takeaways.slice(0, 3).map((kp, i) => (
                 <li key={i} className={styles.takeawayItem}>{kp}</li>
               ))}
             </ul>

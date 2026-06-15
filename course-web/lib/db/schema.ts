@@ -57,6 +57,7 @@ export const courses = pgTable(
     tags: text('tags'),
     certificateEnabled: boolean('certificate_enabled').default(false),
     passingScore: real('passing_score').default(0.7),
+    reviewStatus: text('review_status').default('none').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
     publishedAt: timestamp('published_at', { withTimezone: true }),
@@ -194,6 +195,9 @@ export const enrollments = pgTable(
     progressPercent: real('progress_percent').default(0),
     currentLessonId: text('current_lesson_id'),
     status: text('status').default('active').notNull(),
+    assignedById: text('assigned_by_id'),
+    dueAt: timestamp('due_at', { withTimezone: true }),
+    required: boolean('required').default(false),
   },
   (t) => ({
     courseIdx: index('enroll_course_idx').on(t.courseId),
@@ -307,5 +311,99 @@ export const certificates = pgTable(
   },
   (t) => ({
     courseUserIdx: index('cert_course_user_idx').on(t.courseId, t.userId),
+  })
+)
+
+export const teams = pgTable('teams', {
+  id: text('id').primaryKey(),
+  organizationId: text('organization_id'),
+  name: text('name').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+})
+
+export const teamMembers = pgTable(
+  'team_members',
+  {
+    id: text('id').primaryKey(),
+    teamId: text('team_id').notNull(),
+    userId: text('user_id').notNull(),
+  },
+  (t) => ({
+    teamUserIdx: uniqueIndex('tm_team_user_idx').on(t.teamId, t.userId),
+  })
+)
+
+export const lessonComments = pgTable(
+  'lesson_comments',
+  {
+    id: text('id').primaryKey(),
+    courseId: text('course_id').notNull(),
+    lessonId: text('lesson_id'),
+    authorId: text('author_id').notNull(),
+    body: text('body').notNull(),
+    resolved: boolean('resolved').default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    courseIdx: index('lc_course_idx').on(t.courseId),
+  })
+)
+
+export const flashcards = pgTable('flashcards', {
+  id: text('id').primaryKey(),
+  courseId: text('course_id').notNull(),
+  lessonId: text('lesson_id').notNull(),
+  front: text('front').notNull(),
+  back: text('back').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+})
+
+export const flashcardReviews = pgTable(
+  'flashcard_reviews',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    flashcardId: text('flashcard_id').notNull(),
+    ease: real('ease').default(2.5),
+    intervalDays: integer('interval_days').default(0),
+    dueAt: timestamp('due_at', { withTimezone: true }),
+    lastReviewedAt: timestamp('last_reviewed_at', { withTimezone: true }),
+  },
+  (t) => ({
+    userDueIdx: index('fr_user_due_idx').on(t.userId, t.dueAt),
+  })
+)
+
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    type: text('type').notNull(),
+    title: text('title').notNull(),
+    body: text('body').notNull(),
+    link: text('link'),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    userIdx: index('notif_user_idx').on(t.userId),
+  })
+)
+
+// One free-text note per learner per lesson (upserted on save).
+export const lessonNotes = pgTable(
+  'lesson_notes',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull(),
+    courseId: text('course_id').notNull(),
+    lessonId: text('lesson_id').notNull(),
+    body: text('body').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    userLessonIdx: uniqueIndex('ln_user_lesson_idx').on(t.userId, t.lessonId),
   })
 )

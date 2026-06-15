@@ -8,6 +8,20 @@
       "when": 1781170401441,
       "tag": "0000_nice_madame_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1781512440403,
+      "tag": "0001_shocking_penance",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781514286521,
+      "tag": "0002_chunky_drax",
+      "breakpoints": true
     }
   ]
 }

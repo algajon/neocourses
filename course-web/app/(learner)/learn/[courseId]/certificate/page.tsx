@@ -6,6 +6,7 @@ import { db } from '@/lib/db'
 import { certificates, courses, users, enrollments } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { PrintButton } from './PrintButton'
+import { CopyVerifyLink } from './CopyVerifyLink'
 import { Icon } from '@/components/Icon'
 import styles from './page.module.css'
 
@@ -148,7 +149,11 @@ export default async function CertificatePage({ params }: PageProps) {
             <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
             <polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          Certificate ID <strong>{cert.verificationCode}</strong> — keep this for your records
+          Verification code <strong>{cert.verificationCode}</strong> — anyone can confirm this at /verify/{cert.verificationCode}
+        </div>
+
+        <div className={styles.verifyActions}>
+          <CopyVerifyLink code={cert.verificationCode} className={styles.copyBtn} />
         </div>
       </div>
     </div>

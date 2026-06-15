@@ -11,7 +11,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  max-width: 860px;
+  max-width: min(2000px, 96vw);
   width: 100%;
   margin: 0 auto;
   padding: 0 var(--space-6);
@@ -57,6 +57,12 @@
   border-radius: var(--radius-sm);
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
 .lessonNum {
   font-size: 12px;
   font-weight: 600;
@@ -64,6 +70,34 @@
   background: var(--color-surface-2);
   padding: 4px 10px;
   border-radius: var(--radius-sm);
+}
+
+.kbdHint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+}
+
+.kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 640px) {
+  .kbdHint { display: none; }
 }
 
 /* ── Body — fixed-height fit area; the slide auto-scales to fit (no scroll) ── */

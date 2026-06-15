@@ -41,6 +41,136 @@
   gap: var(--space-4);
 }
 
+/* Resume / Continue learning hero card */
+.resumeCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+}
+
+.resumeCard::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--gradient-accent);
+}
+
+.resumeCard:hover {
+  box-shadow: var(--shadow-md), var(--glow-sm);
+  transform: translateY(-2px);
+  border-color: var(--color-accent-subtle);
+}
+
+.resumeMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.resumeMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.resumeTitle {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.resumeDescription {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.resumeCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-accent-text);
+  margin-top: var(--space-2);
+}
+
+.resumeRing {
+  flex-shrink: 0;
+}
+
+/* Progress ring */
+.ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringTrack {
+  stroke: var(--color-surface-3);
+}
+
+.ringFill {
+  stroke: var(--color-accent);
+  transition: stroke-dashoffset 0.5s var(--ease);
+}
+
+.ringLabel {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* Due badges */
+.dueBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+
+.due_overdue {
+  color: var(--color-error);
+  background: var(--color-error-subtle);
+}
+
+.due_soon {
+  color: var(--color-warning);
+  background: var(--color-warning-subtle);
+}
+
+.due_later {
+  color: var(--color-text-tertiary);
+  background: var(--color-surface-2);
+}
+
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -216,4 +346,25 @@
   font-size: 14px;
   color: var(--color-text-tertiary);
   margin: 0;
+}
+
+.emptyCta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  background: var(--gradient-accent);
+  color: var(--color-accent-contrast);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  box-shadow: var(--glow-sm);
+  transition: box-shadow 0.15s, opacity 0.15s;
+}
+
+.emptyCta:hover {
+  box-shadow: var(--glow-md);
+  opacity: 0.92;
 }

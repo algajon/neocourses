@@ -140,6 +140,10 @@ export default async function CourseOverviewPage({ params }: PageProps) {
                     View Certificate
                   </Link>
                 )}
+
+                <Link href={`/learn/${course.id}/flashcards`} className={styles.flashcardsLink}>
+                  <Icon name="book" size={15} /> Flashcards
+                </Link>
               </div>
             </div>
           </div>

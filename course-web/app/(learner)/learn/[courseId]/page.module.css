@@ -181,6 +181,29 @@
   opacity: 0.9;
 }
 
+.flashcardsLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: 10px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.flashcardsLink:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-accent);
+  background: var(--color-surface-2);
+}
+
 .content {
   padding: var(--space-10) 0 var(--space-12);
 }

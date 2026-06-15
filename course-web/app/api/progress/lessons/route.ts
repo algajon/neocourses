@@ -11,6 +11,7 @@ import {
 } from '@/lib/db/schema'
 import { eq, and, count } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+import { createNotification } from '@/lib/notify'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
 
   if (isCompleted && !enrollment.completedAt) {
     const [course] = await db
-      .select({ certificateEnabled: courses.certificateEnabled })
+      .select({ title: courses.title, certificateEnabled: courses.certificateEnabled })
       .from(courses)
       .where(eq(courses.id, courseId))
       .limit(1)
@@ -113,6 +114,14 @@ export async function POST(req: NextRequest) {
         })
       }
     }
+
+    await createNotification({
+      userId: session.user.id,
+      type: 'completion',
+      title: 'Course completed',
+      body: course?.title ?? 'You finished a course',
+      link: `/learn/${courseId}/certificate`,
+    })
   }
 
   return NextResponse.json({ completionPercentage, completed: isCompleted })

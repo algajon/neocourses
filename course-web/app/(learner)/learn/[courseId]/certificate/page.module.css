@@ -284,6 +284,33 @@
   border-radius: var(--radius-md);
 }
 
+.verifyActions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-3);
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.copyBtn:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
 /* ── Not earned ── */
 .notEarned {
   display: flex;
@@ -344,7 +371,8 @@
 
   .breadcrumb,
   .actions,
-  .verifyNote {
+  .verifyNote,
+  .verifyActions {
     display: none;
   }
 

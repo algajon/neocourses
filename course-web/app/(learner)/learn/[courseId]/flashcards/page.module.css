@@ -1,0 +1,466 @@
+.page {
+  background: var(--color-bg);
+  min-height: calc(100vh - 56px);
+  padding: var(--space-10) var(--space-6) var(--space-12);
+}
+
+.inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.breadcrumbLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+
+.breadcrumbLink:hover {
+  color: var(--color-text-primary);
+}
+
+.breadcrumbSep {
+  font-size: 13px;
+  color: var(--color-border);
+}
+
+.breadcrumbCurrent {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* ── Progress ── */
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.progressCount {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gradient-accent);
+  transition: width 0.35s var(--ease);
+}
+
+/* ── Flip card ── */
+.cardShell {
+  perspective: 1600px;
+}
+
+.flip {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.5s var(--ease);
+  text-align: left;
+  font-family: inherit;
+}
+
+.flipped {
+  transform: rotateY(180deg);
+  cursor: default;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-md);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.faceFront {
+  border-top: 3px solid var(--color-border);
+}
+
+.faceBack {
+  transform: rotateY(180deg);
+  border-top: 3px solid var(--color-accent);
+}
+
+.faceLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.faceBack .faceLabel {
+  color: var(--color-accent-text);
+}
+
+.faceText {
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  margin: auto 0;
+}
+
+.flipHint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+/* keep the flip card's height honest so absolute faces don't collapse */
+.flip::after {
+  content: '';
+  display: block;
+  min-height: 300px;
+}
+
+.skeleton {
+  min-height: 300px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface-3) 50%,
+    var(--color-surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+/* ── Reveal button (when not flipped) ── */
+.revealBtn {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  cursor: pointer;
+  background: var(--gradient-accent);
+  color: var(--color-accent-contrast);
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  transition: filter 0.15s, box-shadow 0.15s;
+}
+
+.revealBtn:hover {
+  filter: brightness(1.05);
+  box-shadow: var(--glow-sm);
+}
+
+/* ── Grade buttons ── */
+.gradeBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: fadeIn 0.25s var(--ease) both;
+}
+
+.gradePrompt {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.grades {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+.gradeBtn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-4) var(--space-2) var(--space-3);
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.gradeBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.gradeBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.gradeKey {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.gradeLabel {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.gradeHint {
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.grade0:hover:not(:disabled) {
+  border-color: var(--color-error);
+  background: var(--color-error-subtle);
+}
+.grade0:hover:not(:disabled) .gradeLabel { color: var(--color-error); }
+
+.grade1:hover:not(:disabled) {
+  border-color: var(--color-warning);
+  background: var(--color-warning-subtle);
+}
+.grade1:hover:not(:disabled) .gradeLabel { color: var(--color-warning); }
+
+.grade2:hover:not(:disabled),
+.grade3:hover:not(:disabled) {
+  border-color: var(--color-success);
+  background: var(--color-success-subtle);
+}
+.grade2:hover:not(:disabled) .gradeLabel,
+.grade3:hover:not(:disabled) .gradeLabel { color: var(--color-success); }
+
+/* ── Intro / summary shared shell ── */
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-8);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.25s var(--ease) both;
+}
+
+.introIcon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-lg);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-text);
+}
+
+.doneIcon {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 99px;
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+}
+
+.introTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.introText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  max-width: 460px;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-8);
+  cursor: pointer;
+  background: var(--gradient-accent);
+  color: var(--color-accent-contrast);
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: filter 0.15s, box-shadow 0.15s;
+}
+
+.primaryBtn:hover {
+  filter: brightness(1.05);
+  box-shadow: var(--glow-sm);
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-8);
+  cursor: pointer;
+  background: var(--color-surface-2);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.secondaryBtn:hover {
+  background: var(--color-surface-3);
+}
+
+.kbdHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+/* ── Summary stats ── */
+.summaryStats {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-2) 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 84px;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+}
+
+.statLabel {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-tertiary);
+}
+
+.statGood .statValue { color: var(--color-success); }
+.statMiss .statValue { color: var(--color-warning); }
+
+.summaryActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip,
+  .skeleton,
+  .intro,
+  .gradeBlock {
+    animation: none;
+    transition: none;
+  }
+}

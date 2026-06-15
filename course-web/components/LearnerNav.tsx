@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { NotificationBell } from '@/components/NotificationBell'
+import { Icon } from '@/components/Icon'
 import styles from './LearnerNav.module.css'
 
 interface LearnerNavProps {
@@ -43,25 +45,30 @@ export function LearnerNav({ user }: LearnerNavProps) {
   }
 
   return (
-    <nav className={styles.nav}>
+    <nav className={styles.nav} aria-label="Primary">
       <div className={styles.navInner}>
         <div className={styles.navLeft}>
-          <Link href="/learn" className={styles.wordmark}>
+          <Link href="/learn" className={styles.wordmark} aria-label="courseneo home">
             course<span className={styles.neo}>neo</span>
           </Link>
           <div className={styles.links}>
-            {LINKS.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={isActive(link.href) ? styles.linkActive : styles.link}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {LINKS.map(link => {
+              const active = isActive(link.href)
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={active ? styles.linkActive : styles.link}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
         </div>
         <div className={styles.navRight}>
+          <NotificationBell />
           <ThemeToggle className={styles.themeToggle} />
           <div className={styles.userMenu} ref={menuRef}>
             <button
@@ -82,6 +89,15 @@ export function LearnerNav({ user }: LearnerNavProps) {
                   <span className={styles.dropdownName}>{user.name}</span>
                   <span className={styles.dropdownEmail}>{user.email}</span>
                 </div>
+                <Link
+                  href="/settings"
+                  className={styles.menuLink}
+                  role="menuitem"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <Icon name="key" size={14} />
+                  Settings
+                </Link>
                 <button
                   type="button"
                   className={styles.signOut}
