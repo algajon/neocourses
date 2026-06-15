@@ -339,3 +339,26 @@
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
 }
+
+@media (max-width: 600px) {
+  .page {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .allDone {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-5);
+  }
+
+  .btnAccent {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+}

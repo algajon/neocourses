@@ -248,3 +248,25 @@
   gap: var(--space-4);
   flex-wrap: wrap;
 }
+
+@media (max-width: 600px) {
+  .inner {
+    padding: 0 var(--space-5);
+  }
+
+  .hero {
+    padding: var(--space-12) 0 var(--space-10);
+  }
+
+  .plansSection {
+    padding: var(--space-12) 0;
+  }
+
+  .faqSection {
+    padding: var(--space-12) 0;
+  }
+
+  .ctaSection {
+    padding: var(--space-12) 0;
+  }
+}

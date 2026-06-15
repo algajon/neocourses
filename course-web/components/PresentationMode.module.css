@@ -341,3 +341,15 @@
   opacity: 0;
   pointer-events: none;
 }
+
+/* ─── Responsive: tighter chrome + stage padding on phones ─── */
+@media (max-width: 720px) {
+  .header,
+  .footer {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .stage {
+    padding: var(--space-6) var(--space-4);
+  }
+}

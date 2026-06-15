@@ -231,3 +231,34 @@
   color: var(--color-text-tertiary);
   font-size: 13px;
 }
+
+.moduleTitle,
+.actionLabel,
+.actionDesc {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .progressSteps {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .stepLabel {
+    font-size: 11px;
+  }
+
+  .actionsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .sectionHeader,
+  .moduleRow {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}

@@ -333,3 +333,34 @@
   min-width: 80px;
   text-align: right;
 }
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .tableHeader,
+  .insightCard {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}
+
+@media (max-width: 520px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .insightHead {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .insightMetrics {
+    gap: var(--space-5);
+  }
+
+  .insightMetric {
+    align-items: flex-start;
+  }
+}

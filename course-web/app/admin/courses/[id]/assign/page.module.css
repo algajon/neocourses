@@ -242,3 +242,23 @@
   border: 1px dashed var(--color-border);
   border-radius: var(--radius-md);
 }
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .memberGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formPanel {
+    padding: var(--space-5);
+  }
+}

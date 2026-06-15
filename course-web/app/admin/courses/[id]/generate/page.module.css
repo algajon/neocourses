@@ -294,3 +294,18 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .startCard {
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .successBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

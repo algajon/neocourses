@@ -302,3 +302,30 @@
   padding-top: var(--space-4);
   border-top: 1px solid var(--color-border);
 }
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .header {
+    flex-wrap: wrap;
+  }
+
+  .headerActions {
+    padding-top: 0;
+  }
+
+  .dropzone {
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .segmented {
+    width: 100%;
+  }
+
+  .segment {
+    flex: 1;
+    justify-content: center;
+  }
+}

@@ -43,6 +43,16 @@
   gap: var(--space-3);
 }
 
+@media (max-width: 600px) {
+  .navInner {
+    padding: 0 var(--space-5);
+  }
+
+  .navRight {
+    gap: var(--space-2);
+  }
+}
+
 .main {
   min-height: calc(100vh - 60px);
   background: var(--color-bg);
@@ -93,4 +103,14 @@
 
 .footerLinks a:hover {
   color: var(--color-text-primary);
+}
+
+@media (max-width: 600px) {
+  .footerInner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 var(--space-5);
+    gap: var(--space-5);
+  }
 }

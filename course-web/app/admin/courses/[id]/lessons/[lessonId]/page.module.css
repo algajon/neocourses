@@ -460,3 +460,48 @@
   text-decoration: none;
   font-weight: 600;
 }
+
+/* ── Mobile: stack the 3-panel editor vertically, drop draggable gutters ── */
+@media (max-width: 900px) {
+  .editorShell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  /* override the inline grid-template-columns set in JS */
+  .panels {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none !important;
+    overflow: visible;
+  }
+
+  .gutter {
+    display: none;
+  }
+
+  .metaPanel,
+  .contentPanel,
+  .previewPanel {
+    overflow: visible;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .panelBody,
+  .previewBody {
+    overflow-y: visible;
+  }
+
+  .topBar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+@media (max-width: 560px) {
+  .previewConceptGrid {
+    grid-template-columns: 1fr;
+  }
+}

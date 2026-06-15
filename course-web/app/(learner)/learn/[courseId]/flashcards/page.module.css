@@ -464,3 +464,41 @@
     transition: none;
   }
 }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .page {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+
+  .face {
+    padding: var(--space-6);
+  }
+
+  .faceText {
+    font-size: 1.15rem;
+  }
+
+  .grades {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gradeBtn {
+    min-height: 64px;
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .intro {
+    padding: var(--space-10) var(--space-5);
+  }
+
+  .summaryStats {
+    gap: var(--space-3);
+  }
+
+  .stat {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-3);
+  }
+}

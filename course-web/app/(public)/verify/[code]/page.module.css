@@ -144,6 +144,7 @@
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
   color: var(--color-accent-text);
+  overflow-wrap: anywhere;
 }
 
 [data-theme="dark"] .code {
@@ -155,4 +156,14 @@
   line-height: 1.6;
   color: var(--color-text-secondary);
   margin: 0;
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: var(--space-8) var(--space-5) var(--space-6);
+  }
+
+  .meta {
+    gap: var(--space-5);
+  }
 }

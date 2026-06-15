@@ -163,3 +163,21 @@
   color: var(--color-text-secondary);
   margin-bottom: var(--space-8);
 }
+
+@media (max-width: 600px) {
+  .inner {
+    padding: 0 var(--space-5);
+  }
+
+  .hero {
+    padding: var(--space-12) 0 var(--space-10);
+  }
+
+  .section {
+    padding: var(--space-12) 0;
+  }
+
+  .cta {
+    padding: var(--space-12) 0;
+  }
+}

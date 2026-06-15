@@ -100,6 +100,60 @@
   .kbdHint { display: none; }
 }
 
+@media (max-width: 560px) {
+  .slide {
+    padding: 0 var(--space-4);
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-4) 0;
+  }
+
+  .headerLeft,
+  .headerRight {
+    gap: var(--space-3);
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .moduleLabel {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .body {
+    padding: var(--space-4) 0;
+  }
+
+  .footer {
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
+  }
+
+  .progressDots {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .footerLeft,
+  .footerRight {
+    flex: 1;
+  }
+
+  .navBtnPrimary {
+    padding: 10px 16px;
+  }
+}
+
 /* ── Body — fixed-height fit area; the slide auto-scales to fit (no scroll) ── */
 .body {
   flex: 1;

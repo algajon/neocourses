@@ -341,3 +341,29 @@
 .ctaSecondary:hover {
   color: var(--color-text-primary);
 }
+
+@media (max-width: 600px) {
+  .section,
+  .sectionAlt,
+  .ctaSection {
+    padding: var(--space-12) 0;
+  }
+
+  .hero {
+    padding: var(--space-12) 0 var(--space-10);
+  }
+
+  .sectionInner,
+  .heroInner,
+  .ctaInner {
+    padding: 0 var(--space-5);
+  }
+
+  .heroStats {
+    gap: var(--space-5);
+  }
+
+  .statDivider {
+    display: none;
+  }
+}

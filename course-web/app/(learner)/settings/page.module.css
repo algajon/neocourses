@@ -111,3 +111,27 @@
   color: var(--color-success);
   font-size: 13px;
 }
+
+@media (max-width: 600px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .header {
+    margin-bottom: var(--space-6);
+  }
+
+  .cardHeader,
+  .form {
+    padding: var(--space-5);
+  }
+
+  .formFooter {
+    justify-content: stretch;
+  }
+
+  .formFooter :global(.btn-primary) {
+    width: 100%;
+    justify-content: center;
+  }
+}

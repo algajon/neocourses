@@ -137,3 +137,9 @@
 .link:hover {
   text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+  .card {
+    padding: var(--space-8) var(--space-6);
+  }
+}

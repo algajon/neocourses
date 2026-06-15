@@ -389,3 +389,37 @@
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .topBar {
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-4);
+  }
+
+  .groundedHint {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .messages {
+    padding: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .message {
+    max-width: 88%;
+  }
+
+  .empty {
+    padding: var(--space-10) var(--space-4);
+  }
+
+  .inputArea {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .sendBtn {
+    width: 40px;
+    height: 40px;
+  }
+}

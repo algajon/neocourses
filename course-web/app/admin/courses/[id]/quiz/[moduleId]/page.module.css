@@ -257,3 +257,23 @@
   text-decoration: none;
   font-weight: 600;
 }
+
+.quizQText,
+.optionRow {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .headerActions {
+    padding-top: 0;
+    width: 100%;
+  }
+
+  .questionRow {
+    flex-direction: column;
+  }
+}
