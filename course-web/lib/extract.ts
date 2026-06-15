@@ -2,8 +2,13 @@
 // route handler and the BullMQ worker (both Node). PDF text is what feeds the AI
 // generation prompts — without it, generation falls back to the course title.
 import pdfParse from 'pdf-parse/lib/pdf-parse.js'
+import { transcribeAudio } from './transcribe'
 
 const MAX_CHARS = 45_000 // cap per file (~11k tokens) so generation prompts stay within model context and fast
+
+// Audio/video formats Whisper can transcribe. Matched by extension or MIME prefix.
+const MEDIA_EXTS = new Set(['mp3', 'm4a', 'wav', 'mp4', 'mov', 'webm', 'mpeg', 'mpga', 'ogg', 'oga', 'flac'])
+const MEDIA_MIME_PREFIXES = ['audio/', 'video/']
 
 export async function extractText(
   buf: Buffer,
@@ -11,7 +16,18 @@ export async function extractText(
   fileName: string
 ): Promise<{ text: string; error: string | null }> {
   const ext = (fileType || fileName.split('.').pop() || '').toLowerCase()
+  const nameExt = (fileName.split('.').pop() || '').toLowerCase()
+  const ft = (fileType || '').toLowerCase()
+  const isMedia =
+    MEDIA_EXTS.has(ext) ||
+    MEDIA_EXTS.has(nameExt) ||
+    MEDIA_MIME_PREFIXES.some(p => ft.startsWith(p))
   try {
+    if (isMedia) {
+      // Route audio/video through Whisper; the transcript becomes the source text.
+      const { text, error } = await transcribeAudio(buf, fileName)
+      return { text: clamp(text), error }
+    }
     if (ext === 'pdf' || buf.subarray(0, 5).toString('latin1') === '%PDF-') {
       const parsed = await pdfParse(buf)
       return { text: clamp(parsed.text ?? ''), error: null }

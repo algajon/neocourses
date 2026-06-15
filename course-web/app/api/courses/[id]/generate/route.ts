@@ -6,6 +6,7 @@ import { courses, sourceMaterials, aiGenerationJobs } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import { enqueueCourseGeneration } from '@/lib/queue'
+import { canGenerate, recordGeneration } from '@/lib/billing'
 
 interface RouteParams {
   params: { id: string }
@@ -49,6 +50,15 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
     )
   }
 
+  // Quota gate. Always passes when billing is disabled or the plan is unlimited.
+  const gate = await canGenerate(session.user.organizationId)
+  if (!gate.allowed) {
+    return NextResponse.json(
+      { error: gate.reason ?? 'Generation limit reached', used: gate.used, limit: gate.limit },
+      { status: 402 },
+    )
+  }
+
   const jobId = uuidv4()
   const now = new Date()
 
@@ -67,6 +77,9 @@ export async function POST(_req: NextRequest, { params }: RouteParams) {
     .where(eq(courses.id, courseId))
 
   await enqueueCourseGeneration({ courseId, jobId })
+
+  // Count the generation against the org's monthly quota (no-op if billing off).
+  await recordGeneration(session.user.organizationId)
 
   return NextResponse.json({ jobId }, { status: 202 })
 }

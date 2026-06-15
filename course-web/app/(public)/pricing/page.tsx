@@ -4,13 +4,13 @@ import styles from './page.module.css'
 
 const plans = [
   {
-    name: 'Starter',
+    name: 'Free',
     badge: null,
-    price: 'Free',
+    price: '$0',
     priceSub: 'No credit card required',
     desc: 'Perfect for individuals and small teams experimenting with AI course creation.',
     features: [
-      'Up to 3 published courses',
+      '5 AI course generations / month',
       'Up to 10 learner accounts',
       'AI outline generation',
       'PDF & document import',
@@ -25,12 +25,12 @@ const plans = [
   {
     name: 'Team',
     badge: 'Most popular',
-    price: 'Contact us',
-    priceSub: 'Per organisation',
-    desc: 'For teams that need unlimited courses, advanced import formats, and admin controls.',
+    price: '$49',
+    priceSub: 'per month',
+    desc: 'For teams that need more generations, seats, advanced import formats, and admin controls.',
     features: [
-      'Unlimited published courses',
-      'Unlimited learner accounts',
+      '100 AI course generations / month',
+      'Up to 50 learner accounts',
       'All import formats (video, audio)',
       'Custom AI model endpoint',
       'Mobile content push (QR)',
@@ -38,29 +38,29 @@ const plans = [
       'Role-based access control',
       'Priority support',
     ],
-    cta: 'Contact sales',
-    ctaHref: 'mailto:hello@courseneo.app',
+    cta: 'Upgrade to Team',
+    ctaHref: '/admin/billing',
     ctaClass: 'btn-cta',
     highlighted: true,
   },
   {
-    name: 'Enterprise',
+    name: 'Business',
     badge: null,
-    price: 'Contact us',
-    priceSub: 'Custom pricing',
-    desc: 'Self-hosted, SSO, SLA guarantees, and dedicated onboarding for large organisations.',
+    price: '$199',
+    priceSub: 'per month',
+    desc: 'For organisations that need unlimited generation, unlimited seats, and dedicated onboarding.',
     features: [
-      'Self-hosted deployment',
-      'SSO / SAML integration',
+      'Unlimited AI course generations',
+      'Unlimited learner accounts',
       'Multi-organisation support',
       'Custom data retention policy',
-      'SLA & uptime guarantee',
+      'SSO / SAML (on request)',
       'Dedicated onboarding',
       'Custom integrations',
       'Security review',
     ],
-    cta: 'Talk to us',
-    ctaHref: 'mailto:hello@courseneo.app',
+    cta: 'Upgrade to Business',
+    ctaHref: '/admin/billing',
     ctaClass: 'btn-secondary',
     highlighted: false,
   },
@@ -69,7 +69,7 @@ const plans = [
 const faqs = [
   {
     q: 'Do I need to provide my own AI API key?',
-    a: 'For Starter, yes — you bring your own OpenAI (or compatible) API key. Team and Enterprise plans can use our hosted model or your own endpoint.',
+    a: 'On the Free plan you can bring your own OpenAI (or compatible) API key. Team and Business plans can use our hosted model or your own endpoint.',
   },
   {
     q: 'Is my data stored on your servers?',
@@ -156,8 +156,8 @@ export default function PricingPage() {
             <Link href="/signup" className="btn-cta">
               Get started free
             </Link>
-            <Link href="mailto:hello@courseneo.app" className="btn-secondary">
-              Contact sales
+            <Link href="/admin/billing" className="btn-secondary">
+              Compare plans
             </Link>
           </div>
         </div>

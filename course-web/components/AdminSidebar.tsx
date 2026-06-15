@@ -66,6 +66,17 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Billing',
+    href: '/admin/billing',
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+        <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.25" />
+        <path d="M1.5 6.5h13" stroke="currentColor" strokeWidth="1.25" />
+        <path d="M4 10h3" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
     label: 'Organization',
     href: '/admin/org',
     icon: (

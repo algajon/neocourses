@@ -22,6 +22,13 @@
       "when": 1781514286521,
       "tag": "0002_chunky_drax",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1781534616843,
+      "tag": "0003_cuddly_dakota_north",
+      "breakpoints": true
     }
   ]
 }

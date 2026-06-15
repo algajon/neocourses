@@ -12,6 +12,7 @@ interface SourceMaterial {
   fileType: string
   fileSizeBytes: number | null
   status: string
+  processingError?: string | null
   createdAt: string
 }
 
@@ -197,9 +198,11 @@ export default function UploadPage() {
     return map[status] ?? { label: status, cls: 'pill pill-draft' }
   }
 
+  const MEDIA_TYPES = new Set(['mp3', 'm4a', 'wav', 'mp4', 'mov', 'webm', 'mpeg', 'mpga', 'ogg', 'oga', 'flac'])
   const fileIcon = (type: string): IconName => {
     if (type === 'url') return 'arrowRight'
     if (type === 'text') return 'edit'
+    if (MEDIA_TYPES.has(type)) return 'play'
     if (type === 'pdf' || type === 'docx' || type === 'txt') return 'file'
     return 'folder'
   }
@@ -212,7 +215,7 @@ export default function UploadPage() {
         <div>
           <p className={styles.breadcrumb}>Course Setup</p>
           <h1 className={styles.title}>Source Materials</h1>
-          <p className={styles.subtitle}>Add reference material from a file, a URL, or pasted text. The AI will use these to generate your course.</p>
+          <p className={styles.subtitle}>Add reference material from a file (PDF, docs, audio, or video), a URL, or pasted text. The AI will use these to generate your course.</p>
         </div>
       </header>
 
@@ -259,7 +262,7 @@ export default function UploadPage() {
             ref={fileInputRef}
             type="file"
             multiple
-            accept=".pdf,.txt,.docx"
+            accept=".pdf,.txt,.md,.docx,.csv,.mp3,.m4a,.wav,.mp4,.mov,.webm,.mpeg,.mpga,.ogg,.oga,.flac,audio/*,video/*"
             onChange={handleFileChange}
             style={{ display: 'none' }}
           />
@@ -267,7 +270,8 @@ export default function UploadPage() {
           <p className={styles.dropzoneMain}>
             {isDragging ? 'Drop files here' : 'Drop files here or click to browse'}
           </p>
-          <p className={styles.dropzoneSub}>PDF, TXT, DOCX — up to 50 MB each</p>
+          <p className={styles.dropzoneSub}>PDF, docs, audio, or video — up to 50 MB each</p>
+          <p className={styles.dropzoneSub}>Audio &amp; video are transcribed automatically (max 25 MB) and may take a little longer to process.</p>
         </div>
       )}
 
@@ -365,6 +369,9 @@ export default function UploadPage() {
                     <span className={styles.materialMeta}>
                       {m.fileType.toUpperCase()}{m.fileSizeBytes ? ` · ${formatBytes(m.fileSizeBytes)}` : ''}
                     </span>
+                    {m.status === 'failed' && m.processingError && (
+                      <span className={styles.sourceError}>{m.processingError}</span>
+                    )}
                   </div>
                   <span className={st.cls}>{st.label}</span>
                   <button

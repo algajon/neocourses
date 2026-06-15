@@ -15,9 +15,34 @@ export const organizations = pgTable('organizations', {
   slug: text('slug').notNull().unique(),
   logoUrl: text('logo_url'),
   settings: text('settings'),
+  // Billing: plan is one of 'free' | 'team' | 'business'. planStatus mirrors the
+  // Stripe subscription status ('active' | 'trialing' | 'past_due' | 'canceled'),
+  // defaulting to 'active' so orgs work out of the box / in billing-disabled mode.
+  plan: text('plan').default('free').notNull(),
+  planStatus: text('plan_status').default('active').notNull(),
+  stripeCustomerId: text('stripe_customer_id'),
+  stripeSubscriptionId: text('stripe_subscription_id'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
 })
+
+// One row per org per billing period; tracks AI course generations consumed so a
+// plan's monthly limit can be enforced. periodStart is the first day of the
+// current calendar month (UTC); a new period implicitly resets the count.
+export const usageCounters = pgTable(
+  'usage_counters',
+  {
+    id: text('id').primaryKey(),
+    organizationId: text('organization_id').references(() => organizations.id).notNull(),
+    periodStart: text('period_start').notNull(),
+    generationsUsed: integer('generations_used').notNull().default(0),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    orgPeriodIdx: uniqueIndex('uc_org_period_idx').on(t.organizationId, t.periodStart),
+  })
+)
 
 export const users = pgTable(
   'users',
