@@ -135,8 +135,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           </div>
           <ThemeToggle className={styles.themeToggle} />
         </div>
-        <Link href="/settings" className={styles.settingsLink}>
-          <Icon name="key" size={14} />
+        <Link href="/admin/account" className={styles.settingsLink}>
+          <Icon name="settings" size={14} />
           Settings
         </Link>
         <button

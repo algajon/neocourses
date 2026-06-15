@@ -100,7 +100,7 @@ export default async function CoursesPage({ searchParams }: PageProps) {
           isFiltered ? (
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>
-                <Icon name="eye" size={22} />
+                <Icon name="search" size={22} />
               </div>
               <p>No courses match your filters.</p>
               <Link href="/admin/courses" className="btn-secondary">

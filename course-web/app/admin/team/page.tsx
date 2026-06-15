@@ -75,7 +75,7 @@ export default async function TeamProgressPage() {
         </div>
         <div className={styles.statCard}>
           <div className={styles.statIcon}>
-            <Icon name="info" size={18} />
+            <Icon name="alertTriangle" size={18} />
           </div>
           <div className={styles.statBody}>
             <div className={styles.statValue}>{totalOverdue}</div>

@@ -114,7 +114,7 @@ export function LearnerNav({ user }: LearnerNavProps) {
                   role="menuitem"
                   onClick={() => setMenuOpen(false)}
                 >
-                  <Icon name="key" size={14} />
+                  <Icon name="settings" size={14} />
                   Settings
                 </Link>
                 <button

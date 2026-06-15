@@ -132,7 +132,7 @@ export function NotificationBell() {
         aria-expanded={open}
         onClick={() => setOpen(o => !o)}
       >
-        <Icon name="info" size={18} />
+        <Icon name="bell" size={18} />
         {unreadCount > 0 && (
           <span className={styles.badge} aria-label={`${unreadCount} unread`}>
             {unreadCount > 99 ? '99+' : unreadCount}
