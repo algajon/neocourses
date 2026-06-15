@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
-import { quizzes, quizQuestions, modules } from '@/lib/db/schema'
+import { quizzes, quizQuestions, modules, courses } from '@/lib/db/schema'
 import { eq, and, asc } from 'drizzle-orm'
 import { normalizeQuizOptions } from '@/lib/quiz'
 
@@ -18,6 +18,15 @@ export async function GET(
     }
     if (session.user.role === 'learner') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const [course] = await db
+      .select({ organizationId: courses.organizationId })
+      .from(courses)
+      .where(eq(courses.id, params.id))
+      .limit(1)
+    if (!course || course.organizationId !== session.user.organizationId) {
+      return NextResponse.json({ error: 'Quiz not found' }, { status: 404 })
     }
 
     const [mod] = await db

@@ -32,12 +32,12 @@ export async function POST(
   }
 
   const [course] = await db
-    .select({ id: courses.id, status: courses.status })
+    .select({ id: courses.id, status: courses.status, organizationId: courses.organizationId })
     .from(courses)
     .where(eq(courses.id, courseId))
     .limit(1)
 
-  if (!course) {
+  if (!course || course.organizationId !== session.user.organizationId) {
     return NextResponse.json({ error: 'Course not found' }, { status: 404 })
   }
 

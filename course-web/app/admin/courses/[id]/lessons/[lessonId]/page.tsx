@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { LessonContent } from '@/lib/ai/types'
 import { Icon } from '@/components/Icon'
 import { LessonComments } from '@/components/LessonComments'
+import { useToast } from '@/components/Toast/ToastProvider'
 import styles from './page.module.css'
 
 interface LessonData {
@@ -59,11 +60,14 @@ export default function LessonEditorPage() {
   const courseId = params.id as string
   const lessonId = params.lessonId as string
 
+  const { toast } = useToast()
   const [lesson, setLesson] = useState<LessonData | null>(null)
   const [edit, setEdit] = useState<EditState | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [regenerating, setRegenerating] = useState(false)
+  const [instruction, setInstruction] = useState('')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Resizable editor columns — drag the gutters to widen a panel for easier reading.
@@ -176,6 +180,45 @@ export default function LessonEditorPage() {
     }
     if (edit) save(edit)
   }
+
+  const regenerate = useCallback(async () => {
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current)
+      saveTimer.current = null
+    }
+    setRegenerating(true)
+    try {
+      const res = await fetch(`/api/courses/${courseId}/lessons/${lessonId}/regenerate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ instruction: instruction.trim() || undefined }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Regeneration failed')
+      }
+      const data: { title?: string; content?: LessonContent; keyPoints?: string[]; summary?: string } = await res.json()
+      setEdit(prev => {
+        if (!prev) return prev
+        const c = data.content
+        return {
+          ...prev,
+          title: data.title ?? prev.title,
+          summary: data.summary ?? prev.summary,
+          keyPoints: data.keyPoints?.length ? data.keyPoints : prev.keyPoints,
+          intro: c?.intro ?? prev.intro,
+          concepts: c?.concepts?.length ? c.concepts : prev.concepts,
+          callouts: c?.callouts?.length ? c.callouts : prev.callouts,
+          keyTakeaways: c?.keyTakeaways?.length ? c.keyTakeaways : prev.keyTakeaways,
+        }
+      })
+      toast({ type: 'success', title: 'Lesson regenerated', description: 'AI content saved.' })
+    } catch (err) {
+      toast({ type: 'error', title: 'Could not regenerate', description: err instanceof Error ? err.message : 'Try again.' })
+    } finally {
+      setRegenerating(false)
+    }
+  }, [courseId, lessonId, instruction, toast])
 
   if (loading) {
     return <div className={styles.loadingState}>Loading lesson...</div>
@@ -343,6 +386,32 @@ export default function LessonEditorPage() {
           </div>
 
           <div className={styles.panelBody}>
+            <div className={styles.regenBox}>
+              <div className={styles.regenHeader}>
+                <Icon name="sparkles" size={15} />
+                <span className={styles.regenTitle}>Regenerate with AI</span>
+              </div>
+              <p className={styles.regenHint}>
+                Rewrites this lesson from the course&apos;s source materials. Add an optional instruction to steer the result.
+              </p>
+              <div className={styles.regenRow}>
+                <input
+                  className="input"
+                  value={instruction}
+                  onChange={e => setInstruction(e.target.value)}
+                  placeholder="Optional: e.g. make it more concise, add a worked example"
+                  disabled={regenerating}
+                />
+                <button
+                  className="btn-primary"
+                  onClick={regenerate}
+                  disabled={regenerating}
+                >
+                  {regenerating ? 'Regenerating...' : 'Regenerate'}
+                </button>
+              </div>
+            </div>
+
             <div className="form-group">
               <label className="label">Introduction</label>
               <textarea

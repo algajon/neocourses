@@ -25,12 +25,12 @@ export async function DELETE(
   const { id: courseId, materialId } = params
 
   const [course] = await db
-    .select({ id: courses.id, createdById: courses.createdById })
+    .select({ id: courses.id, createdById: courses.createdById, organizationId: courses.organizationId })
     .from(courses)
     .where(eq(courses.id, courseId))
     .limit(1)
 
-  if (!course) {
+  if (!course || course.organizationId !== session.user.organizationId) {
     return NextResponse.json({ error: 'Course not found' }, { status: 404 })
   }
 

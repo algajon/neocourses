@@ -37,7 +37,7 @@ export async function GET(
       .where(eq(courses.id, params.id))
       .limit(1)
 
-    if (!course) {
+    if (!course || course.organizationId !== session.user.organizationId) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 })
     }
 
@@ -87,12 +87,12 @@ export async function PUT(
     }
 
     const [existing] = await db
-      .select({ id: courses.id })
+      .select({ id: courses.id, organizationId: courses.organizationId })
       .from(courses)
       .where(eq(courses.id, params.id))
       .limit(1)
 
-    if (!existing) {
+    if (!existing || existing.organizationId !== session.user.organizationId) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 })
     }
 
@@ -142,12 +142,12 @@ export async function DELETE(
     }
 
     const [existing] = await db
-      .select({ id: courses.id })
+      .select({ id: courses.id, organizationId: courses.organizationId })
       .from(courses)
       .where(eq(courses.id, params.id))
       .limit(1)
 
-    if (!existing) {
+    if (!existing || existing.organizationId !== session.user.organizationId) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 })
     }
 

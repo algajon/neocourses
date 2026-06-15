@@ -505,3 +505,45 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Regenerate with AI ── */
+.regenBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-accent-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+}
+
+.regenHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent-text);
+}
+
+.regenTitle {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.regenHint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-tertiary);
+}
+
+.regenRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.regenRow .input {
+  flex: 1;
+}

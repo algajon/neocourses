@@ -7,6 +7,7 @@ import {
   checklistItems,
   checklistProgress,
   enrollments,
+  courses,
 } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 
@@ -18,6 +19,16 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const [course] = await db
+    .select({ organizationId: courses.organizationId })
+    .from(courses)
+    .where(eq(courses.id, params.courseId))
+    .limit(1)
+
+  if (!course || course.organizationId !== session.user.organizationId) {
+    return NextResponse.json({ error: 'No checklist found' }, { status: 404 })
   }
 
   const [checklist] = await db

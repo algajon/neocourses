@@ -39,7 +39,7 @@ export async function GET(
     }
 
     const [course] = await db.select().from(courses).where(eq(courses.id, params.id)).limit(1)
-    if (!course) {
+    if (!course || course.organizationId !== session.user.organizationId) {
       return NextResponse.json({ error: 'Course not found' }, { status: 404 })
     }
 

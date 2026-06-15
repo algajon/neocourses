@@ -6,9 +6,19 @@ import {
   onboardingChecklists,
   checklistItems,
   checklistProgress,
+  courses,
 } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+
+async function courseInOrg(courseId: string, orgId: string | null | undefined) {
+  const [course] = await db
+    .select({ organizationId: courses.organizationId })
+    .from(courses)
+    .where(eq(courses.id, courseId))
+    .limit(1)
+  return !!course && course.organizationId === orgId
+}
 
 interface RouteParams {
   params: { checklistId: string }
@@ -28,7 +38,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     .where(eq(onboardingChecklists.id, checklistId))
     .limit(1)
 
-  if (!checklist) {
+  if (!checklist || !(await courseInOrg(checklist.courseId, session.user.organizationId))) {
     return NextResponse.json({ error: 'Checklist not found' }, { status: 404 })
   }
 
@@ -84,7 +94,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     .where(eq(onboardingChecklists.id, checklistId))
     .limit(1)
 
-  if (!checklist) {
+  if (!checklist || !(await courseInOrg(checklist.courseId, session.user.organizationId))) {
     return NextResponse.json({ error: 'Checklist not found' }, { status: 404 })
   }
 

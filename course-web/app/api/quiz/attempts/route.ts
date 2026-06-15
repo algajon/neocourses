@@ -10,6 +10,7 @@ import {
   certificates,
   lessonProgress,
   lessons,
+  courses,
 } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
@@ -37,6 +38,16 @@ export async function POST(req: NextRequest) {
     .limit(1)
 
   if (!quiz) {
+    return NextResponse.json({ error: 'Quiz not found' }, { status: 404 })
+  }
+
+  const [quizCourse] = await db
+    .select({ organizationId: courses.organizationId })
+    .from(courses)
+    .where(eq(courses.id, quiz.courseId))
+    .limit(1)
+
+  if (!quizCourse || quizCourse.organizationId !== session.user.organizationId) {
     return NextResponse.json({ error: 'Quiz not found' }, { status: 404 })
   }
 

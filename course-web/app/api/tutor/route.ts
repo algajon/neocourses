@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { aiTutorMessages, courses, lessons, modules, sourceMaterials } from '@/lib/db/schema'
 import { eq, and, desc, asc } from 'drizzle-orm'
 import { getAIProvider } from '@/lib/ai'
+import { selectRelevantChunks } from '@/lib/ai/retrieve'
 import { v4 as uuidv4 } from 'uuid'
 
 const SOURCE_CHAR_BUDGET = 6000
@@ -63,16 +64,16 @@ export async function POST(req: NextRequest) {
     .from(sourceMaterials)
     .where(eq(sourceMaterials.courseId, courseId))
 
+  // Retrieve the passages most relevant to THIS question (lexical RAG) rather than
+  // dumping the head of each document — keeps the grounding focused and on-topic.
   let sourceBlock = ''
-  let remaining = SOURCE_CHAR_BUDGET
   const sourceRefs: SourceRef[] = []
   for (const s of sources) {
-    if (remaining <= 0) break
-    const text = (s.extractedText ?? '').replace(/\s+/g, ' ').trim()
+    const text = (s.extractedText ?? '').trim()
     if (!text) continue
-    const slice = text.slice(0, remaining)
-    sourceBlock += `\n[Source file: ${s.fileName}]\n${slice}\n`
-    remaining -= slice.length
+    const relevant = selectRelevantChunks(text, message, Math.floor(SOURCE_CHAR_BUDGET / Math.max(sources.length, 1)))
+    if (!relevant.trim()) continue
+    sourceBlock += `\n[Source file: ${s.fileName}]\n${relevant}\n`
     sourceRefs.push({ label: s.fileName })
   }
 
@@ -92,11 +93,32 @@ export async function POST(req: NextRequest) {
     .where(eq(lessons.courseId, courseId))
     .orderBy(asc(modules.position), asc(lessons.position))
 
+  // Rank lessons by relevance to the question so the most pertinent intro/concepts/
+  // takeaways are injected first and the focused lesson is always retained.
+  const LESSON_BLOCK_BUDGET = 6000
+  const scoredLessons = lessonRows
+    .map((l) => {
+      const text = lessonText(l)
+      const moduleLabel = l.moduleTitle ?? 'Course'
+      const block = `[Lesson: "${l.title}" — Module: "${moduleLabel}"]\n${text || '(no content yet)'}`
+      // selectRelevantChunks over the lesson's own text gives a relevance signal for
+      // the question; empty result ⇒ no lexical overlap.
+      const hit = text ? selectRelevantChunks(`${l.title}\n\n${text}`, message, 600) : ''
+      return { id: l.id, block, score: hit.trim() ? hit.length : 0 }
+    })
+    .sort((a, b) => b.score - a.score)
+
   const lessonBlocks: string[] = []
-  for (const l of lessonRows) {
-    const text = lessonText(l)
-    const moduleLabel = l.moduleTitle ?? 'Course'
-    lessonBlocks.push(`[Lesson: "${l.title}" — Module: "${moduleLabel}"]\n${text || '(no content yet)'}`)
+  let lessonBudget = LESSON_BLOCK_BUDGET
+  // Always include the focused lesson first if the learner is reading one.
+  if (lessonId) {
+    const idx = scoredLessons.findIndex((s) => s.id === lessonId)
+    if (idx > 0) scoredLessons.unshift(...scoredLessons.splice(idx, 1))
+  }
+  for (const s of scoredLessons) {
+    if (lessonBudget <= 0) break
+    lessonBlocks.push(s.block.slice(0, lessonBudget))
+    lessonBudget -= s.block.length
   }
 
   // ── Focused lesson, if the learner is reading one ──

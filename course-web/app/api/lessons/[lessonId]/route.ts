@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
-import { lessons, modules, quizzes } from '@/lib/db/schema'
+import { lessons, modules, quizzes, courses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+
+async function courseInOrg(courseId: string, orgId: string | null | undefined) {
+  const [course] = await db
+    .select({ organizationId: courses.organizationId })
+    .from(courses)
+    .where(eq(courses.id, courseId))
+    .limit(1)
+  return !!course && course.organizationId === orgId
+}
 
 interface RouteParams {
   params: { lessonId: string }
@@ -24,6 +33,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     .limit(1)
 
   if (!lesson) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  if (!(await courseInOrg(lesson.courseId, session.user.organizationId))) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
@@ -112,12 +125,16 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     const { lessonId } = params
 
     const [existing] = await db
-      .select({ id: lessons.id })
+      .select({ id: lessons.id, courseId: lessons.courseId })
       .from(lessons)
       .where(eq(lessons.id, lessonId))
       .limit(1)
 
     if (!existing) {
+      return NextResponse.json({ error: 'Lesson not found' }, { status: 404 })
+    }
+
+    if (!(await courseInOrg(existing.courseId, session.user.organizationId))) {
       return NextResponse.json({ error: 'Lesson not found' }, { status: 404 })
     }
 

@@ -31,6 +31,7 @@ export async function GET(
         courseTitle: courses.title,
         courseStatus: courses.status,
         certificateEnabled: courses.certificateEnabled,
+        courseOrganizationId: courses.organizationId,
       })
       .from(enrollments)
       .innerJoin(courses, eq(enrollments.courseId, courses.id))
@@ -38,6 +39,10 @@ export async function GET(
       .limit(1)
 
     if (!enrollment) {
+      return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 })
+    }
+
+    if (enrollment.courseOrganizationId !== session.user.organizationId) {
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 })
     }
 
@@ -60,9 +65,11 @@ export async function GET(
       .from(modules)
       .where(eq(modules.courseId, enrollment.courseId))
 
+    const { courseOrganizationId: _courseOrganizationId, ...enrollmentOut } = enrollment
+
     return NextResponse.json({
       enrollment: {
-        ...enrollment,
+        ...enrollmentOut,
         completedLessons: completedLessons.length,
         totalLessons: totalLessonsRow?.total ?? 0,
         completedLessonIds: completedLessons.map((lp) => lp.lessonId),
@@ -88,12 +95,21 @@ export async function DELETE(
     const { id: userId, role } = session.user
 
     const [existing] = await db
-      .select({ id: enrollments.id, userId: enrollments.userId })
+      .select({
+        id: enrollments.id,
+        userId: enrollments.userId,
+        courseOrganizationId: courses.organizationId,
+      })
       .from(enrollments)
+      .innerJoin(courses, eq(enrollments.courseId, courses.id))
       .where(eq(enrollments.id, params.id))
       .limit(1)
 
     if (!existing) {
+      return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 })
+    }
+
+    if (existing.courseOrganizationId !== session.user.organizationId) {
       return NextResponse.json({ error: 'Enrollment not found' }, { status: 404 })
     }
 

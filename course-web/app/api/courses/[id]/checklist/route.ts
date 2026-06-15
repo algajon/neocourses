@@ -17,12 +17,12 @@ export async function GET(
   const courseId = params.id
 
   const [course] = await db
-    .select({ id: courses.id })
+    .select({ id: courses.id, organizationId: courses.organizationId })
     .from(courses)
     .where(eq(courses.id, courseId))
     .limit(1)
 
-  if (!course) {
+  if (!course || course.organizationId !== session.user.organizationId) {
     return NextResponse.json({ error: 'Course not found' }, { status: 404 })
   }
 

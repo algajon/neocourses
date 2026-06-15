@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
-import { modules } from '@/lib/db/schema'
+import { modules, courses } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
+
+async function courseInOrg(courseId: string, orgId: string | null | undefined) {
+  const [course] = await db
+    .select({ organizationId: courses.organizationId })
+    .from(courses)
+    .where(eq(courses.id, courseId))
+    .limit(1)
+  return !!course && course.organizationId === orgId
+}
 
 export async function GET(
   _req: NextRequest,
@@ -13,6 +22,10 @@ export async function GET(
     const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!(await courseInOrg(params.id, session.user.organizationId))) {
+      return NextResponse.json({ error: 'Module not found' }, { status: 404 })
     }
 
     const [mod] = await db
@@ -45,6 +58,10 @@ export async function PUT(
     const { role } = session.user
     if (role === 'learner') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    if (!(await courseInOrg(params.id, session.user.organizationId))) {
+      return NextResponse.json({ error: 'Module not found' }, { status: 404 })
     }
 
     const [existing] = await db
@@ -88,6 +105,10 @@ export async function DELETE(
     const { role } = session.user
     if (role === 'learner' || role === 'reviewer') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    if (!(await courseInOrg(params.id, session.user.organizationId))) {
+      return NextResponse.json({ error: 'Module not found' }, { status: 404 })
     }
 
     const [existing] = await db

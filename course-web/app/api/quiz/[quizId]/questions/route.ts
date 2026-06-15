@@ -2,9 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
-import { quizzes, quizQuestions } from '@/lib/db/schema'
+import { quizzes, quizQuestions, courses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+
+async function courseInOrg(courseId: string, orgId: string | null | undefined) {
+  const [course] = await db
+    .select({ organizationId: courses.organizationId })
+    .from(courses)
+    .where(eq(courses.id, courseId))
+    .limit(1)
+  return !!course && course.organizationId === orgId
+}
 
 interface RouteParams {
   params: { quizId: string }
@@ -24,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     .where(eq(quizzes.id, quizId))
     .limit(1)
 
-  if (!quiz) {
+  if (!quiz || !(await courseInOrg(quiz.courseId, session.user.organizationId))) {
     return NextResponse.json({ error: 'Quiz not found' }, { status: 404 })
   }
 
@@ -65,7 +74,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
     .where(eq(quizzes.id, quizId))
     .limit(1)
 
-  if (!quiz) {
+  if (!quiz || !(await courseInOrg(quiz.courseId, session.user.organizationId))) {
     return NextResponse.json({ error: 'Quiz not found' }, { status: 404 })
   }
 

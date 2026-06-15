@@ -1,9 +1,13 @@
 import '@/lib/load-env'
 import { Worker, type Job } from 'bullmq'
-import { eq } from 'drizzle-orm'
+import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import { connection } from '@/lib/queue/connection'
-import { COURSE_GEN_QUEUE, type CourseGenJobData } from '@/lib/queue'
+import {
+  COURSE_GEN_QUEUE,
+  courseGenQueue,
+  type CourseGenJobData,
+} from '@/lib/queue'
 import { db } from '@/lib/db'
 import {
   courses,
@@ -248,6 +252,17 @@ async function processor(job: Job<CourseGenJobData>) {
 const worker = new Worker<CourseGenJobData>(COURSE_GEN_QUEUE, processor, {
   connection,
   concurrency: Number(process.env.WORKER_CONCURRENCY ?? 3),
+  // Course generation is long-running (many model calls), so the per-job lock
+  // must outlive a single iteration. BullMQ auto-renews the lock every
+  // lockDuration/2 while the job is alive; if the worker crashes mid-job the
+  // lock expires after lockDuration and the job is reclaimed as stalled.
+  lockDuration: Number(process.env.WORKER_LOCK_DURATION_MS ?? 5 * 60 * 1000),
+  // How often the worker scans for jobs whose lock expired (crashed workers).
+  stalledInterval: Number(process.env.WORKER_STALLED_INTERVAL_MS ?? 30 * 1000),
+  // A job may be recovered from "stalled" this many times before it is moved to
+  // failed instead of being retried — bounds infinite reprocessing of a job
+  // that reliably crashes the worker.
+  maxStalledCount: Number(process.env.WORKER_MAX_STALLED ?? 2),
 })
 
 worker.on('completed', (job) => {
@@ -260,10 +275,108 @@ worker.on('failed', (job, err) => {
   )
 })
 
+// A stalled job means its lock expired (typically a crashed/hung worker). It
+// will be retried automatically until maxStalledCount; surface it for ops.
+worker.on('stalled', (jobId) => {
+  console.warn(`[worker] job ${jobId} stalled (lock expired) — will be retried`)
+})
+
+worker.on('error', (err) => {
+  console.error(`[worker] worker error: ${err.message}`)
+})
+
+worker.on('ready', () => {
+  console.log('[worker] ready — connected to Redis, listening for jobs')
+})
+
+// Health signal: surface Redis connection problems instead of failing silently.
+connection.on('error', (err) => {
+  console.error(`[worker] redis connection error: ${err.message}`)
+})
+connection.on('reconnecting', () => {
+  console.warn('[worker] redis reconnecting…')
+})
+
+// Lightweight heartbeat so liveness is observable in logs without an HTTP probe.
+const HEARTBEAT_MS = Number(process.env.WORKER_HEARTBEAT_MS ?? 60 * 1000)
+const heartbeat = setInterval(() => {
+  const state = worker.isRunning() ? 'running' : 'stopped'
+  console.log(
+    `[worker] heartbeat: ${state} (concurrency ${worker.concurrency})`,
+  )
+}, HEARTBEAT_MS)
+// Don't keep the event loop alive solely for the heartbeat.
+heartbeat.unref?.()
+
+// Startup recovery: a worker crash can leave ai_generation_jobs rows in
+// 'running' with no live BullMQ job to ever finish them, and their courses
+// stuck out of 'draft'. On boot, reconcile any such orphans to 'failed' so the
+// course returns to a re-generatable state. Safe because the worker isn't
+// processing yet at this point and a genuinely-active job would not be in this
+// table state without a corresponding live job.
+async function recoverOrphanedJobs() {
+  try {
+    const stuck = await db
+      .select()
+      .from(aiGenerationJobs)
+      .where(
+        and(
+          inArray(aiGenerationJobs.status, ['running', 'processing', 'pending']),
+          isNull(aiGenerationJobs.completedAt),
+        ),
+      )
+
+    if (stuck.length === 0) return
+
+    // Cross-check against BullMQ: a job is a real orphan only if there is no
+    // active/waiting/delayed BullMQ job for the same course. This avoids
+    // failing jobs that a still-running worker (or a pending retry) owns.
+    const liveJobs = await courseGenQueue.getJobs([
+      'active',
+      'waiting',
+      'delayed',
+      'paused',
+    ])
+    const liveCourseIds = new Set(
+      liveJobs.map((j) => j?.data?.courseId).filter(Boolean) as string[],
+    )
+
+    const orphans = stuck.filter((row) => !liveCourseIds.has(row.courseId))
+    if (orphans.length === 0) return
+
+    console.warn(
+      `[worker] startup recovery: found ${orphans.length} orphaned generation job(s) — marking failed`,
+    )
+
+    for (const row of orphans) {
+      await db
+        .update(aiGenerationJobs)
+        .set({
+          status: 'failed',
+          errorMessage:
+            'Worker restarted while this job was in progress; the job was not completed.',
+          completedAt: new Date(),
+        })
+        .where(eq(aiGenerationJobs.id, row.id))
+
+      await db
+        .update(courses)
+        .set({ status: 'draft', updatedAt: new Date() })
+        .where(eq(courses.id, row.courseId))
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(`[worker] startup recovery failed: ${message}`)
+  }
+}
+
+void recoverOrphanedJobs()
+
 console.log('Worker listening on course-generation queue')
 
 async function shutdown(signal: string) {
   console.log(`[worker] received ${signal}, shutting down`)
+  clearInterval(heartbeat)
   await worker.close()
   await connection.quit()
   process.exit(0)

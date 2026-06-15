@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     .where(eq(courses.id, courseId))
     .limit(1)
 
-  if (!course) {
+  if (!course || course.organizationId !== session.user.organizationId) {
     return NextResponse.json({ error: 'Course not found' }, { status: 404 })
   }
 
