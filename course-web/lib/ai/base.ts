@@ -1,5 +1,6 @@
 import type { AIProvider, CourseOutline, FullLessonContent, QuizQuestion, ChecklistItem } from './types'
 import { MockAIProvider } from './mock'
+import { selectRelevantChunks } from './retrieve'
 
 export const SYSTEM_PROMPT =
   'You are a professional course content creator. Return valid JSON only, no markdown.'
@@ -90,17 +91,35 @@ real concepts, terminology, and structure. Do not invent topics that are not pre
   // Lessons generate ONE AT A TIME, sequentially within a module (the worker runs
   // modules in parallel). The desktop prompt keys off lesson title + chapter + course
   // topic only — that is what produces specific, factual content reliably.
-  async generateLessons(moduleTitle: string, lessonTitles: string[], courseTitle: string): Promise<FullLessonContent[]> {
+  async generateLessons(
+    moduleTitle: string,
+    lessonTitles: string[],
+    courseTitle: string,
+    sourceText?: string,
+  ): Promise<FullLessonContent[]> {
     const out: FullLessonContent[] = []
     for (const t of lessonTitles) {
-      out.push(await this.generateOneLesson(t, moduleTitle, courseTitle))
+      // Retrieve the source passages most relevant to THIS lesson so its content
+      // is grounded in the uploaded material, not the model's general knowledge.
+      const excerpt = sourceText ? selectRelevantChunks(sourceText, `${moduleTitle} ${t}`, 3500) : ''
+      out.push(await this.generateOneLesson(t, moduleTitle, courseTitle, excerpt))
     }
     return out
   }
 
-  private async generateOneLesson(lessonTitle: string, chapterName: string, courseTopic: string): Promise<FullLessonContent> {
-    const system = 'You are an educational content writer. Return only valid JSON with no markdown fences or extra text.'
-    const user = `Write lesson content for a lesson titled "${lessonTitle}" in chapter "${chapterName}" of a course about "${courseTopic}".
+  private async generateOneLesson(
+    lessonTitle: string,
+    chapterName: string,
+    courseTopic: string,
+    sourceExcerpt = '',
+  ): Promise<FullLessonContent> {
+    const system = sourceExcerpt
+      ? 'You are an educational content writer who writes STRICTLY from provided source material. You never add facts, names, dates, numbers, or claims that are not present in the source. Return only valid JSON with no markdown fences or extra text.'
+      : 'You are an educational content writer. Return only valid JSON with no markdown fences or extra text.'
+    const grounding = sourceExcerpt
+      ? `\n\nSOURCE MATERIAL — base every concept, example, and takeaway STRICTLY on this. Do NOT introduce facts, names, numbers, tools, history, or claims that are not present below. If the source lacks detail for a point, keep it general rather than inventing specifics. Paraphrase; do not copy verbatim.\n"""\n${sourceExcerpt}\n"""\n`
+      : ''
+    const user = `Write lesson content for a lesson titled "${lessonTitle}" in chapter "${chapterName}" of a course about "${courseTopic}".${grounding}
 
 Return this exact JSON with no other text:
 {

@@ -61,7 +61,8 @@ export interface AIProvider {
   generateLessons(
     moduleTitle: string,
     lessonTitles: string[],
-    courseTitle: string
+    courseTitle: string,
+    sourceText?: string
   ): Promise<FullLessonContent[]>
 
   generateQuizQuestions(

@@ -94,7 +94,9 @@ async function runGeneration(courseId: string, jobId: string) {
       })
 
       const lessonTitles = mod.lessons.map((l) => l.title)
-      const fullLessons = await ai.generateLessons(mod.title, lessonTitles, courseTopic)
+      // Pass the full source so each lesson is grounded in the actual uploaded
+      // material (the provider retrieves the passages relevant to each lesson).
+      const fullLessons = await ai.generateLessons(mod.title, lessonTitles, courseTopic, materialText)
 
       // The model's lesson objects don't always include every field; the outline is
       // the source of truth for titles. Guard all NOT-NULL columns with safe defaults.

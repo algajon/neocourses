@@ -103,7 +103,7 @@ export class MockAIProvider implements AIProvider {
     }
   }
 
-  async generateLessons(moduleTitle: string, lessonTitles: string[], _courseTitle: string): Promise<FullLessonContent[]> {
+  async generateLessons(moduleTitle: string, lessonTitles: string[], _courseTitle: string, _sourceText?: string): Promise<FullLessonContent[]> {
     await delay(400, 700)
 
     const introTemplates = [
