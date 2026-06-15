@@ -9,7 +9,13 @@ type Theme = 'dark' | 'white'
  * Persists to localStorage and sets data-theme on <html>. The pre-paint script in
  * the root layout applies the saved theme before hydration to avoid a flash.
  */
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({
+  className,
+  variant = 'icon',
+}: {
+  className?: string
+  variant?: 'icon' | 'menu'
+}) {
   const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
@@ -27,13 +33,14 @@ export function ThemeToggle({ className }: { className?: string }) {
   }
 
   const isDark = theme === 'dark'
+  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode'
   return (
     <button
       type="button"
       onClick={toggle}
       className={className}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={label}
+      title={variant === 'icon' ? label : undefined}
     >
       {isDark ? (
         // sun (switch to light)
@@ -47,6 +54,7 @@ export function ThemeToggle({ className }: { className?: string }) {
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
       )}
+      {variant === 'menu' && <span>{label}</span>}
     </button>
   )
 }

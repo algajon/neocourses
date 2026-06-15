@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { ThemeToggle } from './ThemeToggle'
-import { NotificationBell } from './NotificationBell'
+import { NotificationList } from './NotificationList'
+import { useNotifications } from './useNotifications'
 import { Icon } from './Icon'
 import styles from './AdminSidebar.module.css'
 
@@ -79,9 +80,12 @@ const NAV_ITEMS = [
 export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [notifOpen, setNotifOpen] = useState(false)
+  const { items, unreadCount, markRead, markAllRead } = useNotifications()
 
   useEffect(() => {
     setOpen(false)
+    setNotifOpen(false)
   }, [pathname])
 
   return (
@@ -126,15 +130,37 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
 
       <div className={styles.footer}>
         <div className={styles.userInfo}>
-          <div className={styles.userTop}>
-            <div className={styles.userIdentity}>
-              <span className={styles.userName}>{user.name ?? user.email}</span>
-              <span className={styles.userRole}>{user.role}</span>
-            </div>
-            <NotificationBell />
+          <div className={styles.userIdentity}>
+            <span className={styles.userName}>{user.name ?? user.email}</span>
+            <span className={styles.userRole}>{user.role}</span>
           </div>
-          <ThemeToggle className={styles.themeToggle} />
         </div>
+
+        {notifOpen && (
+          <div className={styles.notifPanel}>
+            <NotificationList
+              items={items}
+              unreadCount={unreadCount}
+              onMarkRead={markRead}
+              onMarkAllRead={markAllRead}
+              onNavigate={() => setNotifOpen(false)}
+            />
+          </div>
+        )}
+
+        <button
+          type="button"
+          className={styles.footerRow}
+          onClick={() => setNotifOpen(o => !o)}
+          aria-expanded={notifOpen}
+        >
+          <Icon name="bell" size={14} />
+          Notifications
+          {unreadCount > 0 && <span className={styles.footerBadge}>{unreadCount > 99 ? '99+' : unreadCount}</span>}
+        </button>
+
+        <ThemeToggle variant="menu" className={styles.footerRow} />
+
         <Link href="/admin/account" className={styles.settingsLink}>
           <Icon name="settings" size={14} />
           Settings

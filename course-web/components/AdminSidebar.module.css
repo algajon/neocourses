@@ -118,6 +118,67 @@
   margin-top: var(--space-3);
 }
 
+.footerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-1);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--sidebar-text-secondary);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.footerRow:hover {
+  color: var(--sidebar-text);
+  background: var(--sidebar-item-hover);
+}
+
+.footerBadge {
+  margin-left: auto;
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-contrast);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Inline notification panel — remap theme tokens to the always-dark sidebar
+   palette so it matches the sidebar in both light and dark app themes. */
+.notifPanel {
+  --color-surface: var(--sidebar-bg);
+  --color-surface-2: var(--sidebar-item-hover);
+  --color-surface-3: var(--sidebar-item-hover);
+  --color-border-subtle: var(--sidebar-border);
+  --color-border: var(--sidebar-border);
+  --color-text-primary: var(--sidebar-text);
+  --color-text-secondary: var(--sidebar-text-secondary);
+  --color-text-tertiary: var(--sidebar-text-secondary);
+  --color-accent: var(--sidebar-accent);
+  --color-accent-subtle: var(--sidebar-item-hover);
+  --color-accent-text: var(--sidebar-accent);
+  --color-accent-contrast: var(--sidebar-accent-contrast);
+  --color-success: var(--sidebar-accent);
+  --color-success-subtle: var(--sidebar-item-hover);
+  margin-bottom: var(--space-2);
+  border: 1px solid var(--sidebar-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
 .userInfo {
   display: flex;
   flex-direction: column;

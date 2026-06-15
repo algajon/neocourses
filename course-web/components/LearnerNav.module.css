@@ -119,6 +119,7 @@
 }
 
 .userAvatar {
+  position: relative;
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -141,7 +142,11 @@
   position: absolute;
   top: calc(100% + var(--space-2));
   right: 0;
-  min-width: 220px;
+  width: 340px;
+  max-width: calc(100vw - var(--space-6));
+  /* Never run off-screen — cap height and scroll instead. */
+  max-height: min(600px, calc(100vh - 80px));
+  overflow-y: auto;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -150,6 +155,30 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+}
+
+/* Full-bleed notification section inside the padded dropdown. */
+.notifSection {
+  margin: 0 calc(-1 * var(--space-2));
+  border-top: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--space-1) calc(-1 * var(--space-2));
+}
+
+.avatarDot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 2px solid var(--color-bg);
 }
 
 .dropdownHeader {

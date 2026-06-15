@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { NotificationBell } from '@/components/NotificationBell'
+import { NotificationList } from '@/components/NotificationList'
+import { useNotifications } from '@/components/useNotifications'
 import { Icon } from '@/components/Icon'
 import styles from './LearnerNav.module.css'
 
@@ -28,6 +29,7 @@ export function LearnerNav({ user }: LearnerNavProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const { items, unreadCount, markRead, markAllRead } = useNotifications()
 
   useEffect(() => {
     if (!menuOpen) return
@@ -87,8 +89,6 @@ export function LearnerNav({ user }: LearnerNavProps) {
           </div>
         </div>
         <div className={styles.navRight}>
-          <NotificationBell />
-          <ThemeToggle className={styles.themeToggle} />
           <div className={styles.userMenu} ref={menuRef}>
             <button
               type="button"
@@ -99,6 +99,7 @@ export function LearnerNav({ user }: LearnerNavProps) {
             >
               <span className={styles.userAvatar}>
                 {user.name?.[0]?.toUpperCase() ?? 'U'}
+                {unreadCount > 0 && <span className={styles.avatarDot} aria-label={`${unreadCount} unread notifications`} />}
               </span>
               <span className={styles.userName}>{user.name}</span>
             </button>
@@ -108,6 +109,21 @@ export function LearnerNav({ user }: LearnerNavProps) {
                   <span className={styles.dropdownName}>{user.name}</span>
                   <span className={styles.dropdownEmail}>{user.email}</span>
                 </div>
+
+                <div className={styles.notifSection}>
+                  <NotificationList
+                    items={items}
+                    unreadCount={unreadCount}
+                    onMarkRead={markRead}
+                    onMarkAllRead={markAllRead}
+                    onNavigate={() => setMenuOpen(false)}
+                  />
+                </div>
+
+                <div className={styles.menuDivider} />
+
+                <ThemeToggle variant="menu" className={styles.menuLink} />
+
                 <Link
                   href="/settings"
                   className={styles.menuLink}
