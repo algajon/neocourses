@@ -104,20 +104,20 @@ real concepts, terminology, and structure. Do not invent topics that are not pre
 
 Return this exact JSON with no other text:
 {
-  "intro": "An engaging 2-3 sentence hook that draws the reader in — open with a vivid question, a surprising fact, a concrete real-world scenario, or a striking stake. Make it specific to ${lessonTitle}. Do NOT begin with 'This lesson', 'In this lesson', 'Welcome', or 'Understanding'",
+  "intro": "An engaging 2-sentence hook (max 38 words total) that draws the reader in — open with a vivid question, a surprising fact, a concrete real-world scenario, or a striking stake. Make it specific to ${lessonTitle}. Do NOT begin with 'This lesson', 'In this lesson', 'Welcome', or 'Understanding'",
   "concepts": [
-    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 tight, factual sentences of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing"},
-    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 tight, factual sentences of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing"},
-    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 tight, factual sentences of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing"}
+    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 short sentences (max 30 words TOTAL) of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing. Keep it tight; brevity is mandatory"},
+    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 short sentences (max 30 words TOTAL) of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing. Keep it tight; brevity is mandatory"},
+    {"title": "Short concept title (2-4 words)", "body": "Exactly 2 short sentences (max 30 words TOTAL) of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing. Keep it tight; brevity is mandatory"}
   ],
   "keyPoints": [
     "Short factual bullet point about ${lessonTitle}",
     "Short factual bullet point about ${lessonTitle}",
     "Short factual bullet point about ${lessonTitle}"
   ],
-  "example": "One concrete real-world example or scenario demonstrating ${lessonTitle} in practice (1-2 sentences)",
-  "trivia": "One surprising fact, piece of history, or interesting bit of context about ${lessonTitle} that makes it more memorable (1-2 sentences)",
-  "tip": "One specific, actionable insight or practical tip about ${lessonTitle}"
+  "example": "One concrete real-world example demonstrating ${lessonTitle} in practice (1-2 sentences, max 34 words)",
+  "trivia": "One surprising fact or bit of context about ${lessonTitle} that makes it memorable (1 sentence, max 28 words)",
+  "tip": "One specific, actionable tip about ${lessonTitle} (1 sentence, max 26 words)"
 }`
     try {
       const raw = parseJSON<{
