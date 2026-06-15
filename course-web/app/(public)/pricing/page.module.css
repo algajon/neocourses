@@ -1,0 +1,250 @@
+.page {
+  color: var(--color-text-primary);
+}
+
+.inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 80px 0 64px;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border-subtle);
+  text-align: center;
+}
+
+.label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+  background: var(--color-accent-subtle);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+  padding: 4px 12px;
+  border-radius: 99px;
+  margin-bottom: var(--space-5);
+}
+
+[data-theme="dark"] .label {
+  color: #e5ff00;
+  background: rgba(229, 255, 0, 0.10);
+  border-color: rgba(229, 255, 0, 0.22);
+}
+
+.title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  margin-bottom: var(--space-5);
+}
+
+.sub {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ── Plans ── */
+.plansSection {
+  padding: 72px 0;
+  background: var(--color-bg);
+}
+
+.plansGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .plansGrid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
+
+.planCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.planCardHighlighted {
+  border-color: rgba(229, 255, 0, 0.45);
+  box-shadow: 0 0 0 1px rgba(229, 255, 0, 0.20), var(--shadow-md);
+  background: var(--color-surface);
+}
+
+[data-theme="dark"] .planCardHighlighted {
+  background: #1c1e12;
+  border-color: rgba(229, 255, 0, 0.35);
+}
+
+.planBadge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gradient-accent);
+  color: #0a0a0a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+  box-shadow: var(--glow-sm);
+}
+
+.planName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.planPrice {
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--color-text-primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.planPriceSub {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.planDesc {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.planDivider {
+  height: 1px;
+  background: var(--color-border-subtle);
+  margin: var(--space-6) 0;
+}
+
+.featureList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.featureItem {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.check {
+  color: var(--color-success);
+  font-weight: 700;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* ── FAQ ── */
+.faqSection {
+  padding: 72px 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.faqTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+.faqGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+}
+
+@media (max-width: 700px) {
+  .faqGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.faqItem {
+  padding: var(--space-6);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.faqQ {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.faqA {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+/* ── CTA ── */
+.ctaSection {
+  padding: 96px 0;
+  text-align: center;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.ctaTitle {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--space-3);
+}
+
+.ctaSub {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-8);
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ctaButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}

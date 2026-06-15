@@ -1,0 +1,341 @@
+.page {
+  background: var(--color-bg);
+  min-height: calc(100vh - 56px);
+  padding: var(--space-10) var(--space-6) var(--space-12);
+}
+
+.inner {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.breadcrumbLink {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+
+.breadcrumbLink:hover {
+  color: var(--color-text-primary);
+}
+
+.breadcrumbSep {
+  font-size: 13px;
+  color: var(--color-border);
+}
+
+.breadcrumbCurrent {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.requiredNote {
+  color: var(--color-warning);
+}
+
+/* ── Circle progress ── */
+.circleProgress {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.circleSvg {
+  width: 64px;
+  height: 64px;
+  transform: rotate(-90deg);
+}
+
+.circleTrack {
+  fill: none;
+  stroke: var(--color-surface-3);
+  stroke-width: 3;
+}
+
+.circleFill {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.circlePct {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* ── Progress bar ── */
+.progressBar {
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* ── List ── */
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.item:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-subtle);
+}
+
+.itemDone {
+  background: var(--color-surface);
+  border-color: var(--color-success);
+  opacity: 0.75;
+}
+
+.itemDone:hover {
+  opacity: 0.9;
+  background: var(--color-success-subtle);
+  border-color: var(--color-success);
+}
+
+/* ── Checkbox ── */
+.checkbox {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface-2);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: transparent;
+}
+
+.checkbox:hover:not(:disabled) {
+  border-color: var(--color-accent);
+}
+
+.checkboxDone {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #fff;
+}
+
+.checkboxDone:hover:not(:disabled) {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  opacity: 0.85;
+}
+
+/* ── Item content ── */
+.itemContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.itemText {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.itemDone .itemText {
+  text-decoration: line-through;
+  text-decoration-color: var(--color-border);
+  color: var(--color-text-tertiary);
+}
+
+.requiredBadge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-warning);
+  background: var(--color-warning-subtle);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+}
+
+.itemDescription {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.completedAt {
+  font-size: 11px;
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+/* ── All done banner ── */
+.allDone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-success-subtle);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-lg);
+}
+
+.allDoneIcon {
+  font-size: 28px;
+  width: 52px;
+  height: 52px;
+  background: var(--color-success);
+  color: #fff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.allDoneTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-success);
+  margin: 0;
+}
+
+.allDoneSub {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 2px 0 0;
+}
+
+.btnAccent {
+  margin-left: auto;
+  display: inline-block;
+  background: var(--gradient-accent);
+  color: #0a0a0a;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  box-shadow: var(--glow-sm);
+  transition: box-shadow 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.btnAccent:hover {
+  box-shadow: var(--glow-md);
+  opacity: 0.9;
+}
+
+/* ── Error ── */
+.errorText {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: var(--space-3);
+  color: var(--color-accent-text);
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* ── Skeleton ── */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.skItem {
+  height: 64px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

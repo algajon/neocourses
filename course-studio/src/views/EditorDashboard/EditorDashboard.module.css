@@ -59,7 +59,7 @@
   background: var(--color-accent);
   border: 1px solid var(--color-accent);
   border-radius: var(--radius-sm);
-  color: #fff;
+  color: var(--color-accent-contrast);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 500;
@@ -130,7 +130,7 @@
 
 .publishBtn:hover {
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-accent-contrast);
 }
 
 .publishBtn:focus-visible {

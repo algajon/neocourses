@@ -31,6 +31,14 @@ pub enum AppError {
     #[error("Job was cancelled")]
     #[serde(rename = "JOB_CANCELLED")]
     JobCancelled,
+
+    #[error("Pairing failed")]
+    #[serde(rename = "PAIRING_FAILED")]
+    PairingFailed(String),
+
+    #[error("Pairing is not active")]
+    #[serde(rename = "PAIRING_NOT_ACTIVE")]
+    PairingNotActive,
 }
 
 impl From<AppError> for String {

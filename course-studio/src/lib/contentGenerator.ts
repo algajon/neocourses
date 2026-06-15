@@ -3,6 +3,7 @@ export type LessonContent = {
   concepts: { title: string; body: string }[];
   keyPoints?: string[];
   example?: string;
+  trivia?: string;
   tip: string;
 };
 
@@ -113,12 +114,20 @@ export function generateLessonContent(lessonTitle: string, courseTopic: string):
     `Compare two approaches in ${ctx}: one that uses ${t} correctly and one that does not. The difference in the results is usually the fastest way to build intuition for what ${t} actually does.`,
   ];
 
+  const trivia = [
+    `${t} has roots that go back further than most people expect — the core idea was in use long before it became a standard part of ${ctx}.`,
+    `Many ${ctx} practitioners use ${t} every day without ever naming it explicitly. Putting a name to the pattern is often what turns intuition into a repeatable skill.`,
+    `A surprising amount of ${ctx} tooling is built specifically to make ${t} easier — a good sign of just how central it is to the field.`,
+    `The most common misconception about ${t} is that it is more complicated than it is. In practice, the simple form covers the overwhelming majority of real ${ctx} work.`,
+  ];
+
   const ci = h % conceptSets.length;
   return {
     intro: intros[h % intros.length],
     concepts: conceptSets[ci],
     keyPoints: keyPointSets[(h + 1) % keyPointSets.length],
     example: examples[(h + 3) % examples.length],
+    trivia: trivia[(h + 1) % trivia.length],
     tip: tips[(h + 2) % tips.length],
   };
 }
@@ -130,9 +139,14 @@ function firstSentence(s: string): string {
   return m ? m[0].trim() : s.slice(0, 90).trim();
 }
 
-function clip(s: string, max = 62): string {
-  const sent = firstSentence(s);
-  return sent.length > max ? sent.slice(0, max - 1) + '…' : sent;
+// Trim to a whole-word boundary; only ellipsize when genuinely long.
+function clip(s: string, max = 110): string {
+  const sent = firstSentence(s).trim();
+  if (sent.length <= max) return sent;
+  const cut = sent.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  const word = lastSpace > max * 0.5 ? cut.slice(0, lastSpace) : cut;
+  return word.replace(/[\s.,;:]+$/, '') + '…';
 }
 
 // Returns 3 distinct strings from `pool` (excluding `exclude`), cycling by seed.
@@ -147,21 +161,146 @@ function pickThree(pool: string[], exclude: string, seed: number): [string, stri
   return [a, b, c];
 }
 
+export type OutlineModule = { module: string; lessons: string[] };
+
+// Deterministically pick up to `count` distinct items from `pool`, seeded by `seed`.
+function pickN(pool: string[], exclude: string[], count: number, seed: number): string[] {
+  const unique = [...new Set(pool)].filter(s => s && !exclude.includes(s));
+  const out: string[] = [];
+  for (let k = 0; out.length < count && unique.length > 0; k++) {
+    const idx = (seed + k * 7 + 3) % unique.length;
+    out.push(unique.splice(idx, 1)[0]);
+  }
+  return out;
+}
+
+// Plausible same-topic lesson titles to use when the outline can't supply
+// enough cross-chapter distractors. Phrased to stay grammatical and complete.
+function syntheticDistractors(courseTopic: string): string[] {
+  const t = cleanForProse(courseTopic);
+  return [
+    `Advanced ${t} Techniques`,
+    `Common Pitfalls in ${t}`,
+    `${t} Best Practices`,
+    `Debugging and Troubleshooting`,
+    `Performance and Optimization`,
+    `Real-World ${t} Projects`,
+  ];
+}
+
+// No-AI quiz: contextual questions built purely from the real outline
+// (chapter name + lesson titles + course topic). Every option is a complete,
+// readable title or phrase — no fabricated prose, no truncation.
+function generateOutlineQuiz(
+  chapterName: string,
+  lessons: string[],
+  courseTopic: string,
+  allModules?: OutlineModule[]
+): QuizQuestion[] {
+  const h = hash(chapterName);
+  const cleanChapter = cleanForProse(chapterName);
+  const cleanTopic = cleanForProse(courseTopic);
+
+  const otherModules = (allModules ?? []).filter(m => m.module !== chapterName);
+  const otherLessons = otherModules.flatMap(m => m.lessons).filter(l => !lessons.includes(l));
+  const otherChapters = otherModules.map(m => m.module);
+
+  const lessonDistractorPool = [...otherLessons, ...syntheticDistractors(courseTopic)];
+  const chapterDistractorPool = [...otherChapters, `${cleanTopic} Fundamentals`, `Getting Started with ${cleanTopic}`, `Advanced ${cleanTopic}`];
+
+  const questions: QuizQuestion[] = [];
+
+  // Q1 — identify a real lesson in this chapter
+  const correct1 = lessons[h % lessons.length];
+  const d1 = pickN(lessonDistractorPool, [correct1, ...lessons], 3, h);
+  if (d1.length === 3) {
+    questions.push(makeQ('cq1',
+      `Which of these is a lesson in the chapter "${cleanChapter}"?`,
+      correct1,
+      d1 as [string, string, string],
+      h,
+    ));
+  }
+
+  // Q2 — match a lesson back to its chapter
+  if (otherChapters.length >= 1) {
+    const lessonForQ2 = lessons[(h + 1) % lessons.length];
+    const d2 = pickN(chapterDistractorPool, [chapterName], 3, h + 1);
+    if (d2.length === 3) {
+      questions.push(makeQ('cq2',
+        `Which chapter covers the lesson "${cleanForProse(lessonForQ2)}"?`,
+        chapterName,
+        d2 as [string, string, string],
+        h + 1,
+      ));
+    }
+  }
+
+  // Q3 — focus/topic of this chapter
+  const d3 = pickN(chapterDistractorPool, [chapterName], 3, h + 2);
+  if (d3.length === 3) {
+    questions.push(makeQ('cq3',
+      `What is the focus of the "${cleanChapter}" chapter?`,
+      chapterName,
+      d3 as [string, string, string],
+      h + 2,
+    ));
+  }
+
+  // Q4 — count of lessons in the chapter (grounded, unambiguous)
+  const correctCount = String(lessons.length);
+  const countDistractors = [lessons.length + 1, lessons.length + 2, Math.max(1, lessons.length - 1)]
+    .filter((v, i, arr) => arr.indexOf(v) === i && v !== lessons.length)
+    .slice(0, 3)
+    .map(String);
+  if (countDistractors.length === 3) {
+    questions.push(makeQ('cq4',
+      `How many lessons does the "${cleanChapter}" chapter contain?`,
+      correctCount,
+      countDistractors as [string, string, string],
+      h + 3,
+    ));
+  }
+
+  // Q5 — another distinct real lesson from this chapter (if available)
+  if (lessons.length >= 2) {
+    const correct5 = lessons[(h + 2) % lessons.length] === correct1
+      ? lessons[(h + 3) % lessons.length]
+      : lessons[(h + 2) % lessons.length];
+    const d5 = pickN(lessonDistractorPool, [correct5, ...lessons], 3, h + 4);
+    if (d5.length === 3) {
+      questions.push(makeQ('cq5',
+        `Which of the following belongs to the "${cleanChapter}" chapter?`,
+        correct5,
+        d5 as [string, string, string],
+        h + 4,
+      ));
+    }
+  }
+
+  return questions;
+}
+
 export function generateChapterQuiz(
   chapterName: string,
   lessons: string[],
   courseTopic: string,
-  aiContents?: Map<string, LessonContent>
+  aiContents?: Map<string, LessonContent>,
+  allModules?: OutlineModule[]
 ): QuizQuestion[] {
   if (lessons.length === 0) return [];
+
+  // Without real AI content, the only course-specific material is the titles —
+  // build well-formed, contextual questions from the outline instead of generic
+  // template prose (which produced nonsense stems and truncated options).
+  const hasAI = aiContents && lessons.every(l => aiContents.has(l));
+  if (!hasAI) {
+    return generateOutlineQuiz(chapterName, lessons, courseTopic, allModules);
+  }
+
   const h = hash(chapterName);
   const n = lessons.length;
-
-  // Use AI-generated content when all lessons in this chapter have been fetched
-  const hasAI = aiContents && lessons.every(l => aiContents.has(l));
-  const contents: LessonContent[] = hasAI
-    ? lessons.map(l => aiContents!.get(l)!)
-    : lessons.map(l => generateLessonContent(l, courseTopic));
+  const contents: LessonContent[] = lessons.map(l => aiContents!.get(l)!);
 
   // ── Pools of answer material ──────────────────────────────────────────────
   const allConceptTitles = contents.flatMap(c => c.concepts.map(x => x.title));

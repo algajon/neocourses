@@ -1,0 +1,128 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--color-bg);
+  position: relative;
+}
+
+.page::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(229, 255, 0, 0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.wordmark {
+  display: inline-block;
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -0.04em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+}
+
+.neo {
+  color: var(--color-accent);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.sub {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+/* ── Error banner ── */
+.errorBanner {
+  background: var(--color-error-subtle);
+  border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  color: var(--color-error);
+  margin-bottom: var(--space-5);
+  text-align: center;
+}
+
+/* ── Form ── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.submitBtn {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-2);
+  font-size: 15px;
+  padding: 12px 20px;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: none;
+}
+
+/* ── Footer text ── */
+.footer {
+  margin-top: var(--space-6);
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.link {
+  color: var(--color-accent-text);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+[data-theme="dark"] .link {
+  color: var(--color-accent);
+}
+
+.link:hover {
+  text-decoration: underline;
+}

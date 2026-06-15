@@ -97,7 +97,7 @@ export function ImportPanel({ onGenerate, isGenerating }: Props) {
         <div>
           <h2 className={styles.title}>Import & Generate</h2>
           <p className={styles.subtitle}>
-            Drop in PDFs, audio recordings, videos, or manuals. neoCourses will extract the content and build a structured course outline instantly. No manual writing required.
+            Drop in PDFs, audio recordings, videos, or manuals. courseneo will extract the content and build a structured course outline instantly. No manual writing required.
           </p>
         </div>
       </div>

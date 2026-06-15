@@ -2,28 +2,42 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  z-index: 9999;
   background: var(--color-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   color: var(--color-text-primary);
   font-family: var(--font-ui);
+  /* Rely on inset:0 to track the live viewport. A fixed 100vh value is
+     captured before the Tauri window enters native fullscreen, leaving the
+     footer/fuse mis-positioned until a manual resize forces a recalc. */
 }
 
-/* ─── Header: 3-column grid ──────────────────────────────── */
+/* ─── Header: centered logo with side controls ──────────── */
 .header {
   display: grid;
-  grid-template-columns: 40px 1fr 40px; /* close | logo | right-controls */
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  justify-items: center;
   padding: 10px 20px;
   background: color-mix(in srgb, var(--color-surface) 90%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border-subtle);
   flex-shrink: 0;
-  /* right column is wider to fit counter + fsBtn */
-  grid-template-columns: minmax(40px, auto) 1fr minmax(120px, auto);
   gap: var(--space-3);
+  z-index: 10;
+  position: relative;
+}
+
+/* Close button to the left */
+.header > :first-child {
+  justify-self: start;
+}
+
+/* Right controls to the right */
+.header > :last-child {
+  justify-self: end;
 }
 
 /* ── Close button (left) ── */
@@ -113,31 +127,54 @@
   color: var(--color-accent);
 }
 
-/* ─── Image panel ────────────────────────────────────────── */
+/* ─── Content area (scrollable middle section) ──────────── */
+.contentArea {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 60px;
+}
+
+
+/* ─── Key visual panel (branded, gradient + watermark icon) ── */
 .imageWrap {
   position: relative;
   flex-shrink: 0;
-  height: clamp(200px, 38vh, 360px);
+  height: clamp(307px, 40vh, 413px);
   overflow: hidden;
   background: var(--color-surface-2);
-}
-
-.image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 30%; /* bias toward upper portion for natural framing */
-  display: block;
-}
-
-.imageFallback {
-  width: 100%;
-  height: 100%;
+  align-self: stretch;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface-2);
-  color: var(--color-border);
+}
+
+/* Curated subject photo — fills the banner edge-to-edge */
+.image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* Watermark icon shown only if the photo fails to load */
+.keyVisual {
+  width: clamp(64px, 11vh, 104px);
+  height: clamp(64px, 11vh, 104px);
+  color: rgba(255, 255, 255, 0.92);
+  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.28));
+  opacity: 0.95;
+  z-index: 1;
 }
 
 .imageScrim {
@@ -171,62 +208,56 @@
   white-space: nowrap;
 }
 
-/* ─── Fuse timer ─────────────────────────────────────────── */
+/* ─── Fuse timer (fixed at bottom above footer) ──────────── */
 .fuseWrap {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 22px;
+  padding: 8px 22px 0;
   height: 22px;     /* enough room for the glow tip to breathe */
   flex-shrink: 0;
   overflow: visible;
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-bg);
 }
 
 .fuseTrack {
   flex: 1;
-  height: 7px;
+  height: 4px;
   background: var(--color-surface-3);
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: visible;
   position: relative;
 }
 
 .fuseBar {
   height: 100%;
-  background: linear-gradient(90deg, #15803d 0%, #22c55e 60%, #4ade80 100%);
-  border-radius: 4px;
+  /* Calmer, lower-saturation green so the timer reads as ambient progress
+     rather than competing with the question for attention. */
+  background: color-mix(in srgb, var(--color-success) 70%, var(--color-surface-3));
+  border-radius: 3px;
   position: relative;
   transition: width 1s linear;
   min-width: 0;
 }
 
-/* Glowing orb at the burning tip */
+/* Subtle tip at the burning end — small, soft glow, gentle slow pulse */
 .fuseTip {
   position: absolute;
-  right: -8px;
+  right: -4px;
   top: 50%;
   transform: translateY(-50%);
-  width: 17px;
-  height: 17px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: #4ade80;
-  animation: fuseFlicker 0.35s ease-in-out infinite alternate;
+  background: color-mix(in srgb, var(--color-success) 85%, #fff);
+  animation: fuseFlicker 1.6s ease-in-out infinite alternate;
   z-index: 2;
 }
 
 @keyframes fuseFlicker {
-  0% {
-    box-shadow:
-      0 0 0 3px rgba(74,222,128,0.20),
-      0 0 10px 4px rgba(74,222,128,0.65),
-      0 0 22px 8px rgba(74,222,128,0.35);
-  }
-  100% {
-    box-shadow:
-      0 0 0 4px rgba(74,222,128,0.30),
-      0 0 14px 6px rgba(74,222,128,0.90),
-      0 0 30px 12px rgba(74,222,128,0.50);
-  }
+  0%   { box-shadow: 0 0 4px 1px color-mix(in srgb, var(--color-success) 30%, transparent); }
+  100% { box-shadow: 0 0 7px 2px color-mix(in srgb, var(--color-success) 45%, transparent); }
 }
 
 /* When answer is revealed — snap bar to zero */
@@ -246,46 +277,71 @@
 
 /* ─── Question ───────────────────────────────────────────── */
 .questionWrap {
-  padding: 14px 40px 4px;
-  flex-shrink: 0;
+  padding: 28px 40px 10px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
 }
 
 .questionText {
   font-family: var(--font-display);
-  font-size: clamp(1.05rem, 2.1vw, 1.5rem);
+  /* Smaller, more responsive scale so a medium-length question stays on one
+     line (or balances cleanly across two) instead of being forced to wrap with
+     a long word stranded alone on a short trailing line. */
+  font-size: clamp(1.5rem, 2.6vw, 2.35rem);
   font-weight: 700;
   color: var(--color-text-primary);
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: -0.02em;
-  max-width: 820px;
   margin: 0;
   text-align: center;
+  /* Wider line budget so most questions resolve to one or two balanced lines
+     instead of being squeezed into three. balance still evens the wrap. */
+  max-width: 36ch;
+  /* Wrap on whole words only — never split a word mid-syllable. WebKit (the
+     Tauri WKWebView) only honours the -webkit- prefixed hyphens property, so
+     the unprefixed value alone was ignored and "satisfaction" still broke into
+     "satisfac-tion". Force hyphenation fully off. balance evens out the line
+     lengths so we don't get a near-empty trailing line. */
+  word-break: normal;
+  overflow-wrap: normal;
+  -webkit-hyphens: none;
+  hyphens: none;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 /* ─── Options 2 × 2 ──────────────────────────────────────── */
 .optionsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 10px 40px 14px;
-  flex-shrink: 0;         /* size to content, no stretching */
-  max-width: 940px;
+  gap: 16px;
+  padding: 12px 56px 16px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  min-width: 0;
+  /* Every option box is the same size — equal row heights (1fr) and stretch so
+     a 2-line option grows its 1-line neighbour to match instead of leaving an
+     uneven, ragged grid. */
+  grid-auto-rows: 1fr;
+  align-items: stretch;
 }
 
 .option {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 13px 16px;
+  align-items: center;
+  gap: 18px;
+  padding: 30px 30px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   transition: background 0.45s, border-color 0.45s, opacity 0.45s, box-shadow 0.45s;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .optionCorrect {
@@ -298,15 +354,15 @@
 
 .optionBadge {
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   background: var(--color-surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--color-text-secondary);
   transition: all 0.45s;
@@ -322,13 +378,17 @@
 /* No clamping, no ellipsis — let the text wrap freely */
 .optionText {
   font-family: var(--font-ui);
-  font-size: 13.5px;
-  line-height: 1.5;
+  font-size: clamp(1.32rem, 2.1vw, 1.78rem);
+  line-height: 1.4;
   color: var(--color-text-primary);
   flex: 1;
   overflow-wrap: break-word;
-  word-break: break-word;
+  word-break: normal;
+  -webkit-hyphens: none;
+  hyphens: none;
+  white-space: normal;
   transition: color 0.45s;
+  min-width: 0;
 }
 
 .optionCorrect .optionText {
@@ -342,15 +402,33 @@
   margin-top: 3px;
 }
 
-/* ─── Footer ─────────────────────────────────────────────── */
+/* ─── Footer (fixed at bottom) ──────────────────────────── */
 .footer {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 8px 22px;
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
-  border-top: 1px solid var(--color-border-subtle);
+  background: transparent;
+  border-top: none;
   flex-shrink: 0;
+  z-index: 10;
+}
+
+.escHint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+/* Controls revealed on mouse activity, hidden when the pointer is idle. */
+.controlHidden {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 .fsHint {

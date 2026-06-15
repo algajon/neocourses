@@ -1,0 +1,24 @@
+# dependencies
+/node_modules
+
+# next.js build output
+/.next/
+/out/
+/build
+
+# typescript / tooling
+*.tsbuildinfo
+next-env.d.ts
+
+# env (secrets) — also covered by the repo-root .gitignore
+.env
+.env*.local
+
+# local runtime artifacts
+/public/uploads
+/data
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*

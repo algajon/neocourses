@@ -231,8 +231,8 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
-  background: #e5ff00;
-  color: #111111;
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-contrast);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;

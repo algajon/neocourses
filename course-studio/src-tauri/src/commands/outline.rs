@@ -40,6 +40,7 @@ pub async fn generate_lesson_content(
     base_url: String,
     api_key: String,
     model: String,
+    tier: Option<String>,
 ) -> Result<String, AppError> {
     if lesson_title.trim().is_empty() {
         return Err(AppError::OutlineGenerationFailed("Lesson title cannot be empty".into()));
@@ -63,11 +64,62 @@ Return this exact JSON with no other text:
     "Short factual bullet point about {lesson_title}"
   ],
   "example": "One concrete real-world example or scenario demonstrating {lesson_title} in practice (2-3 sentences)",
+  "trivia": "One surprising fact, piece of history, or interesting bit of context about {lesson_title} that makes it more memorable (1-2 sentences)",
   "tip": "One specific, actionable insight or practical tip about {lesson_title}"
 }}"#
     );
 
-    crate::commands::model::call_model(&base_url, &api_key, &model, system, &user).await
+    crate::commands::model::call_model(&base_url, &api_key, &model, system, &user, tier.as_deref()).await
+}
+
+#[tauri::command]
+pub async fn generate_quiz(
+    chapter_name: String,
+    chapter_content: String,
+    course_topic: String,
+    base_url: String,
+    api_key: String,
+    model: String,
+    tier: Option<String>,
+) -> Result<String, AppError> {
+    if chapter_content.trim().is_empty() {
+        return Err(AppError::OutlineGenerationFailed("Chapter content cannot be empty".into()));
+    }
+
+    let system = "You are an expert assessment designer. You write clear, unambiguous multiple-choice \
+quiz questions that test genuine understanding of the material. Each question has exactly four answer \
+options with one unambiguously correct answer and three plausible but incorrect distractors. \
+Return only valid JSON with no markdown fences or extra text.";
+
+    let user = format!(
+        r#"Based on the following content from the chapter "{chapter_name}" of a course about "{course_topic}", write 5 multiple-choice quiz questions that test understanding of the key concepts taught.
+
+CHAPTER CONTENT:
+{chapter_content}
+
+Requirements:
+- Write complete, self-contained questions that make sense on their own.
+- Each question must have exactly 4 answer options.
+- Exactly one option is correct; the other three are plausible distractors.
+- Do not truncate or abbreviate any question or answer text — write full, natural sentences.
+- Vary the question style (definitions, application, comparison, best-practice).
+- Base every question strictly on the chapter content above.
+
+Return this exact JSON structure with no other text:
+{{
+  "questions": [
+    {{
+      "question": "Full question text ending with a question mark?",
+      "options": ["First option", "Second option", "Third option", "Fourth option"],
+      "correctIndex": 0
+    }}
+  ]
+}}
+
+The "questions" array must contain exactly 5 questions. "correctIndex" is the 0-based index of the correct option."#
+    );
+
+    crate::commands::model::call_model(&base_url, &api_key, &model, system, &user, tier.as_deref()).await
 }
 
 #[tauri::command]
@@ -79,6 +131,7 @@ pub async fn generate_outline_direct(
     base_url: String,
     api_key: String,
     model: String,
+    tier: Option<String>,
 ) -> Result<String, AppError> {
     if topic.trim().is_empty() {
         return Err(AppError::OutlineGenerationFailed("Topic cannot be empty".into()));
@@ -93,7 +146,7 @@ Output exactly 3 to 5 chapters, each with 3 to 5 lessons. Nothing else.";
         "Topic: {topic}\nAudience: {audience}\nLevel: {level}\nGoal: {goal}"
     );
 
-    crate::commands::model::call_model(&base_url, &api_key, &model, system, &user).await
+    crate::commands::model::call_model(&base_url, &api_key, &model, system, &user, tier.as_deref()).await
 }
 
 #[cfg(test)]

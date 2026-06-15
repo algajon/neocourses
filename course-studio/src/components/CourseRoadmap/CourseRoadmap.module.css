@@ -346,9 +346,9 @@
 }
 
 .quizBtn:hover {
-  background: #e5ff00;
-  border-color: #e5ff00;
-  color: #111111;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-contrast);
 }
 
 .quizBtnPassed {

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "course-studio",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "export PATH=\"/usr/local/opt/node/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH\" && cd course-studio && npm run dev"],
+      "port": 1420
+    },
+    {
+      "name": "course-web",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "export PATH=\"/usr/local/opt/node/bin:/usr/local/bin:/usr/local/opt/postgresql@16/bin:$PATH\" && cd /Users/jonnila/Downloads/coursestudio/course-web && exec npm run dev"],
+      "port": 3000
+    }
+  ]
+}

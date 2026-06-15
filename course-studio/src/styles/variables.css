@@ -51,6 +51,8 @@
   --color-accent-hover:   #545c00;
   --color-accent-subtle:  rgba(229,255,0,0.14);
   --color-accent-text:    #4a5200;
+  --color-accent-contrast: #ffffff;
+  --sidebar-accent-contrast: #ffffff;
 
   --color-error:          #dc2626;
   --color-error-subtle:   #fef2f2;
@@ -100,6 +102,8 @@
   --color-accent-hover:   #f0ff4d;
   --color-accent-subtle:  rgba(229,255,0,0.12);
   --color-accent-text:    #e5ff00;
+  --color-accent-contrast: #0a0a0a;
+  --sidebar-accent-contrast: #0a0a0a;
 
   --color-error:          #f87171;
   --color-error-subtle:   rgba(239,68,68,0.12);

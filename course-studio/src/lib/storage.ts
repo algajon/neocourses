@@ -1,10 +1,12 @@
-import { SCHEMA_VERSION, SavedCourse, ModelSettings, User, CourseEnrollment } from './types';
+import { SCHEMA_VERSION, SavedCourse, ModelSettings, User, CourseEnrollment, StoredQuiz, QuizAttempt } from './types';
 import { migrate } from './migrations';
 
 const COURSES_KEY = 'cs_courses_v' + SCHEMA_VERSION;
 const SETTINGS_KEY = 'cs_settings_v' + SCHEMA_VERSION;
 const USERS_KEY = 'cs_users_v' + SCHEMA_VERSION;
 const ENROLLMENTS_KEY = 'cs_enrollments_v' + SCHEMA_VERSION;
+const QUIZZES_KEY = 'cs_quizzes_v' + SCHEMA_VERSION;
+const ATTEMPTS_KEY = 'cs_quiz_attempts_v' + SCHEMA_VERSION;
 
 export function loadCourses(): SavedCourse[] {
   try {
@@ -77,5 +79,41 @@ export function saveEnrollments(enrollments: CourseEnrollment[]): void {
     localStorage.setItem(ENROLLMENTS_KEY, JSON.stringify(enrollments));
   } catch (e) {
     console.error('Enrollments write failed', e);
+  }
+}
+
+export function loadQuizzes(): StoredQuiz[] {
+  try {
+    const raw = localStorage.getItem(QUIZZES_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveQuizzes(quizzes: StoredQuiz[]): void {
+  try {
+    localStorage.setItem(QUIZZES_KEY, JSON.stringify(quizzes));
+  } catch (e) {
+    console.error('Quizzes write failed', e);
+  }
+}
+
+export function loadQuizAttempts(): QuizAttempt[] {
+  try {
+    const raw = localStorage.getItem(ATTEMPTS_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveQuizAttempts(attempts: QuizAttempt[]): void {
+  try {
+    localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(attempts));
+  } catch (e) {
+    console.error('Quiz attempts write failed', e);
   }
 }

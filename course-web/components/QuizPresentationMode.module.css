@@ -1,0 +1,408 @@
+/* ─── Overlay (fills the fullscreened element) ───────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+}
+
+/* ─── Header ──────────────────────────────────────────────── */
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-subtle);
+  flex-shrink: 0;
+  z-index: 10;
+  transition: opacity 0.3s;
+}
+
+.header > :first-child { justify-self: start; }
+.header > :last-child { justify-self: end; }
+
+.exitBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.exitBtn:hover {
+  background: var(--color-error-subtle);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 70%, transparent);
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.logoAccent { color: var(--color-accent); }
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ─── Stage: centered slide ──────────────────────────────── */
+.stage {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-10);
+}
+
+.slide {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  margin: auto;
+}
+
+.quizTag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+  text-align: center;
+}
+
+.question {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  margin: 0;
+  text-align: center;
+  max-width: 38ch;
+  text-wrap: balance;
+}
+
+/* ─── Options ────────────────────────────────────────────── */
+.optionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  width: 100%;
+  grid-auto-rows: 1fr;
+  align-items: stretch;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: background 0.4s, border-color 0.4s, opacity 0.4s, box-shadow 0.4s;
+  min-width: 0;
+}
+
+.optionCorrect {
+  background: var(--color-success-subtle);
+  border-color: var(--color-success);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--color-success) 22%, transparent);
+}
+
+.optionDim { opacity: 0.3; }
+
+.optionBadge {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  transition: background 0.4s, color 0.4s, box-shadow 0.4s;
+}
+
+.optionBadgeCorrect {
+  background: var(--color-success);
+  color: var(--color-accent-contrast);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--color-success) 50%, transparent);
+}
+
+.optionText {
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  transition: color 0.4s;
+}
+
+.optionCorrect .optionText {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  color: var(--color-success);
+  display: flex;
+}
+
+/* ─── Short answer ───────────────────────────────────────── */
+.shortAnswer {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.shortAnswerLabel {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.shortAnswerPrompt {
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  font-style: italic;
+}
+
+.shortAnswerText {
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--color-success);
+  margin: 0;
+}
+
+/* ─── Explanation ────────────────────────────────────────── */
+.explanation {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+}
+
+.explanationLabel {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+}
+
+.explanationText {
+  font-size: clamp(13px, 1.2vw, 15.5px);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ─── Empty state ────────────────────────────────────────── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.emptyText {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.emptySub {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+/* ─── Footer ─────────────────────────────────────────────── */
+.footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  border-top: 1px solid var(--color-border-subtle);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  flex-shrink: 0;
+  z-index: 10;
+  transition: opacity 0.3s;
+}
+
+.footer > :first-child { justify-self: start; }
+.footer > :last-child { justify-self: end; }
+
+.escHint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  opacity: 0.7;
+}
+
+/* ─── Progress dots ──────────────────────────────────────── */
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-self: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-surface-3);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.dotActive {
+  background: var(--gradient-accent);
+  transform: scale(1.35);
+}
+
+/* ─── Nav controls ───────────────────────────────────────── */
+.navControls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.revealBtn {
+  padding: 9px 18px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 38%, transparent);
+  color: var(--color-accent-text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+.revealBtn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
+.revealBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.navBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+}
+.navBtn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+.navBtn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Controls fade out when the pointer is idle. */
+.controlHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option,
+  .optionBadge,
+  .optionText,
+  .dot,
+  .dotActive,
+  .header,
+  .footer,
+  .exitBtn,
+  .navBtn,
+  .revealBtn {
+    transition: none;
+  }
+  .dotActive {
+    transform: none;
+  }
+}

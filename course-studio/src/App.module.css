@@ -1,6 +1,10 @@
 .app {
   display: flex;
-  height: 100vh;
+  /* 100% (not 100vh): WKWebView freezes the 100vh value while the window is in
+     native fullscreen and doesn't recalc on exit, leaving the app taller than
+     the window so the bottom UI clips. 100% tracks html/body/#root (all 100%)
+     which follow the live window height. */
+  height: 100%;
   overflow: hidden;
   background: var(--color-bg);
   position: relative;

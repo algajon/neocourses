@@ -1,0 +1,11 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" rx="224" ry="224" fill="#0a0a0a"/>
+  <text x="512" y="512"
+        font-family="Helvetica Neue, Helvetica, Arial, sans-serif"
+        font-size="430"
+        font-weight="700"
+        letter-spacing="-18"
+        fill="#e5ff00"
+        text-anchor="middle"
+        dominant-baseline="central">neo</text>
+</svg>

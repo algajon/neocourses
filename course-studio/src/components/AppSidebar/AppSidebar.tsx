@@ -87,7 +87,7 @@ export function AppSidebar({ session, currentView, onViewChange, theme, onThemeC
       {/* Logo */}
       <div className={styles.logo}>
         <div className={styles.logoText}>
-          <span className={styles.logoName}>neo<span className={styles.logoAccent}>Courses</span></span>
+          <span className={styles.logoName}>course<span className={styles.logoAccent}>neo</span></span>
         </div>
       </div>
 

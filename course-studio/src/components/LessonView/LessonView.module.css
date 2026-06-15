@@ -74,6 +74,21 @@
   overflow-y: auto;
 }
 
+/* Vertically center the whole slide composition as one block so a maximized
+   window doesn't leave a large empty gap above the tip bar. Auto margins on
+   the first/last children split the free space evenly; when the content is
+   taller than the viewport they collapse to 0 (no clipped top, unlike
+   justify-content:center) and the area scrolls normally. A max-width keeps
+   lines readable on ultra-wide displays. */
+.slide > * {
+  width: 100%;
+  max-width: 1180px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.slide > :first-child { margin-top: auto; }
+.slide > :last-child  { margin-bottom: auto; }
+
 /* ─── Top: breadcrumb + title + intro ────────────────────── */
 .slideTop {
   flex-shrink: 0;
@@ -84,7 +99,7 @@
 
 .slideBreadcrumb {
   font-family: var(--font-ui);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -93,7 +108,7 @@
 
 .slideTitle {
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 2.6vw, 2rem);
+  font-size: clamp(1.9rem, 3.4vw, 2.9rem);
   font-weight: 800;
   color: var(--color-text-primary);
   letter-spacing: -0.035em;
@@ -103,12 +118,11 @@
 
 .slideIntro {
   font-family: var(--font-ui);
-  font-size: 13.5px;
-  line-height: 1.6;
+  font-size: clamp(15px, 1.5vw, 18px);
+  line-height: 1.65;
   color: var(--color-text-secondary);
-  border-left: 3px solid var(--color-accent);
-  padding-left: var(--space-4);
   margin: 0;
+  max-width: 80ch;
 }
 
 /* ─── 2×2 grid: 3 concepts + key takeaways ──────────────── */
@@ -123,34 +137,35 @@
 .slideCard {
   display: flex;
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   min-height: 120px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 16px rgba(15, 23, 42, 0.05);
 }
 
 .slideCardTakeaways {
-  border-color: color-mix(in srgb, #10b981 35%, transparent);
+  border-color: var(--color-border-subtle);
 }
 
-.slideCardAccent {
-  width: 4px;
-  flex-shrink: 0;
-  background: var(--accent, #e5ff00);
-}
+/* The old left bar is gone — the accent now lives in a small tag on the title. */
+.slideCardAccent { display: none; }
 
 .slideCardBody {
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-5) var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
   overflow: hidden;
   flex: 1;
 }
 
 .slideCardTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: clamp(15px, 1.4vw, 17px);
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
@@ -158,16 +173,23 @@
   margin: 0;
 }
 
+/* Small rounded-square accent tag — distinct from the circular takeaway badges */
+.slideCardTitle::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent, #e5ff00) 22%, transparent);
+  box-shadow: inset 0 0 0 2px var(--accent, #e5ff00);
+}
+
 .slideCardText {
   font-family: var(--font-ui);
-  font-size: 12.5px;
+  font-size: clamp(13.5px, 1.25vw, 15.5px);
   line-height: 1.6;
   color: var(--color-text-secondary);
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* ─── Key takeaways list ─────────────────────────────────── */
@@ -184,9 +206,9 @@
 /* Use padding-left + ::before (no flex/webkit-box conflict) */
 .takeawayItem {
   position: relative;
-  padding-left: 14px;
+  padding-left: 16px;
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: clamp(13px, 1.2vw, 15px);
   line-height: 1.55;
   color: var(--color-text-secondary);
 }
@@ -197,34 +219,69 @@
   left: 0;
   top: 0;
   color: #10b981;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.7;
 }
 
-/* ─── Tip bar ────────────────────────────────────────────── */
-.tipBar {
+/* ─── Info row: Example + Did-you-know ───────────────────── */
+.infoRow {
   flex-shrink: 0;
-  margin-top: auto;
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
-  background: color-mix(in srgb, #e5ff00 8%, var(--color-bg));
-  border: 1px solid color-mix(in srgb, #e5ff00 30%, transparent);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-5);
 }
 
-.tipIcon { color: var(--color-accent); flex-shrink: 0; margin-top: 1px; }
+.infoCard {
+  --callout: #0ea5e9;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: color-mix(in srgb, var(--callout) 7%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--callout) 22%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+}
 
-.tipText {
+.infoCardTrivia {
+  --callout: #a855f7;
+}
+
+.infoLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-ui);
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--color-text-primary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--callout);
+}
+
+/* Icon rendered as a filled rounded badge rather than a bare glyph */
+.infoLabel svg {
+  width: 26px;
+  height: 26px;
+  padding: 6px;
+  border-radius: 8px;
+  background: var(--callout);
+  color: #fff;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.infoText {
+  font-family: var(--font-ui);
+  font-size: clamp(13px, 1.2vw, 15px);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ─── Tip callout (shares .infoCard, amber accent) ───────── */
+.tipCard {
+  --callout: #eab308;
+  flex-shrink: 0;
 }
 
 /* ─── Loading skeleton ───────────────────────────────────── */
@@ -307,7 +364,7 @@
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
-.nextBtn:hover { background: var(--color-accent); color: #fff; }
+.nextBtn:hover { background: var(--color-accent); color: var(--color-accent-contrast); }
 
 /* ─── Shared variant helpers ─────────────────────────────── */
 .slideCardSm { min-height: 90px; }
@@ -317,7 +374,7 @@
 .slideIntroOne {}
 
 .slideTitleMd {
-  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  font-size: clamp(1.6rem, 2.9vw, 2.4rem);
 }
 
 /* ─── Variant 1: two-column split ───────────────────────── */
@@ -350,7 +407,7 @@
 
 .v1TakeawaysLabel {
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: clamp(13px, 1.2vw, 15px);
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
@@ -382,7 +439,7 @@
 
 .v2ChipsLabel {
   font-family: var(--font-ui);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -400,6 +457,54 @@
   line-height: 1.5;
   color: var(--color-text-secondary);
   word-break: break-word;
+}
+
+/* ─── Variant 2 takeaways: numbered list ────────────────── */
+.v2Takeaways {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.numberedList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.numberedItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.numberedBadge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.numberedText {
+  font-family: var(--font-ui);
+  font-size: clamp(13.5px, 1.25vw, 15.5px);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  padding-top: 3px;
 }
 
 /* ─── Variant 3: header row + 2-col + full-width card ───── */
@@ -439,13 +544,7 @@
   min-height: 80px;
 }
 
-.slideCardAccentTop {
-  height: 4px;
-  width: 100%;
-  flex-shrink: 0;
-  background: var(--accent, #e5ff00);
-}
+/* Top bar removed to match the new card style (accent lives in the title tag) */
+.slideCardAccentTop { display: none; }
 
-.slideCardTextFull {
-  -webkit-line-clamp: 2;
-}
+.slideCardTextFull {}

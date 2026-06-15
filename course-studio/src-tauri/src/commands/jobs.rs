@@ -55,6 +55,7 @@ pub async fn generate_outline_with_model(
     base_url: String,
     api_key: String,
     model: String,
+    tier: Option<String>,
 ) -> Result<String, AppError> {
     let job_id = Uuid::new_v4().to_string();
     let token = CancellationToken::new();
@@ -76,7 +77,7 @@ pub async fn generate_outline_with_model(
         );
 
         tokio::select! {
-            result = call_model(&base_url, &api_key, &model, system, &user) => {
+            result = call_model(&base_url, &api_key, &model, system, &user, tier.as_deref()) => {
                 let _ = app_clone.emit("job_progress", ProgressPayload { job_id: job_id_clone.clone(), progress: 90 });
                 match result {
                     Ok(outline) => {

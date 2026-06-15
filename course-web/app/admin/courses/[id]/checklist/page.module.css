@@ -1,0 +1,268 @@
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.breadcrumb {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
+}
+
+.breadcrumbLink {
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+
+.breadcrumbLink:hover {
+  color: var(--color-accent-text);
+}
+
+.title {
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 28px;
+  flex-wrap: wrap;
+}
+
+.savedBadge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: var(--color-success-subtle);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.errorBanner {
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-error-subtle);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  font-size: 14px;
+}
+
+.infoCard {
+  background: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+}
+
+.infoText {
+  font-size: 13px;
+  color: var(--color-accent-text);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Items list ── */
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Item card ── */
+.itemCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.itemCard:hover {
+  border-color: var(--color-border);
+}
+
+.itemCard.dragging {
+  opacity: 0.55;
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-accent);
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.dragHandle {
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+  cursor: grab;
+  user-select: none;
+  line-height: 1;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.itemNum {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex: 1;
+}
+
+/* ── Required toggle ── */
+.requiredToggle {
+  flex-shrink: 0;
+}
+
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.toggleInput {
+  display: none;
+}
+
+.togglePill {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--color-surface-3);
+  color: var(--color-text-tertiary);
+  border: 1px solid var(--color-border);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.togglePillActive {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-text);
+  border-color: var(--color-accent);
+}
+
+/* ── Item actions ── */
+.itemActions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.itemActionBtn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  transition: background 0.12s, color 0.12s;
+}
+
+.itemActionBtn:hover:not(:disabled) {
+  background: var(--color-surface-3);
+  color: var(--color-text-primary);
+}
+
+.itemActionBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.itemDeleteBtn:hover:not(:disabled) {
+  background: var(--color-error-subtle);
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+/* ── Item body ── */
+.itemBody {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Add item button ── */
+.addItemBtn {
+  border: 2px dashed var(--color-border);
+  background: transparent;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  width: 100%;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-family: var(--font-ui);
+}
+
+.addItemBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+  background: var(--color-accent-subtle);
+}
+
+/* ── Footer / empty ── */
+.emptyHint {
+  text-align: center;
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+  padding: var(--space-6) 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--space-12);
+  color: var(--color-text-secondary);
+}
+
+.backLink {
+  color: var(--color-accent-text);
+  text-decoration: none;
+  font-weight: 600;
+}

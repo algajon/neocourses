@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { SavedCourse, UserSession } from '../../lib/types';
 import { useEnrollmentStore } from '../../store/useEnrollmentStore';
+import { useQuizStore } from '../../store/useQuizStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { CourseRoadmap, RoadmapModule } from '../../components/CourseRoadmap/CourseRoadmap';
 import { LessonView } from '../../components/LessonView/LessonView';
 import { generateChapterQuiz, generateLessonContent, cleanForProse, LessonContent, QuizQuestion } from '../../lib/contentGenerator';
-import { generateLessonContentAI } from '../../lib/modelClient';
+import { generateLessonContentAI, generateChapterQuizAI } from '../../lib/modelClient';
 import { QuizPresentationMode } from '../../components/QuizPresentationMode/QuizPresentationMode';
 import styles from './StudentDashboard.module.css';
 
@@ -72,9 +73,12 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
   const [presentationQuiz, setPresentationQuiz] = useState<{ moduleName: string; lessons: string[] } | null>(null);
   const [passedQuizzes, setPassedQuizzes] = useState<Set<string>>(new Set());
   const [lessonContents, setLessonContents] = useState<Map<string, LessonContent>>(new Map());
+  const [quizCache, setQuizCache] = useState<Map<string, QuizQuestion[]>>(new Map());
   const fetchingRef = useRef<Set<string>>(new Set());
+  const quizFetchingRef = useRef<Set<string>>(new Set());
 
   const settings = useSettingsStore(s => s.settings);
+  const { saveQuiz, getQuiz, recordAttempt } = useQuizStore();
 
   // Catalog filters
   const [search, setSearch] = useState('');
@@ -85,10 +89,81 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
     fetchingRef.current.add(title);
     generateLessonContentAI(title, chapterName, topic, settings)
       .then(result => {
-        if (result.ok) setLessonContents(prev => new Map(prev).set(title, result.content));
+        // Always resolve to content — if the AI call fails (parse error, timeout,
+        // unreachable), fall back to the template so the lesson is never left empty.
+        const content = result.ok ? result.content : generateLessonContent(title, topic);
+        setLessonContents(prev => new Map(prev).set(title, content));
+      })
+      .catch(() => {
+        setLessonContents(prev => new Map(prev).set(title, generateLessonContent(title, topic)));
       })
       .finally(() => fetchingRef.current.delete(title));
   }
+
+  // Build a plain-text digest of a chapter's lesson content for the quiz prompt
+  function buildChapterContent(lessons: string[], topic: string): string {
+    return lessons
+      .map(title => {
+        const c = lessonContents.get(title) ?? generateLessonContent(title, topic);
+        const concepts = c.concepts.map(x => `- ${x.title}: ${x.body}`).join('\n');
+        const keyPoints = (c.keyPoints ?? []).map(k => `- ${k}`).join('\n');
+        return [
+          `## Lesson: ${title}`,
+          c.intro,
+          `Concepts:\n${concepts}`,
+          keyPoints ? `Key points:\n${keyPoints}` : '',
+          c.example ? `Example: ${c.example}` : '',
+          `Tip: ${c.tip}`,
+        ].filter(Boolean).join('\n');
+      })
+      .join('\n\n');
+  }
+
+  // Generate the chapter quiz: reuse a previously saved quiz, otherwise prefer
+  // AI-formed questions and persist them, falling back to a template.
+  function ensureQuiz(courseId: string, chapterName: string, lessons: string[], topic: string) {
+    if (lessons.length === 0) return;
+    if (quizCache.has(chapterName) || quizFetchingRef.current.has(chapterName)) return;
+
+    // Hydrate from the database so previously generated quizzes load instantly
+    // and stay identical across sessions (and match what admins review).
+    const saved = getQuiz(courseId, chapterName);
+    if (saved) {
+      setQuizCache(prev => new Map(prev).set(chapterName, saved.questions));
+      return;
+    }
+
+    const allModules = parseModules(activeCourse?.outline ?? '');
+    const template = generateChapterQuiz(chapterName, lessons, topic, lessonContents, allModules);
+
+    if (!settings.apiKey) {
+      setQuizCache(prev => new Map(prev).set(chapterName, template));
+      saveQuiz(courseId, chapterName, template);
+      return;
+    }
+
+    quizFetchingRef.current.add(chapterName);
+    const chapterContent = buildChapterContent(lessons, topic);
+    generateChapterQuizAI(chapterName, chapterContent, topic, settings)
+      .then(result => {
+        const questions = result.ok ? result.questions : template;
+        setQuizCache(prev => new Map(prev).set(chapterName, questions));
+        saveQuiz(courseId, chapterName, questions);
+      })
+      .catch(() => {
+        setQuizCache(prev => new Map(prev).set(chapterName, template));
+        saveQuiz(courseId, chapterName, template);
+      })
+      .finally(() => quizFetchingRef.current.delete(chapterName));
+  }
+
+  // Seed the session cache from content pre-generated at publish time so
+  // trainees read instantly and no regeneration happens. Keyed on course id so
+  // it only runs on course change and never clobbers an in-progress fetch.
+  useEffect(() => {
+    const generated = activeCourse?.generated?.lessons;
+    if (generated) setLessonContents(new Map(Object.entries(generated)));
+  }, [activeCourse?.id]);
 
   // Pre-fetch first chapter's lessons when course screen opens
   useEffect(() => {
@@ -122,6 +197,14 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
     prefetchLesson(activeLessonTitle, currentChapter, topic);
     if (nextTitle) prefetchLesson(nextTitle, nextChapter, topic);
   }, [screen, activeLessonTitle, activeCourse?.id, settings.apiKey]);
+
+  // Generate the chapter quiz (AI-formed) when a quiz or presentation opens
+  useEffect(() => {
+    if (!activeCourse) return;
+    const topic = cleanForProse(activeCourse.topic);
+    if (presentationQuiz) ensureQuiz(activeCourse.id, presentationQuiz.moduleName, presentationQuiz.lessons, topic);
+    if (activeQuiz) ensureQuiz(activeCourse.id, activeQuiz.moduleName, activeQuiz.lessons, topic);
+  }, [presentationQuiz?.moduleName, activeQuiz?.moduleName, activeCourse?.id, settings.apiKey, lessonContents]);
 
   const { enroll, toggleLessonComplete, markCourseComplete, getEnrollment, getUserEnrollments } =
     useEnrollmentStore();
@@ -158,36 +241,56 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
   const animClass = animDir === 'right' ? styles.slideInRight : styles.slideInLeft;
 
   /* ───── Presentation mode overlay (accessible from roadmap) ─ */
+  const presentationQuestions = presentationQuiz ? quizCache.get(presentationQuiz.moduleName) : undefined;
   const presentationOverlay = presentationQuiz && activeCourse ? (
-    <QuizPresentationMode
-      questions={generateChapterQuiz(presentationQuiz.moduleName, presentationQuiz.lessons, activeCourse.topic, lessonContents)}
-      chapterName={presentationQuiz.moduleName}
-      onClose={() => setPresentationQuiz(null)}
-    />
+    presentationQuestions ? (
+      <QuizPresentationMode
+        questions={presentationQuestions}
+        chapterName={presentationQuiz.moduleName}
+        onClose={() => setPresentationQuiz(null)}
+      />
+    ) : (
+      <QuizLoadingOverlay
+        chapterName={presentationQuiz.moduleName}
+        onClose={() => setPresentationQuiz(null)}
+      />
+    )
   ) : null;
 
   /* ───── Chapter quiz ────────────────────────────────── */
   if (screen === 'quiz' && activeCourse && activeQuiz) {
-    const questions = generateChapterQuiz(activeQuiz.moduleName, activeQuiz.lessons, activeQuiz.moduleName, lessonContents);
+    const questions = quizCache.get(activeQuiz.moduleName);
     const quizModules = parseModules(activeCourse.outline);
     const nextChapterFirst = quizModules[activeQuiz.moduleIndex + 1]?.lessons[0] ?? null;
     return (
       <>
         {presentationOverlay}
         <div key="quiz" className={`${styles.screen} ${animClass}`}>
-          <ChapterQuizScreen
-            chapterName={activeQuiz.moduleName}
-            chapterNum={activeQuiz.moduleIndex + 1}
-            courseTopic={activeCourse.topic}
-            questions={questions}
-            alreadyPassed={passedQuizzes.has(activeQuiz.moduleName)}
-            onPass={() => setPassedQuizzes(prev => new Set(prev).add(activeQuiz!.moduleName))}
-            onBack={() => navigate('course')}
-            onContinue={nextChapterFirst ? () => {
-              setActiveLessonTitle(nextChapterFirst);
-              navigate('lesson');
-            } : undefined}
-          />
+          {questions ? (
+            <ChapterQuizScreen
+              chapterName={activeQuiz.moduleName}
+              chapterNum={activeQuiz.moduleIndex + 1}
+              courseTopic={activeCourse.topic}
+              questions={questions}
+              alreadyPassed={passedQuizzes.has(activeQuiz.moduleName)}
+              onPass={() => setPassedQuizzes(prev => new Set(prev).add(activeQuiz!.moduleName))}
+              onAttempt={(result) => recordAttempt({
+                userId: session.userId,
+                username: session.username,
+                courseId: activeCourse!.id,
+                courseTopic: activeCourse!.topic,
+                chapterName: activeQuiz!.moduleName,
+                ...result,
+              })}
+              onBack={() => navigate('course')}
+              onContinue={nextChapterFirst ? () => {
+                setActiveLessonTitle(nextChapterFirst);
+                navigate('lesson');
+              } : undefined}
+            />
+          ) : (
+            <QuizLoadingPanel chapterName={activeQuiz.moduleName} onBack={() => navigate('course')} />
+          )}
         </div>
       </>
     );
@@ -457,6 +560,8 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
               const pct = enrolled ? getPct(course) : 0;
               const enrollment = enrolled ? getEnrollment(session.userId, course.id) : null;
               const levelColor = LEVEL_COLORS[course.level] ?? '#d97706';
+              const cardModules = parseModules(course.outline);
+              const cardLessons = allLessons(course.outline);
 
               return (
                 <div key={course.id} className={styles.card}>
@@ -470,8 +575,36 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
                   </div>
                   <div className={styles.cardBody}>
                     <h3 className={styles.cardTitle}>{course.topic}</h3>
-                    <p className={styles.cardAudience}>{course.audience}</p>
+                    <p className={styles.cardAudience}>For {course.audience}</p>
                     {course.goal && <p className={styles.cardGoal}>{course.goal}</p>}
+
+                    {cardModules.length > 0 && (
+                      <div className={styles.cardSyllabus}>
+                        <span className={styles.cardSyllabusLabel}>What you'll cover</span>
+                        <ul className={styles.cardSyllabusList}>
+                          {cardModules.slice(0, 3).map((m, mi) => (
+                            <li key={mi} className={styles.cardSyllabusItem}>{m.module}</li>
+                          ))}
+                        </ul>
+                        {cardModules.length > 3 && (
+                          <span className={styles.cardSyllabusMore}>
+                            +{cardModules.length - 3} more {cardModules.length - 3 === 1 ? 'chapter' : 'chapters'}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    <div className={styles.cardMeta}>
+                      <span className={styles.cardMetaItem}>
+                        {cardModules.length} {cardModules.length === 1 ? 'chapter' : 'chapters'}
+                      </span>
+                      <span className={styles.cardMetaDot}>·</span>
+                      <span className={styles.cardMetaItem}>
+                        {cardLessons.length} {cardLessons.length === 1 ? 'lesson' : 'lessons'}
+                      </span>
+                      <span className={styles.cardMetaDot}>·</span>
+                      <span className={styles.cardMetaItem}>quiz per chapter</span>
+                    </div>
                   </div>
                   <div className={styles.cardFooter}>
                     {enrolled ? (
@@ -602,7 +735,58 @@ export function StudentDashboard({ session, publishedCourses, initialTab = 'cata
   );
 }
 
+// ─── Quiz loading states ──────────────────────────────────────────────────────
+
+function QuizLoadingOverlay({ chapterName, onClose }: { chapterName: string; onClose: () => void }) {
+  return (
+    <div className={styles.quizLoadingOverlay} data-theme={document.documentElement.dataset.theme ?? 'white'}>
+      <button className={styles.quizLoadingClose} onClick={onClose} title="Cancel">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+      </button>
+      <div className={styles.quizLoadingSpinner} />
+      <p className={styles.quizLoadingTitle}>Generating quiz questions…</p>
+      <p className={styles.quizLoadingSub}>Forming questions from “{chapterName}”</p>
+    </div>
+  );
+}
+
+function QuizLoadingPanel({ chapterName, onBack }: { chapterName: string; onBack: () => void }) {
+  return (
+    <div className={styles.quizWrapper}>
+      <div className={styles.quizHeader}>
+        <button className={styles.quizBackBtn} onClick={onBack}>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back to course
+        </button>
+      </div>
+      <div className={styles.quizLoadingPanel}>
+        <div className={styles.quizLoadingSpinner} />
+        <p className={styles.quizLoadingTitle}>Generating quiz questions…</p>
+        <p className={styles.quizLoadingSub}>Forming questions from “{chapterName}”</p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Chapter quiz screen ──────────────────────────────────────────────────────
+
+type QuizAttemptResult = {
+  score: number;
+  total: number;
+  percentage: number;
+  passed: boolean;
+  answers: {
+    questionId: string;
+    question: string;
+    options: string[];
+    correctIndex: number;
+    selectedIndex: number;
+  }[];
+};
 
 type ChapterQuizProps = {
   chapterName: string;
@@ -611,11 +795,12 @@ type ChapterQuizProps = {
   questions: QuizQuestion[];
   alreadyPassed: boolean;
   onPass: () => void;
+  onAttempt: (result: QuizAttemptResult) => void;
   onBack: () => void;
   onContinue?: () => void;
 };
 
-function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, alreadyPassed, onPass, onBack, onContinue }: ChapterQuizProps) {
+function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, alreadyPassed, onPass, onAttempt, onBack, onContinue }: ChapterQuizProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [justPassed, setJustPassed] = useState(false);
@@ -629,8 +814,22 @@ function ChapterQuizScreen({ chapterName, chapterNum, courseTopic, questions, al
 
   function handleSubmit() {
     const sc = questions.filter(q => answers[q.id] === q.correctIndex).length;
+    const didPass = sc >= passThreshold;
     setSubmitted(true);
-    if (sc >= passThreshold && !alreadyPassed) {
+    onAttempt({
+      score: sc,
+      total: questions.length,
+      percentage: questions.length > 0 ? Math.round((sc / questions.length) * 100) : 0,
+      passed: didPass,
+      answers: questions.map(q => ({
+        questionId: q.id,
+        question: q.question,
+        options: q.options,
+        correctIndex: q.correctIndex,
+        selectedIndex: q.id in answers ? answers[q.id] : -1,
+      })),
+    });
+    if (didPass && !alreadyPassed) {
       setJustPassed(true);
       onPass();
     }

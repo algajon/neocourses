@@ -1,0 +1,100 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
+import { ThemeToggle } from '@/components/ThemeToggle'
+import styles from './LearnerNav.module.css'
+
+interface LearnerNavProps {
+  user: {
+    name: string
+    email: string
+    role: string
+  }
+}
+
+const LINKS = [
+  { href: '/learn', label: 'My Learning' },
+  { href: '/learn/catalog', label: 'Catalog' },
+  { href: '/learn/certificates', label: 'Certificates' },
+]
+
+export function LearnerNav({ user }: LearnerNavProps) {
+  const pathname = usePathname()
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function onClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [menuOpen])
+
+  function isActive(href: string) {
+    if (href === '/learn') return pathname === '/learn'
+    return pathname === href || pathname.startsWith(href + '/')
+  }
+
+  return (
+    <nav className={styles.nav}>
+      <div className={styles.navInner}>
+        <div className={styles.navLeft}>
+          <Link href="/learn" className={styles.wordmark}>
+            course<span className={styles.neo}>neo</span>
+          </Link>
+          <div className={styles.links}>
+            {LINKS.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={isActive(link.href) ? styles.linkActive : styles.link}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className={styles.navRight}>
+          <ThemeToggle className={styles.themeToggle} />
+          <div className={styles.userMenu} ref={menuRef}>
+            <button
+              type="button"
+              className={styles.userTrigger}
+              onClick={() => setMenuOpen(o => !o)}
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
+            >
+              <span className={styles.userAvatar}>
+                {user.name?.[0]?.toUpperCase() ?? 'U'}
+              </span>
+              <span className={styles.userName}>{user.name}</span>
+            </button>
+            {menuOpen && (
+              <div className={styles.dropdown} role="menu">
+                <div className={styles.dropdownHeader}>
+                  <span className={styles.dropdownName}>{user.name}</span>
+                  <span className={styles.dropdownEmail}>{user.email}</span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.signOut}
+                  role="menuitem"
+                  onClick={() => signOut({ callbackUrl: '/login' })}
+                >
+                  Sign out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
+}

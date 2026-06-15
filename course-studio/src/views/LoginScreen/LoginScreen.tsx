@@ -32,7 +32,7 @@ export function LoginScreen() {
         {/* Logo */}
         <div className={styles.logo}>
           <div className={styles.logoText}>
-            neo<span className={styles.logoAccent}>Courses</span>
+            course<span className={styles.logoAccent}>neo</span>
           </div>
         </div>
 

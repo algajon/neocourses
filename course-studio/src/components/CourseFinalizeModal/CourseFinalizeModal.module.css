@@ -1,0 +1,101 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.card {
+  width: min(480px, 90vw);
+  padding: 40px 36px 32px;
+  border-radius: 16px;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--sidebar-border);
+  box-shadow: var(--shadow-lg);
+  color: var(--sidebar-text);
+  text-align: center;
+}
+
+.wordmark {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--sidebar-text);
+}
+
+.accent {
+  color: var(--sidebar-accent);
+}
+
+.title {
+  margin: 18px 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--sidebar-text);
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sidebar-text-secondary);
+}
+
+.track {
+  height: 8px;
+  width: 100%;
+  border-radius: 999px;
+  background: var(--sidebar-item-hover);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--sidebar-accent);
+  transition: width 0.3s ease;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--sidebar-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.step {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--sidebar-text-secondary);
+  flex-shrink: 0;
+}
+
+.cancelBtn {
+  margin-top: 28px;
+  padding: 9px 22px;
+  border-radius: 8px;
+  border: 1px solid var(--sidebar-border);
+  background: transparent;
+  color: var(--sidebar-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cancelBtn:hover {
+  background: var(--sidebar-item-hover);
+}

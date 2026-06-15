@@ -37,11 +37,43 @@ export function LessonView({
   const variant = content ? layoutVariant(lesson) : 0;
 
   const tipBar = content && (
-    <div className={styles.tipBar}>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className={styles.tipIcon}>
-        <path d="M7 1.5l1.6 3.2 3.5.5-2.55 2.5.6 3.5L7 9.6l-3.15 1.6.6-3.5L2 5.2l3.5-.5L7 1.5z" fill="currentColor"/>
-      </svg>
-      <span className={styles.tipText}>{content.tip}</span>
+    <div className={`${styles.infoCard} ${styles.tipCard}`}>
+      <span className={styles.infoLabel}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1.5l1.6 3.2 3.5.5-2.55 2.5.6 3.5L7 9.6l-3.15 1.6.6-3.5L2 5.2l3.5-.5L7 1.5z" fill="currentColor"/>
+        </svg>
+        Tip
+      </span>
+      <p className={styles.infoText}>{content.tip}</p>
+    </div>
+  );
+
+  const infoRow = content && (content.example || content.trivia) && (
+    <div className={styles.infoRow}>
+      {content.example && (
+        <div className={styles.infoCard}>
+          <span className={styles.infoLabel}>
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <path d="M2 11.5L5.5 8 8 10.5 12 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            In practice
+          </span>
+          <p className={styles.infoText}>{content.example}</p>
+        </div>
+      )}
+      {content.trivia && (
+        <div className={`${styles.infoCard} ${styles.infoCardTrivia}`}>
+          <span className={styles.infoLabel}>
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.4"/>
+              <path d="M7 6v3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              <circle cx="7" cy="4" r="0.9" fill="currentColor"/>
+            </svg>
+            Did you know?
+          </span>
+          <p className={styles.infoText}>{content.trivia}</p>
+        </div>
+      )}
     </div>
   );
 
@@ -126,6 +158,7 @@ export function LessonView({
                 ))}
               </div>
             </div>
+            {infoRow}
             {tipBar}
           </>
 
@@ -149,12 +182,18 @@ export function LessonView({
                 </div>
               ))}
             </div>
-            <div className={styles.v2Chips}>
+            <div className={styles.v2Takeaways}>
               <span className={styles.v2ChipsLabel}>Key takeaways</span>
-              {(content.keyPoints ?? []).slice(0, 4).map((kp, i) => (
-                <span key={i} className={styles.v2Chip}>{kp}</span>
-              ))}
+              <ol className={styles.numberedList}>
+                {(content.keyPoints ?? []).slice(0, 4).map((kp, i) => (
+                  <li key={i} className={styles.numberedItem}>
+                    <span className={styles.numberedBadge}>{i + 1}</span>
+                    <span className={styles.numberedText}>{kp}</span>
+                  </li>
+                ))}
+              </ol>
             </div>
+            {infoRow}
             {tipBar}
           </>
 
@@ -195,6 +234,7 @@ export function LessonView({
                 </div>
               )}
             </div>
+            {infoRow}
             {tipBar}
           </>
 
@@ -230,6 +270,7 @@ export function LessonView({
                 </div>
               </div>
             </div>
+            {infoRow}
             {tipBar}
           </>
         )}

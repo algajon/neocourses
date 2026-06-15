@@ -12,11 +12,13 @@ export const ERROR_MESSAGES: Record<string, string> = {
   AUTH_INVALID_CREDENTIALS: 'Invalid username or password.',
   AUTH_USER_EXISTS: 'A user with that username already exists.',
   AUTH_FORBIDDEN: 'You do not have permission to do that.',
+  PAIRING_FAILED: 'Pairing could not start.',
+  PAIRING_NOT_ACTIVE: 'Pairing is not active.',
   UNKNOWN: 'An unexpected error occurred.',
 };
 
 export const UI = {
-  APP_NAME: 'neoCourses',
+  APP_NAME: 'courseneo',
 
   // Login
   LOGIN_TITLE: 'Sign in',
@@ -47,6 +49,10 @@ export const UI = {
   EDITOR_EXPORT_BUTTON: 'Export to Markdown',
   EDITOR_PUBLISH_BUTTON: 'Publish',
   EDITOR_UNPUBLISH_BUTTON: 'Unpublish',
+  FINALIZE_TITLE_PREFIX: 'Finalizing',
+  FINALIZE_SUBTITLE: 'Pre-generating every lesson and quiz so trainees never wait.',
+  FINALIZE_CANCEL: 'Cancel',
+  FINALIZE_ERROR: 'Finalizing failed. The course was not published.',
   SAVED_COURSES_TITLE: 'My courses',
   SAVED_COURSES_EMPTY: 'No courses yet.',
   CONFIRM_DELETE: 'Delete this course? This cannot be undone.',

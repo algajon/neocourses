@@ -26,9 +26,10 @@ type PendingOutline = {
 
 type Props = {
   session: UserSession;
+  onRequestPublish: (courseId: string) => void;
 };
 
-export function EditorDashboard({ session }: Props) {
+export function EditorDashboard({ onRequestPublish }: Props) {
   const { courses, activeCourseId, addCourse, updateCourse, deleteCourse, setActiveCourse } =
     useCourseStore();
   const settings = useSettingsStore(s => s.settings);
@@ -84,11 +85,7 @@ export function EditorDashboard({ session }: Props) {
   }
 
   function handlePublishToggle(courseId: string) {
-    const course = courses.find(c => c.id === courseId);
-    if (!course) return;
-    const nextPublished = !course.published;
-    updateCourse(courseId, { published: nextPublished });
-    setStatusSuccess(nextPublished ? 'Course published. Trainees can now see it.' : 'Course unpublished.');
+    onRequestPublish(courseId);
   }
 
   async function handleImportGenerate(files: ImportedFile[], audience: string, level: string) {

@@ -2,11 +2,14 @@ import { create } from 'zustand';
 import { ModelSettings } from '../lib/types';
 import { loadSettings, saveSettings } from '../lib/storage';
 
+// Primary model is the on-prem DGX Spark cluster (Qwen, OpenAI-compatible).
+// Base URL omits /v1 — the Rust layer appends /v1/chat/completions.
 const DEFAULT_SETTINGS: ModelSettings = {
   schemaVersion: 1,
-  baseUrl: 'https://api.openai.com',
-  apiKey: '',
-  model: 'gpt-4o-mini',
+  baseUrl: 'http://192.168.1.50:8000',
+  apiKey: import.meta.env.VITE_DGX_API_KEY ?? '',
+  model: 'Qwen/Qwen2.5-72B-Instruct',
+  tier: 'heavy',
 };
 
 type SettingsStore = {
@@ -17,7 +20,7 @@ type SettingsStore = {
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
   settings: DEFAULT_SETTINGS,
-  loadFromStorage: () => set({ settings: loadSettings() ?? DEFAULT_SETTINGS }),
+  loadFromStorage: () => set({ settings: { ...DEFAULT_SETTINGS, ...(loadSettings() ?? {}) } }),
   updateSettings: (updates) =>
     set(s => {
       const updated = { ...s.settings, ...updates };

@@ -1,0 +1,365 @@
+/* ─── Slide wrapper ──────────────────────────────────────────
+   Unlike the desktop fixed-viewport slide, the web slide grows with its
+   content and lets the page scroll — it must never clip. */
+.slide {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ─── Top: breadcrumb + title + intro ────────────────────── */
+.slideTop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.breadcrumb {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.titleMd {
+  font-size: clamp(1.6rem, 2.9vw, 2.4rem);
+}
+
+.intro {
+  font-family: var(--font-ui);
+  font-size: clamp(15px, 1.4vw, 18px);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 80ch;
+}
+
+/* ─── Concept cards ──────────────────────────────────────── */
+.conceptCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.conceptCard:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.conceptCardSm {
+  padding: var(--space-5);
+}
+
+.conceptCardFull {
+  grid-column: 1 / -1;
+}
+
+.conceptTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.4vw, 17px);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* Small rounded-square accent tag, accent color cycles per card. */
+.conceptTitle::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent, #e5ff00) 22%, transparent);
+  box-shadow: inset 0 0 0 2px var(--accent, #e5ff00);
+}
+
+.conceptBody {
+  font-family: var(--font-ui);
+  font-size: clamp(13.5px, 1.2vw, 15.5px);
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.conceptBodyFull {
+  max-width: 90ch;
+}
+
+/* ─── Variant 0: 2×2 grid ────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.takeawayCard {
+  background: var(--color-surface);
+}
+
+/* ─── Key takeaways list ─────────────────────────────────── */
+.takeawayList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.takeawayItem {
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--font-ui);
+  font-size: clamp(13.5px, 1.2vw, 15px);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.takeawayItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.takeawaysLabel {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Callouts ───────────────────────────────────────────── */
+.calloutRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.callout {
+  --callout: #0ea5e9;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: color-mix(in srgb, var(--callout) 7%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--callout) 22%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.calloutTrivia { --callout: #a855f7; }
+.calloutTip { --callout: #eab308; }
+
+.calloutLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--callout);
+}
+
+.calloutBadge {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--callout);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.calloutText {
+  font-family: var(--font-ui);
+  font-size: clamp(13px, 1.2vw, 15px);
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* ─── Variant 1: two-column split ────────────────────────── */
+.v1Layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.v1Left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.v1Right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.v1Takeaways {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.v1TakeawaysLabel {
+  font-family: var(--font-display);
+  font-size: clamp(13px, 1.2vw, 15px);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* ─── Variant 2: three-column row + numbered takeaways ───── */
+.v2Grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.v2Takeaways {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.numberedList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.numberedItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.numberedBadge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent-text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.numberedText {
+  font-family: var(--font-ui);
+  font-size: clamp(13.5px, 1.2vw, 15px);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+  padding-top: 3px;
+}
+
+/* ─── Variant 3: header row + 2-col + full-width card ────── */
+.v3Top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.v3TopText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.v3Chips {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 220px;
+}
+
+.chip {
+  padding: 6px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 99px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  word-break: break-word;
+}
+
+.v3Grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+/* ─── Responsive: collapse multi-column grids ────────────── */
+@media (max-width: 720px) {
+  .grid,
+  .v1Layout,
+  .v2Grid,
+  .v3Grid,
+  .numberedList {
+    grid-template-columns: 1fr;
+  }
+
+  .v3Top {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .v3Chips {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

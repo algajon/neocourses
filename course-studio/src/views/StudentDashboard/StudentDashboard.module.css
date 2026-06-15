@@ -16,8 +16,12 @@
   to   { transform: translateX(0);     opacity: 1; }
 }
 
-.slideInRight { animation: slideInRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.slideInLeft  { animation: slideInLeft  0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+/* No `both`/`forwards` fill mode: it leaves a persistent transform on the
+   element, which in WKWebView establishes a containing block that swallows
+   mouse-wheel scroll events over the markdown course copy. Letting the
+   animation revert to no transform after it finishes restores scrolling. */
+.slideInRight { animation: slideInRight 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+.slideInLeft  { animation: slideInLeft  0.28s cubic-bezier(0.16, 1, 0.3, 1); }
 
 /* ─── Top bar ─────────────────────────────────────────────── */
 .topBar {
@@ -291,11 +295,91 @@
 .cardGoal {
   font-family: var(--font-ui);
   font-size: 12.5px;
+  line-height: 1.5;
   color: var(--color-text-secondary);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ─── Catalog card syllabus preview ───────────────────────── */
+.cardSyllabus {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 2px;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.cardSyllabusLabel {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.cardSyllabusList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cardSyllabusItem {
+  position: relative;
+  padding-left: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardSyllabusItem::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.cardSyllabusMore {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  padding-left: 14px;
+}
+
+.cardMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.cardMetaItem {
+  white-space: nowrap;
+}
+
+.cardMetaDot {
+  color: var(--color-border);
 }
 
 .cardFooter {
@@ -1024,3 +1108,78 @@
   transition: opacity 0.15s;
 }
 .quizDone:hover { opacity: 0.88; }
+
+/* ─── Quiz loading states ──────────────────────────────── */
+@keyframes quizSpin {
+  to { transform: rotate(360deg); }
+}
+
+.quizLoadingOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.quizLoadingClose {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.quizLoadingClose:hover {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.quizLoadingPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 80px 20px;
+}
+
+.quizLoadingSpinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  animation: quizSpin 0.8s linear infinite;
+}
+
+.quizLoadingTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.quizLoadingSub {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  text-align: center;
+  max-width: 420px;
+}
