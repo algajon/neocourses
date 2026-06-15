@@ -49,7 +49,7 @@ export default function NewCoursePage() {
   const [step2, setStep2] = useState<Step2Data>({
     difficultyLevel: 'beginner',
     estimatedHours: '',
-    certificateEnabled: false,
+    certificateEnabled: true,
   })
 
   function handleStep1Submit(e: FormEvent) {
