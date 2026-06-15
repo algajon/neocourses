@@ -26,6 +26,7 @@ const LINKS = [
 export function LearnerNav({ user }: LearnerNavProps) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -39,6 +40,10 @@ export function LearnerNav({ user }: LearnerNavProps) {
     return () => document.removeEventListener('mousedown', onClick)
   }, [menuOpen])
 
+  useEffect(() => {
+    setNavOpen(false)
+  }, [pathname])
+
   function isActive(href: string) {
     if (href === '/learn') return pathname === '/learn'
     return pathname === href || pathname.startsWith(href + '/')
@@ -48,10 +53,23 @@ export function LearnerNav({ user }: LearnerNavProps) {
     <nav className={styles.nav} aria-label="Primary">
       <div className={styles.navInner}>
         <div className={styles.navLeft}>
+          <button
+            type="button"
+            className={styles.navToggle}
+            onClick={() => setNavOpen(o => !o)}
+            aria-label={navOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={navOpen}
+            aria-controls="learner-nav-links"
+          >
+            <Icon name={navOpen ? 'x' : 'menu'} size={18} />
+          </button>
           <Link href="/learn" className={styles.wordmark} aria-label="courseneo home">
             course<span className={styles.neo}>neo</span>
           </Link>
-          <div className={styles.links}>
+          <div
+            id="learner-nav-links"
+            className={`${styles.links} ${navOpen ? styles.linksOpen : ''}`}
+          >
             {LINKS.map(link => {
               const active = isActive(link.href)
               return (
@@ -60,6 +78,7 @@ export function LearnerNav({ user }: LearnerNavProps) {
                   href={link.href}
                   className={active ? styles.linkActive : styles.link}
                   aria-current={active ? 'page' : undefined}
+                  onClick={() => setNavOpen(false)}
                 >
                   {link.label}
                 </Link>

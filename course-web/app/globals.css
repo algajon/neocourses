@@ -217,6 +217,30 @@ code, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; }
   transform: translateY(0);
 }
 
+/* ─── Responsive: collapse admin sidebar + tighten container padding ─── */
+@media (max-width: 1024px) {
+  /* Admin layout's fixed sidebar + main margin both read this token; zeroing it
+     lets the sidebar collapse into the AdminSidebar's own mobile top bar. */
+  :root, [data-theme="white"], [data-theme="dark"] {
+    --sidebar-width: 0px;
+  }
+
+  /* Reserve space for the fixed admin top bar so content isn't covered. */
+  body:has(.admin-shell-nav) main#main {
+    padding-top: 56px;
+  }
+
+  .page-wrap {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+}
+
+@media (max-width: 600px) {
+  .page-wrap {
+    padding: var(--space-5) var(--space-3) var(--space-8);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

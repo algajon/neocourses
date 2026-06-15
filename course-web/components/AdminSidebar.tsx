@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
@@ -77,15 +78,31 @@ const NAV_ITEMS = [
 
 export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname()
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname])
 
   return (
-    <div className={styles.sidebar}>
+    <div className={`admin-shell-nav ${styles.sidebar} ${open ? styles.sidebarOpen : ''}`}>
       <div className={styles.logo}>
         <span className={styles.logoText}>
           course<span className={styles.logoAccent}>neo</span>
         </span>
+        <button
+          type="button"
+          className={styles.mobileToggle}
+          onClick={() => setOpen(o => !o)}
+          aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={open}
+          aria-controls="admin-nav-panel"
+        >
+          <Icon name={open ? 'x' : 'menu'} size={18} />
+        </button>
       </div>
 
+      <div className={styles.panel} id="admin-nav-panel">
       <div className={styles.navSection} id="admin-nav-label">Workspace</div>
       <nav className={styles.nav} aria-labelledby="admin-nav-label">
         {NAV_ITEMS.map((item) => {
@@ -131,6 +148,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           </svg>
           Sign out
         </button>
+      </div>
       </div>
     </div>
   )

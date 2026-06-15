@@ -368,3 +368,46 @@
   box-shadow: var(--glow-md);
   opacity: 0.92;
 }
+
+@media (max-width: 768px) {
+  .page {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .header {
+    margin-bottom: var(--space-6);
+  }
+
+  .section {
+    margin-bottom: var(--space-8);
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resumeCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-5) var(--space-6);
+  }
+
+  .resumeRing {
+    align-self: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: var(--space-5) var(--space-3);
+  }
+
+  .cardBody {
+    padding: var(--space-5);
+  }
+}

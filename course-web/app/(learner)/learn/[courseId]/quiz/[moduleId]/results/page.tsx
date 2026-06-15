@@ -82,14 +82,27 @@ export default async function QuizResultsPage({ params, searchParams }: PageProp
 
           <div className={styles.scoreRight}>
             <div className={`${styles.verdict} ${passed ? styles.verdictPass : styles.verdictFail}`}>
+              <span className={`${styles.verdictDot} ${passed ? styles.verdictDotPass : styles.verdictDotFail}`} />
               {passed ? 'Passed' : 'Not Passed'}
             </div>
             <p className={styles.scoreSub}>
               {correctCount} of {questions.length} questions correct
             </p>
-            <p className={styles.scoreSub}>
-              Passing score: {passingPct}%
-            </p>
+
+            <div
+              className={styles.scoreBar}
+              role="img"
+              aria-label={`Scored ${scorePct} percent; passing score is ${passingPct} percent`}
+            >
+              <div
+                className={`${styles.scoreBarFill} ${passed ? styles.scoreBarPass : styles.scoreBarFail}`}
+                style={{ width: `${scorePct}%` }}
+              />
+              <div className={styles.scoreBarThreshold} style={{ left: `${passingPct}%` }}>
+                <span className={styles.scoreBarThresholdLabel}>Pass {passingPct}%</span>
+              </div>
+            </div>
+
             <div className={styles.scoreActions}>
               {passed ? (
                 <Link
