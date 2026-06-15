@@ -416,6 +416,41 @@ export const notifications = pgTable(
   })
 )
 
+// One row per learner: accumulated points and the running daily streak.
+// lastActivityDate is a YYYY-MM-DD string (UTC day) so streak math is calendar-day
+// based and timezone-stable regardless of the exact timestamp of the activity.
+export const learnerStats = pgTable(
+  'learner_stats',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => users.id).notNull().unique(),
+    points: integer('points').notNull().default(0),
+    currentStreakDays: integer('current_streak_days').notNull().default(0),
+    longestStreakDays: integer('longest_streak_days').notNull().default(0),
+    lastActivityDate: text('last_activity_date'),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    userIdx: uniqueIndex('ls_user_idx').on(t.userId),
+  })
+)
+
+// One row per learner per earned badge. The unique (userId, badgeKey) index makes
+// awarding idempotent — a second insert for an already-earned badge is a no-op.
+export const learnerBadges = pgTable(
+  'learner_badges',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => users.id).notNull(),
+    badgeKey: text('badge_key').notNull(),
+    earnedAt: timestamp('earned_at', { withTimezone: true }).notNull(),
+  },
+  (t) => ({
+    userBadgeIdx: uniqueIndex('lb_user_badge_idx').on(t.userId, t.badgeKey),
+    userIdx: index('lb_user_idx').on(t.userId),
+  })
+)
+
 // One free-text note per learner per lesson (upserted on save).
 export const lessonNotes = pgTable(
   'lesson_notes',

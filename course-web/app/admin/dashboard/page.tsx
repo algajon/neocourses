@@ -1,12 +1,13 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { eq, count, countDistinct, and, isNotNull, isNull, lt, sql } from 'drizzle-orm'
+import { eq, count, countDistinct, and, isNotNull, isNull, lt, notInArray, sql } from 'drizzle-orm'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
 import { courses, enrollments, users } from '@/lib/db/schema'
 import { Icon } from '@/components/Icon'
 import type { IconName } from '@/components/Icon'
+import { OrgSetupWizard } from '@/components/OrgSetupWizard'
 import styles from './page.module.css'
 
 const STATUS_PILL: Record<string, string> = {
@@ -47,6 +48,7 @@ export default async function DashboardPage() {
     [activeLearnersResult],
     [enrollmentTotalsResult],
     [overdueResult],
+    [teamMembersResult],
     recentCourses,
     attentionEnrollments,
   ] = await Promise.all([
@@ -103,6 +105,15 @@ export default async function DashboardPage() {
           lt(enrollments.dueAt, now),
           isNull(enrollments.completedAt)
         )
+      ),
+    // Team members in the org beyond owners/admins (i.e. people invited to learn/review)
+    db
+      .select({ count: count() })
+      .from(users)
+      .where(
+        orgId
+          ? and(eq(users.organizationId, orgId), notInArray(users.role, ['owner', 'admin']))
+          : and(isNotNull(users.organizationId), notInArray(users.role, ['owner', 'admin']))
       ),
     // Recent courses for the activity column
     db
@@ -176,7 +187,19 @@ export default async function DashboardPage() {
     },
   ]
 
-  const hasAnyData = (totalCoursesResult?.count ?? 0) > 0 || totalEnrollments > 0
+  const totalCourses = totalCoursesResult?.count ?? 0
+  const publishedCourses = publishedCoursesResult?.count ?? 0
+  const teamMembers = teamMembersResult?.count ?? 0
+
+  const hasCourse = totalCourses > 0
+  const hasTeamMember = teamMembers > 0
+  const hasPublishedCourse = publishedCourses > 0
+  const setupComplete = hasCourse && hasTeamMember && hasPublishedCourse
+
+  // Point "Generate & publish" at a real course when one exists, else the courses list.
+  const generateHref = recentCourses[0]
+    ? `/admin/courses/${recentCourses[0].id}`
+    : '/admin/courses'
 
   return (
     <div className={styles.page}>
@@ -185,23 +208,17 @@ export default async function DashboardPage() {
         <h1>Dashboard</h1>
       </div>
 
-      {!hasAnyData ? (
-        <div className={styles.welcome}>
-          <div className={styles.welcomeIcon}>
-            <Icon name="sparkles" size={22} />
-          </div>
-          <h2>Welcome — let’s get your team learning</h2>
-          <p>
-            You don’t have any courses or enrollments yet. Create your first course and assign it
-            to your team to start tracking progress here.
-          </p>
-          <Link href="/admin/courses/new" className="btn-cta">
-            <Icon name="sparkles" size={15} /> Create your first course
-          </Link>
-        </div>
-      ) : (
-        <>
-          <div className={styles.statsGrid}>
+      {!setupComplete && (
+        <OrgSetupWizard
+          hasCourse={hasCourse}
+          hasTeamMember={hasTeamMember}
+          hasPublishedCourse={hasPublishedCourse}
+          generateHref={generateHref}
+        />
+      )}
+
+      <>
+        <div className={styles.statsGrid}>
             {kpis.map((kpi) => (
               <div
                 key={kpi.label}
@@ -296,7 +313,6 @@ export default async function DashboardPage() {
             </div>
           </div>
         </>
-      )}
     </div>
   )
 }

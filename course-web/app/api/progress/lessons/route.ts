@@ -12,6 +12,7 @@ import {
 import { eq, and, count } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 import { createNotification } from '@/lib/notify'
+import { recordActivity } from '@/lib/gamification'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -122,6 +123,11 @@ export async function POST(req: NextRequest) {
       body: course?.title ?? 'You finished a course',
       link: `/learn/${courseId}/certificate`,
     })
+  }
+
+  // Gamification: only on a genuinely new lesson completion, best-effort, non-blocking.
+  if (existing.length === 0) {
+    void recordActivity(session.user.id, { kind: 'lesson' })
   }
 
   return NextResponse.json({ completionPercentage, completed: isCompleted })

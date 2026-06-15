@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
 import { enrollments, courses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
+import { getGamificationSummary, BADGES } from '@/lib/gamification'
 import styles from './page.module.css'
 
 async function getEnrollmentsWithCourses(userId: string) {
@@ -66,7 +67,10 @@ export default async function LearnPage() {
     redirect('/login')
   }
 
-  const rows = await getEnrollmentsWithCourses(session.user.id)
+  const [rows, gamification] = await Promise.all([
+    getEnrollmentsWithCourses(session.user.id),
+    getGamificationSummary(session.user.id),
+  ])
 
   const active = rows.filter(r => !r.enrollment.completedAt)
   const completed = rows.filter(r => !!r.enrollment.completedAt)
@@ -105,6 +109,8 @@ export default async function LearnPage() {
           )}
         </p>
       </div>
+
+      {rows.length > 0 && <StatsStrip summary={gamification} />}
 
       {rows.length === 0 && (
         <div className={styles.empty}>
@@ -178,6 +184,66 @@ export default async function LearnPage() {
         </section>
       )}
     </div>
+  )
+}
+
+function StatsStrip({
+  summary,
+}: {
+  summary: Awaited<ReturnType<typeof getGamificationSummary>>
+}) {
+  const earned = new Set(summary.earnedBadgeKeys)
+  const earnedCount = earned.size
+
+  return (
+    <section className={styles.statsStrip} aria-label="Your learning stats">
+      <div className={styles.statBlock}>
+        <span className={styles.statIcon} data-flame={summary.currentStreakDays > 0 ? 'on' : undefined}>
+          <Icon name="target" size={18} />
+        </span>
+        <div className={styles.statText}>
+          <span className={styles.statValue}>{summary.currentStreakDays}</span>
+          <span className={styles.statLabel}>
+            day streak{summary.currentStreakDays === 1 ? '' : 's'}
+          </span>
+        </div>
+      </div>
+
+      <div className={styles.statDivider} aria-hidden="true" />
+
+      <div className={styles.statBlock}>
+        <span className={styles.statIcon}>
+          <Icon name="star" size={18} />
+        </span>
+        <div className={styles.statText}>
+          <span className={styles.statValue}>{summary.points.toLocaleString()}</span>
+          <span className={styles.statLabel}>points</span>
+        </div>
+      </div>
+
+      <div className={styles.statDivider} aria-hidden="true" />
+
+      <div className={styles.badgesBlock}>
+        <span className={styles.badgesHeading}>
+          Badges <span className={styles.badgesCount}>{earnedCount}/{BADGES.length}</span>
+        </span>
+        <ul className={styles.badgeList}>
+          {BADGES.map(badge => {
+            const unlocked = earned.has(badge.key)
+            return (
+              <li
+                key={badge.key}
+                className={`${styles.badge} ${unlocked ? styles.badgeUnlocked : styles.badgeLocked}`}
+                title={`${badge.label} — ${badge.description}${unlocked ? '' : ' (locked)'}`}
+              >
+                <Icon name={unlocked ? badge.icon : 'lock'} size={16} />
+                <span className={styles.badgeLabel}>{badge.label}</span>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    </section>
   )
 }
 

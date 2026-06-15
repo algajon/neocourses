@@ -31,6 +31,10 @@
   color: var(--color-text-tertiary);
 }
 
+.headerActions {
+  margin-left: auto;
+}
+
 /* ─── Invite card ─────────────────────────── */
 
 .inviteCard {

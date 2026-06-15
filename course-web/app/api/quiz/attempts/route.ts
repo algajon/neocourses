@@ -14,6 +14,7 @@ import {
 } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
+import { recordActivity } from '@/lib/gamification'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -136,6 +137,9 @@ export async function POST(req: NextRequest) {
       }
     }
   }
+
+  // Gamification: best-effort, non-blocking. score is a 0..1 fraction.
+  void recordActivity(session.user.id, { kind: 'quiz', score: score / 100, passed })
 
   return NextResponse.json({
     attemptId,

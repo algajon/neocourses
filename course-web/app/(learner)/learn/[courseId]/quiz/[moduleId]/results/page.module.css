@@ -209,6 +209,116 @@
   flex-wrap: wrap;
 }
 
+/* ── Remediation (review before retrying) ── */
+.remediation {
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.remediationProminent {
+  background: var(--color-surface);
+  border: 1px solid var(--color-error);
+  border-left: 3px solid var(--color-error);
+  box-shadow: var(--shadow-md);
+}
+
+.remediationSubtle {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  padding: var(--space-5);
+}
+
+.remediationHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.remediationIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.remediationIconProminent {
+  background: var(--color-error-subtle);
+  color: var(--color-error);
+}
+
+.remediationIconSubtle {
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-text);
+}
+
+.remediationHeadText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.remediationTitle {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.remediationSubtle .remediationTitle {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.remediationReason {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.remediationList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.remediationLessonLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.remediationSubtle .remediationLessonLink {
+  background: var(--color-surface);
+}
+
+.remediationLessonLink:hover {
+  background: var(--color-surface-3);
+  border-color: var(--color-border);
+  color: var(--color-accent-text);
+}
+
 /* ── Review ── */
 .reviewSection {
   display: flex;

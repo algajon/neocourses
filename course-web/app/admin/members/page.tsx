@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { MembersClient } from './MembersClient'
+import { ImportMembers } from './ImportMembers'
 import styles from './page.module.css'
 
 export default async function MembersPage() {
@@ -32,6 +33,9 @@ export default async function MembersPage() {
       <div className={styles.header}>
         <h1>Members</h1>
         <span className={styles.count}>{memberList.length} member{memberList.length !== 1 ? 's' : ''}</span>
+        <div className={styles.headerActions}>
+          <ImportMembers />
+        </div>
       </div>
 
       <MembersClient members={memberList} currentUserId={session.user.id} />
