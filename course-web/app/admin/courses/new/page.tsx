@@ -1,10 +1,14 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, Fragment } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 import styles from './page.module.css'
+
+// The full course-creation pipeline. Steps 1–2 are this form; 3–6 happen after
+// the course is created (shown here so admins see the whole process up front).
+const PIPELINE = ['Basic Info', 'Settings', 'Upload', 'Generate', 'Review', 'Publish']
 
 interface Step1Data {
   title: string
@@ -104,15 +108,23 @@ export default function NewCoursePage() {
       </div>
 
       <div className={styles.stepIndicator}>
-        <div className={`${styles.step} ${step === 1 ? styles.active : styles.done}`}>
-          <span className={styles.stepNum}>{step > 1 ? <Icon name="check" size={14} /> : '1'}</span>
-          Basic Info
-        </div>
-        <div className={styles.stepConnector} />
-        <div className={`${styles.step} ${step === 2 ? styles.active : ''}`}>
-          <span className={styles.stepNum}>2</span>
-          Settings
-        </div>
+        {PIPELINE.map((label, idx) => {
+          const n = idx + 1
+          const state = n < step ? 'done' : n === step ? 'active' : 'upcoming'
+          return (
+            <Fragment key={label}>
+              {idx > 0 && <div className={styles.stepConnector} />}
+              <div
+                className={`${styles.step} ${state === 'active' ? styles.active : ''} ${state === 'done' ? styles.done : ''}`}
+              >
+                <span className={styles.stepNum}>
+                  {state === 'done' ? <Icon name="check" size={14} /> : n}
+                </span>
+                {label}
+              </div>
+            </Fragment>
+          )
+        })}
       </div>
 
       {step === 1 && (

@@ -20,7 +20,9 @@
 .stepIndicator {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0;
+  row-gap: var(--space-2);
   margin-bottom: var(--space-8);
 }
 
@@ -68,10 +70,27 @@
 }
 
 .stepConnector {
-  flex: 0 0 32px;
+  flex: 1 1 8px;
+  min-width: 6px;
+  max-width: 18px;
   height: 1.5px;
   background: var(--color-border);
-  margin: 0 var(--space-2);
+  margin: 0 4px;
+}
+
+.step {
+  white-space: nowrap;
+  gap: var(--space-1) !important;
+}
+
+@media (max-width: 560px) {
+  .stepConnector {
+    flex-basis: 8px;
+    margin: 0 3px;
+  }
+  .step {
+    font-size: 12px;
+  }
 }
 
 .card {
