@@ -9,6 +9,7 @@ import {
   enrollments,
 } from '@/lib/db/schema'
 import type { IconName } from '@/components/Icon'
+import { createNotification } from '@/lib/notify'
 
 // ---------------------------------------------------------------------------
 // Point values & streak rules
@@ -68,6 +69,7 @@ export const BADGES: BadgeDef[] = [
 ]
 
 const BADGE_KEYS = new Set(BADGES.map((b) => b.key))
+const BADGE_BY_KEY = new Map(BADGES.map((b) => [b.key, b]))
 
 // ---------------------------------------------------------------------------
 // Date helpers (UTC calendar days, YYYY-MM-DD)
@@ -173,16 +175,33 @@ async function recordActivityInner(userId: string, activity: ActivityInput): Pro
       .where(eq(learnerStats.userId, userId))
   }
 
-  await evaluateBadges(userId, activity, currentStreak, now)
+  const newlyEarned = await evaluateBadges(userId, activity, currentStreak, now)
+
+  // Best-effort: announce only badges that were genuinely earned just now.
+  for (const key of newlyEarned) {
+    const badge = BADGE_BY_KEY.get(key)
+    if (!badge) continue
+    void createNotification({
+      userId,
+      type: 'badge',
+      title: `Achievement unlocked: ${badge.label}`,
+      body: badge.description,
+      link: '/learn',
+    }).catch(() => {})
+  }
 }
 
-/** Determines which badge keys are newly satisfied and inserts them idempotently. */
+/**
+ * Determines which badge keys are newly satisfied and inserts them idempotently.
+ * Returns the keys that were actually inserted this call (not previously held), so
+ * the caller can notify exactly once per genuinely-earned badge.
+ */
 async function evaluateBadges(
   userId: string,
   activity: ActivityInput,
   currentStreak: number,
   now: Date,
-): Promise<void> {
+): Promise<string[]> {
   const toAward = new Set<string>()
 
   if (activity.kind === 'lesson') {
@@ -210,16 +229,23 @@ async function evaluateBadges(
 
   if (completedCourses >= 1) toAward.add('first_course')
 
-  if (toAward.size === 0) return
+  if (toAward.size === 0) return []
 
   const rows = [...toAward]
     .filter((key) => BADGE_KEYS.has(key))
     .map((key) => ({ id: randomUUID(), userId, badgeKey: key, earnedAt: now }))
 
-  if (rows.length === 0) return
+  if (rows.length === 0) return []
 
-  // Unique (userId, badgeKey) makes re-awards a no-op.
-  await db.insert(learnerBadges).values(rows).onConflictDoNothing()
+  // Unique (userId, badgeKey) makes re-awards a no-op. `returning` yields only the
+  // rows that were actually inserted — i.e. badges the learner did not already hold.
+  const inserted = await db
+    .insert(learnerBadges)
+    .values(rows)
+    .onConflictDoNothing()
+    .returning({ badgeKey: learnerBadges.badgeKey })
+
+  return inserted.map((r) => r.badgeKey)
 }
 
 // ---------------------------------------------------------------------------

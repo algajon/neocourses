@@ -15,6 +15,7 @@ import {
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
 import { recordActivity } from '@/lib/gamification'
+import { createNotification } from '@/lib/notify'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -140,6 +141,21 @@ export async function POST(req: NextRequest) {
 
   // Gamification: best-effort, non-blocking. score is a 0..1 fraction.
   void recordActivity(session.user.id, { kind: 'quiz', score: score / 100, passed })
+
+  // Encouragement: notify only on a pass (never on fails). Fire-and-forget so it
+  // can never block or fail the response. A perfect score gets a little extra.
+  if (passed) {
+    const perfect = score >= 100
+    void createNotification({
+      userId: session.user.id,
+      type: 'quiz',
+      title: `Quiz passed: ${quiz.title}`,
+      body: perfect
+        ? 'Perfect score — flawless run. On to the next.'
+        : `You scored ${score}%. Nicely done.`,
+      link: `/learn/${quiz.courseId}`,
+    }).catch(() => {})
+  }
 
   return NextResponse.json({
     attemptId,

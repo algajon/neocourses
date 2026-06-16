@@ -33,10 +33,55 @@
   margin: 0;
 }
 
+.section {
+  margin-bottom: var(--space-10);
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--space-4);
+}
+
+.emptyInline {
+  text-align: center;
+  padding: var(--space-8) var(--space-6);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.emptyIconSmall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.emptyInlineText {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1) 0;
+}
+
+.emptyInlineSubtext {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin: 0;
 }
 
 .card {

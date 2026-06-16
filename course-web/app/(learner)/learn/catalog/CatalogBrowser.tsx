@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 import { EnrollButton } from '@/components/EnrollButton'
+import { priceModelOf, pricingLabel, formatPrice } from '@/lib/pricing'
+import { courseGradient } from '@/lib/gradient'
 import styles from './page.module.css'
 
 export interface CatalogItem {
@@ -14,8 +16,12 @@ export interface CatalogItem {
   courseType: string
   estimatedMinutes: number | null
   certificateEnabled: boolean
+  thumbnailUrl: string | null
+  pricingModel: string
+  priceCents: number
   lessonCount: number
   enrolled: boolean
+  paid: boolean
   progressPercent: number
 }
 
@@ -36,6 +42,7 @@ export function CatalogBrowser({ items }: { items: CatalogItem[] }) {
   const [query, setQuery] = useState('')
   const [difficulty, setDifficulty] = useState('all')
   const [courseType, setCourseType] = useState('all')
+  const [price, setPrice] = useState('all')
 
   const difficulties = useMemo(
     () => Array.from(new Set(items.map(i => i.difficultyLevel))),
@@ -48,15 +55,21 @@ export function CatalogBrowser({ items }: { items: CatalogItem[] }) {
     return items.filter(item => {
       if (difficulty !== 'all' && item.difficultyLevel !== difficulty) return false
       if (courseType !== 'all' && item.courseType !== courseType) return false
+      if (price !== 'all') {
+        const isFree = priceModelOf(item) === 'free'
+        if (price === 'free' && !isFree) return false
+        if (price === 'paid' && isFree) return false
+      }
       if (q) {
         const haystack = `${item.title} ${item.description ?? ''}`.toLowerCase()
         if (!haystack.includes(q)) return false
       }
       return true
     })
-  }, [items, query, difficulty, courseType])
+  }, [items, query, difficulty, courseType, price])
 
-  const hasFilters = query.trim() !== '' || difficulty !== 'all' || courseType !== 'all'
+  const hasFilters =
+    query.trim() !== '' || difficulty !== 'all' || courseType !== 'all' || price !== 'all'
 
   return (
     <>
@@ -101,6 +114,16 @@ export function CatalogBrowser({ items }: { items: CatalogItem[] }) {
               </option>
             ))}
           </select>
+          <select
+            className={styles.select}
+            value={price}
+            onChange={e => setPrice(e.target.value)}
+            aria-label="Filter by price"
+          >
+            <option value="all">All prices</option>
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+          </select>
         </div>
       </div>
 
@@ -137,6 +160,7 @@ export function CatalogBrowser({ items }: { items: CatalogItem[] }) {
                 setQuery('')
                 setDifficulty('all')
                 setCourseType('all')
+                setPrice('all')
               }}
             >
               Clear filters
@@ -150,9 +174,25 @@ export function CatalogBrowser({ items }: { items: CatalogItem[] }) {
 
 function CatalogCard({ item }: { item: CatalogItem }) {
   const progress = Math.round(item.progressPercent)
+  const model = priceModelOf(item)
+  const isFree = model === 'free'
 
   return (
     <div className={styles.card}>
+      <div
+        className={styles.cardThumb}
+        style={
+          item.thumbnailUrl
+            ? { backgroundImage: `url(${item.thumbnailUrl})` }
+            : { backgroundImage: courseGradient(item.id) }
+        }
+        role="img"
+        aria-label={`${item.title} cover`}
+      >
+        <span className={`${styles.priceBadge} ${isFree ? styles.priceBadgeFree : ''}`}>
+          {pricingLabel(item)}
+        </span>
+      </div>
       <div className={styles.cardBody}>
         <div className={styles.cardMeta}>
           <span className={styles.pill}>
@@ -198,8 +238,23 @@ function CatalogCard({ item }: { item: CatalogItem }) {
             {progress > 0 ? 'Continue' : 'Start'}
             <Icon name="arrowRight" size={14} />
           </Link>
+        ) : model === 'paid' ? (
+          <EnrollButton
+            courseId={item.id}
+            action="purchase"
+            priceLabel={formatPrice(item.priceCents)}
+            courseTitle={item.title}
+            className={styles.btnAccent}
+          />
+        ) : model === 'first_chapter_free' ? (
+          <EnrollButton
+            courseId={item.id}
+            action="start-free"
+            courseTitle={item.title}
+            className={styles.btnAccent}
+          />
         ) : (
-          <EnrollButton courseId={item.id} className={styles.btnAccent} label="Enroll" />
+          <EnrollButton courseId={item.id} action="enroll" className={styles.btnAccent} />
         )}
       </div>
     </div>

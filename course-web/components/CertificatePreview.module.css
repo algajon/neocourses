@@ -1,0 +1,124 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.accent {
+  position: relative;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accent::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.45);
+}
+
+.lock {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: rgba(10, 10, 10, 0.55);
+  color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.seal {
+  position: relative;
+  z-index: 1;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gradient-accent);
+  border: 2px dashed rgba(0, 0, 0, 0.25);
+  display: grid;
+  place-items: center;
+  opacity: 0.75;
+  filter: grayscale(0.35);
+}
+
+.sealNeo {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #0a0a0a;
+  line-height: 1;
+}
+
+.body {
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.type {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.earnBy {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  margin-top: auto;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  transition: color 0.15s;
+}
+
+.card:hover .cta {
+  color: var(--color-accent-text);
+}

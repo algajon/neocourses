@@ -62,6 +62,37 @@
   gap: var(--space-4);
 }
 
+.banner {
+  position: relative;
+  height: 160px;
+  border-radius: var(--radius-lg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.bannerPrice {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0a0a0a;
+  background: var(--color-accent);
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.bannerPriceFree {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;
@@ -121,6 +152,75 @@
   gap: var(--space-3);
 }
 
+.enrollCard {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.priceValue {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.priceModel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+  background: var(--color-accent-subtle);
+  padding: 3px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.enrollNote {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.unlockBtn {
+  display: block;
+  width: 100%;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-accent);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: var(--space-2);
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.unlockBtn:hover {
+  background: var(--color-accent-subtle);
+  box-shadow: var(--glow-sm);
+}
+
+.unlockBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .progressHeader {
   display: flex;
   justify-content: space-between;
@@ -164,6 +264,7 @@
 
 .ctaBtn {
   display: block;
+  width: 100%;
   background: var(--gradient-accent);
   color: #0a0a0a;
   font-size: 14px;
@@ -173,8 +274,16 @@
   text-align: center;
   text-decoration: none;
   margin-top: var(--space-2);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   box-shadow: var(--glow-sm);
   transition: box-shadow 0.15s, opacity 0.15s;
+}
+
+.ctaBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .ctaBtn:hover {

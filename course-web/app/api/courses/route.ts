@@ -97,10 +97,25 @@ export async function POST(req: NextRequest) {
       difficultyLevel,
       estimatedHours,
       certificateEnabled,
+      pricingModel,
+      priceCents,
+      thumbnailUrl,
     } = body
 
     if (!title) {
       return NextResponse.json({ error: 'title is required' }, { status: 400 })
+    }
+
+    const model =
+      pricingModel === 'paid' || pricingModel === 'first_chapter_free'
+        ? pricingModel
+        : 'free'
+    const cents = model === 'free' ? 0 : Math.round(Number(priceCents) || 0)
+    if (model !== 'free' && cents <= 0) {
+      return NextResponse.json(
+        { error: 'A price greater than $0 is required for paid courses.' },
+        { status: 400 }
+      )
     }
 
     const now = new Date()
@@ -116,6 +131,9 @@ export async function POST(req: NextRequest) {
       difficultyLevel: difficultyLevel ?? 'beginner',
       estimatedMinutes: estimatedHours != null ? Math.round(estimatedHours * 60) : null,
       certificateEnabled: certificateEnabled ?? false,
+      pricingModel: model,
+      priceCents: cents,
+      thumbnailUrl: typeof thumbnailUrl === 'string' && thumbnailUrl ? thumbnailUrl : null,
       status: 'draft',
       createdAt: now,
       updatedAt: now,

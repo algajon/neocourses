@@ -12,6 +12,9 @@ import {
 } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { Icon } from '@/components/Icon'
+import { EnrollButton } from '@/components/EnrollButton'
+import { priceModelOf, pricingLabel, formatPrice, hasFullAccess } from '@/lib/pricing'
+import { courseGradient } from '@/lib/gradient'
 import styles from './page.module.css'
 
 interface PageProps {
@@ -92,6 +95,11 @@ export default async function CourseOverviewPage({ params }: PageProps) {
     advanced: 'Advanced',
   }
 
+  const model = priceModelOf(course)
+  const priceText = formatPrice(course.priceCents)
+  const isEnrolled = !!enrollment
+  const hasAccess = hasFullAccess(course, enrollment)
+
   return (
     <div className={styles.page}>
       <div className={styles.hero}>
@@ -104,6 +112,22 @@ export default async function CourseOverviewPage({ params }: PageProps) {
 
           <div className={styles.heroContent}>
             <div className={styles.heroLeft}>
+              <div
+                className={styles.banner}
+                style={
+                  course.thumbnailUrl
+                    ? { backgroundImage: `url(${course.thumbnailUrl})` }
+                    : { backgroundImage: courseGradient(course.id) }
+                }
+                role="img"
+                aria-label={`${course.title} cover`}
+              >
+                <span
+                  className={`${styles.bannerPrice} ${model === 'free' ? styles.bannerPriceFree : ''}`}
+                >
+                  {pricingLabel(course)}
+                </span>
+              </div>
               <div className={styles.tags}>
                 <span className={styles.tag}>{difficultyLabel[course.difficultyLevel] ?? course.difficultyLevel}</span>
                 <span className={styles.tag}>{course.courseType}</span>
@@ -118,33 +142,95 @@ export default async function CourseOverviewPage({ params }: PageProps) {
             </div>
 
             <div className={styles.heroRight}>
-              <div className={styles.progressCard}>
-                <div className={styles.progressHeader}>
-                  <span className={styles.progressLabel}>Your progress</span>
-                  <span className={styles.progressPct}>{progressPct}%</span>
-                </div>
-                <div className={styles.progressBar}>
-                  <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
-                </div>
-                <p className={styles.progressSub}>{completedCount} of {totalLessons} lessons</p>
+              {!isEnrolled ? (
+                <div className={styles.enrollCard}>
+                  <div className={styles.priceRow}>
+                    <span className={styles.priceValue}>
+                      {model === 'free' ? 'Free' : priceText}
+                    </span>
+                    <span className={styles.priceModel}>{pricingLabel(course)}</span>
+                  </div>
 
-                {firstIncompleteLessonId ? (
-                  <Link
-                    href={`/learn/${course.id}/lessons/${firstIncompleteLessonId}`}
-                    className={styles.ctaBtn}
-                  >
-                    {completedCount === 0 ? 'Start Course' : 'Continue Learning'}
-                  </Link>
-                ) : (
-                  <Link href={`/learn/${course.id}/certificate`} className={styles.ctaBtn}>
-                    View Certificate
-                  </Link>
-                )}
+                  {model === 'paid' ? (
+                    <>
+                      <EnrollButton
+                        courseId={course.id}
+                        action="purchase"
+                        priceLabel={priceText}
+                        courseTitle={course.title}
+                        className={styles.ctaBtn}
+                      />
+                      <p className={styles.enrollNote}>
+                        Purchase to enroll and unlock every chapter.
+                      </p>
+                    </>
+                  ) : model === 'first_chapter_free' ? (
+                    <>
+                      <EnrollButton
+                        courseId={course.id}
+                        action="start-free"
+                        courseTitle={course.title}
+                        className={styles.ctaBtn}
+                      />
+                      <p className={styles.enrollNote}>
+                        Chapters 2+ unlock for {priceText}.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <EnrollButton
+                        courseId={course.id}
+                        action="enroll"
+                        className={styles.ctaBtn}
+                      />
+                      <p className={styles.enrollNote}>Enroll free to start learning.</p>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className={styles.progressCard}>
+                  <div className={styles.progressHeader}>
+                    <span className={styles.progressLabel}>Your progress</span>
+                    <span className={styles.progressPct}>{progressPct}%</span>
+                  </div>
+                  <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
+                  </div>
+                  <p className={styles.progressSub}>{completedCount} of {totalLessons} lessons</p>
 
-                <Link href={`/learn/${course.id}/flashcards`} className={styles.flashcardsLink}>
-                  <Icon name="book" size={15} /> Flashcards
-                </Link>
-              </div>
+                  {firstIncompleteLessonId ? (
+                    <Link
+                      href={`/learn/${course.id}/lessons/${firstIncompleteLessonId}`}
+                      className={styles.ctaBtn}
+                    >
+                      Continue Learning
+                    </Link>
+                  ) : (
+                    <Link href={`/learn/${course.id}/certificate`} className={styles.ctaBtn}>
+                      View Certificate
+                    </Link>
+                  )}
+
+                  {!hasAccess && (
+                    <>
+                      <EnrollButton
+                        courseId={course.id}
+                        action="unlock"
+                        priceLabel={priceText}
+                        courseTitle={course.title}
+                        className={styles.unlockBtn}
+                      />
+                      <p className={styles.progressSub}>
+                        Chapters 2+ are locked. Unlock the full course for {priceText}.
+                      </p>
+                    </>
+                  )}
+
+                  <Link href={`/learn/${course.id}/flashcards`} className={styles.flashcardsLink}>
+                    <Icon name="book" size={15} /> Flashcards
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

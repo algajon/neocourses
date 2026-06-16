@@ -181,6 +181,94 @@
   max-width: 720px;
 }
 
+/* ── Locked chapter ── */
+.lockedWrap {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.lockedCard {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-md);
+}
+
+.lockedIcon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-accent-subtle);
+  color: var(--color-accent-text);
+}
+
+.lockedTitle {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.lockedText {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.lockedCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-2);
+  font-size: 14px;
+  font-weight: 700;
+  color: #0a0a0a;
+  background: var(--gradient-accent);
+  border: none;
+  cursor: pointer;
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--glow-sm);
+  font-family: inherit;
+  transition: box-shadow 0.15s, opacity 0.15s;
+}
+
+.lockedCta:hover:not(:disabled) {
+  box-shadow: var(--glow-md);
+  opacity: 0.9;
+}
+
+.lockedCta:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.lockedBack {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  transition: color 0.12s;
+}
+
+.lockedBack:hover {
+  color: var(--color-text-primary);
+}
+
 /* ── Concept Grid ── */
 .conceptGrid {
   display: grid;

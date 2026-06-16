@@ -2,10 +2,11 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
+import { CertificatePreview } from '@/components/CertificatePreview'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
 import { certificates, courses } from '@/lib/db/schema'
-import { eq, desc } from 'drizzle-orm'
+import { eq, and, desc } from 'drizzle-orm'
 import styles from './page.module.css'
 
 async function getCertificates(userId: string) {
@@ -18,6 +19,23 @@ async function getCertificates(userId: string) {
     .innerJoin(courses, eq(certificates.courseId, courses.id))
     .where(eq(certificates.userId, userId))
     .orderBy(desc(certificates.issuedAt))
+}
+
+async function getEarnableCourses(organizationId: string) {
+  return db
+    .select({
+      id: courses.id,
+      title: courses.title,
+      thumbnailUrl: courses.thumbnailUrl,
+    })
+    .from(courses)
+    .where(
+      and(
+        eq(courses.organizationId, organizationId),
+        eq(courses.status, 'published'),
+        eq(courses.certificateEnabled, true)
+      )
+    )
 }
 
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -34,6 +52,13 @@ export default async function CertificatesPage() {
 
   const rows = await getCertificates(session.user.id)
 
+  const earnedIds = new Set(rows.map(({ course }) => course.id))
+  const earnable = session.user.organizationId
+    ? (await getEarnableCourses(session.user.organizationId)).filter(
+        (c) => !earnedIds.has(c.id)
+      )
+    : []
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -43,6 +68,9 @@ export default async function CertificatesPage() {
           {rows.length} certificate{rows.length !== 1 ? 's' : ''} earned
         </p>
       </div>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Earned</h2>
 
       {rows.length > 0 ? (
         <div className={styles.grid}>
@@ -94,6 +122,36 @@ export default async function CertificatesPage() {
           </Link>
         </div>
       )}
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Certificates you can earn</h2>
+
+        {earnable.length > 0 ? (
+          <div className={styles.grid}>
+            {earnable.map((course) => (
+              <CertificatePreview
+                key={course.id}
+                courseId={course.id}
+                title={course.title}
+                thumbnailUrl={course.thumbnailUrl}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.emptyInline}>
+            <div className={styles.emptyIconSmall}>
+              <Icon name="lock" size={24} />
+            </div>
+            <p className={styles.emptyInlineText}>
+              No certificates available to earn right now.
+            </p>
+            <p className={styles.emptyInlineSubtext}>
+              Certificate-eligible courses you haven&apos;t completed will show up here.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   )
 }

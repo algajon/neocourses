@@ -128,6 +128,37 @@ export async function POST(req: NextRequest) {
   // Gamification: only on a genuinely new lesson completion, best-effort, non-blocking.
   if (existing.length === 0) {
     void recordActivity(session.user.id, { kind: 'lesson' })
+
+    // Encouragement notifications for meaningful moments only. Fire-and-forget;
+    // never block or fail the response. `completed`/`completionPercentage` already
+    // reflect this lesson's insert; deriving the previous percentage lets us detect
+    // a genuine threshold *crossing* (so each milestone fires at most once).
+    const prevCompleted = completed - 1
+    const prevPercentage = total > 0 ? Math.round((prevCompleted / total) * 100) : 0
+
+    if (completed === 1) {
+      void createNotification({
+        userId: session.user.id,
+        type: 'milestone',
+        title: "You're underway",
+        body: 'First lesson complete 🎉 Keep the momentum going.',
+        link: `/learn/${courseId}`,
+      }).catch(() => {})
+    }
+
+    // Halfway: fire once, on the lesson that crosses from <50% to >=50%.
+    // Skip when the same lesson also reaches 100% (a tiny course) — the course
+    // completion notification above covers that, so we don't double-notify.
+    if (!isCompleted && prevPercentage < 50 && completionPercentage >= 50) {
+      void createNotification({
+        userId: session.user.id,
+        type: 'milestone',
+        title: 'Halfway there',
+        body: "You've completed half the course. The finish line is in sight.",
+        link: `/learn/${courseId}`,
+      }).catch(() => {})
+    }
+    // 100% completion notification is emitted by the course-completion block above.
   }
 
   return NextResponse.json({ completionPercentage, completed: isCompleted })

@@ -79,6 +79,11 @@ export const courses = pgTable(
     difficultyLevel: text('difficulty_level').default('beginner').notNull(),
     estimatedMinutes: integer('estimated_minutes'),
     thumbnailUrl: text('thumbnail_url'),
+    // Sales: 'free' (fully free), 'paid' (purchase to enroll), 'first_chapter_free'
+    // (enroll free, chapters 2+ locked until purchased). priceCents applies to
+    // paid + first_chapter_free.
+    pricingModel: text('pricing_model').default('free').notNull(),
+    priceCents: integer('price_cents').default(0).notNull(),
     tags: text('tags'),
     certificateEnabled: boolean('certificate_enabled').default(false),
     passingScore: real('passing_score').default(0.7),
@@ -223,6 +228,9 @@ export const enrollments = pgTable(
     assignedById: text('assigned_by_id'),
     dueAt: timestamp('due_at', { withTimezone: true }),
     required: boolean('required').default(false),
+    // Full-access flag: true for free courses + completed (placeholder) purchases;
+    // false for first_chapter_free until the learner unlocks the rest.
+    paid: boolean('paid').default(false).notNull(),
   },
   (t) => ({
     courseIdx: index('enroll_course_idx').on(t.courseId),

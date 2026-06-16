@@ -16,11 +16,17 @@ async function getCatalog(organizationId: string, userId: string): Promise<Catal
   const courseIds = published.map(c => c.id)
 
   const enrolled = await db
-    .select({ courseId: enrollments.courseId, progressPercent: enrollments.progressPercent })
+    .select({
+      courseId: enrollments.courseId,
+      progressPercent: enrollments.progressPercent,
+      paid: enrollments.paid,
+    })
     .from(enrollments)
     .where(eq(enrollments.userId, userId))
 
-  const enrolledMap = new Map(enrolled.map(e => [e.courseId, e.progressPercent ?? 0]))
+  const enrolledMap = new Map(
+    enrolled.map(e => [e.courseId, { progress: e.progressPercent ?? 0, paid: !!e.paid }]),
+  )
 
   const lessonCounts = new Map<string, number>()
   if (courseIds.length > 0) {
@@ -33,18 +39,25 @@ async function getCatalog(organizationId: string, userId: string): Promise<Catal
     }
   }
 
-  return published.map(course => ({
-    id: course.id,
-    title: course.title,
-    description: course.description,
-    difficultyLevel: course.difficultyLevel,
-    courseType: course.courseType,
-    estimatedMinutes: course.estimatedMinutes,
-    certificateEnabled: course.certificateEnabled ?? false,
-    lessonCount: lessonCounts.get(course.id) ?? 0,
-    enrolled: enrolledMap.has(course.id),
-    progressPercent: enrolledMap.get(course.id) ?? 0,
-  }))
+  return published.map(course => {
+    const enrollment = enrolledMap.get(course.id)
+    return {
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      difficultyLevel: course.difficultyLevel,
+      courseType: course.courseType,
+      estimatedMinutes: course.estimatedMinutes,
+      certificateEnabled: course.certificateEnabled ?? false,
+      thumbnailUrl: course.thumbnailUrl,
+      pricingModel: course.pricingModel,
+      priceCents: course.priceCents,
+      lessonCount: lessonCounts.get(course.id) ?? 0,
+      enrolled: !!enrollment,
+      paid: enrollment?.paid ?? false,
+      progressPercent: enrollment?.progress ?? 0,
+    }
+  })
 }
 
 export default async function CatalogPage() {
