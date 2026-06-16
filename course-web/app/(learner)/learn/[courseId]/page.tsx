@@ -102,7 +102,14 @@ export default async function CourseOverviewPage({ params }: PageProps) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.hero}>
+      <div
+        className={styles.hero}
+        style={
+          course.thumbnailUrl
+            ? { backgroundImage: `url(${course.thumbnailUrl})` }
+            : { backgroundImage: courseGradient(course.id) }
+        }
+      >
         <div className={styles.heroInner}>
           <div className={styles.breadcrumb}>
             <Link href="/learn" className={styles.breadcrumbLink}>My Learning</Link>
@@ -112,22 +119,9 @@ export default async function CourseOverviewPage({ params }: PageProps) {
 
           <div className={styles.heroContent}>
             <div className={styles.heroLeft}>
-              <div
-                className={styles.banner}
-                style={
-                  course.thumbnailUrl
-                    ? { backgroundImage: `url(${course.thumbnailUrl})` }
-                    : { backgroundImage: courseGradient(course.id) }
-                }
-                role="img"
-                aria-label={`${course.title} cover`}
-              >
-                <span
-                  className={`${styles.bannerPrice} ${model === 'free' ? styles.bannerPriceFree : ''}`}
-                >
-                  {pricingLabel(course)}
-                </span>
-              </div>
+              <span className={`${styles.heroBadge} ${model === 'free' ? styles.heroBadgeFree : ''}`}>
+                {pricingLabel(course)}
+              </span>
               <div className={styles.tags}>
                 <span className={styles.tag}>{difficultyLabel[course.difficultyLevel] ?? course.difficultyLevel}</span>
                 <span className={styles.tag}>{course.courseType}</span>

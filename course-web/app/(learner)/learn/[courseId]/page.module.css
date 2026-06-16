@@ -2,13 +2,30 @@
   min-height: calc(100vh - 56px);
 }
 
+/* The course gradient (or uploaded image) is the hero background, set inline. */
 .hero {
-  background: var(--color-surface);
+  position: relative;
+  background-color: var(--color-surface);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-10) 0;
+  overflow: hidden;
+}
+
+/* Subtle scrim so an uploaded photo doesn't wash out the frosted panels. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.34));
+  pointer-events: none;
 }
 
 .heroInner {
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
@@ -22,25 +39,26 @@
   margin-bottom: var(--space-6);
 }
 
+/* Breadcrumb sits directly on the always-dark gradient → keep it light in both themes. */
 .breadcrumbLink {
   font-size: 13px;
-  color: var(--color-text-tertiary);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
   transition: color 0.15s;
 }
 
 .breadcrumbLink:hover {
-  color: var(--color-text-primary);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .breadcrumbSep {
   font-size: 13px;
-  color: var(--color-border);
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .breadcrumbCurrent {
   font-size: 13px;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .heroContent {
@@ -56,10 +74,38 @@
   }
 }
 
+/* Frosted "blur backdrop" panel so text stays readable over the gradient. */
 .heroLeft {
+  align-self: start;
+  width: fit-content;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-4);
+  padding: var(--space-6) var(--space-8);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.heroBadge {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0a0a0a;
+  background: var(--color-accent);
+  padding: 5px 12px;
+  border-radius: 99px;
+}
+
+.heroBadgeFree {
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
 }
 
 .banner {
@@ -143,8 +189,10 @@
 }
 
 .progressCard {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface-2) 84%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   display: flex;
@@ -153,8 +201,10 @@
 }
 
 .enrollCard {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface-2) 84%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  backdrop-filter: blur(16px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   display: flex;
