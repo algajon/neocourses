@@ -240,6 +240,43 @@ export default async function DashboardPage() {
             <div className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h2>
+                  <Icon name="book" size={15} /> Recent courses
+                </h2>
+                <Link href="/admin/courses" className="btn-secondary">
+                  View all
+                </Link>
+              </div>
+              {recentCourses.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <span>
+                    No courses yet. <Link href="/admin/courses/new">Create your first course.</Link>
+                  </span>
+                </div>
+              ) : (
+                <ul className={styles.courseList}>
+                  {recentCourses.map((course) => (
+                    <li key={course.id} className={styles.courseRow}>
+                      <div className={styles.courseInfo}>
+                        <div className={styles.courseTitle}>{course.title}</div>
+                        <div className={styles.courseMeta}>Created {formatDate(course.createdAt)}</div>
+                      </div>
+                      <div className={styles.courseActions}>
+                        <span className={STATUS_PILL[course.status] ?? 'pill pill-draft'}>
+                          {course.status}
+                        </span>
+                        <Link href={`/admin/courses/${course.id}`} className="btn-secondary">
+                          View
+                        </Link>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2>
                   <Icon name="alertTriangle" size={15} /> Needs attention
                 </h2>
                 <Link href="/admin/courses" className="btn-secondary">
@@ -267,43 +304,6 @@ export default async function DashboardPage() {
                         </span>
                         <Link href={`/admin/courses/${row.courseId}`} className={styles.linkBtn}>
                           <Icon name="arrowRight" size={14} />
-                        </Link>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <div className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h2>
-                  <Icon name="book" size={15} /> Recent courses
-                </h2>
-                <Link href="/admin/courses" className="btn-secondary">
-                  View all
-                </Link>
-              </div>
-              {recentCourses.length === 0 ? (
-                <div className={styles.emptyState}>
-                  <span>
-                    No courses yet. <Link href="/admin/courses/new">Create your first course.</Link>
-                  </span>
-                </div>
-              ) : (
-                <ul className={styles.courseList}>
-                  {recentCourses.map((course) => (
-                    <li key={course.id} className={styles.courseRow}>
-                      <div className={styles.courseInfo}>
-                        <div className={styles.courseTitle}>{course.title}</div>
-                        <div className={styles.courseMeta}>Created {formatDate(course.createdAt)}</div>
-                      </div>
-                      <div className={styles.courseActions}>
-                        <span className={STATUS_PILL[course.status] ?? 'pill pill-draft'}>
-                          {course.status}
-                        </span>
-                        <Link href={`/admin/courses/${course.id}`} className="btn-secondary">
-                          View
                         </Link>
                       </div>
                     </li>
