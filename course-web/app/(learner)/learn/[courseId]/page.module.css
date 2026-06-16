@@ -32,17 +32,25 @@
   padding: 0 var(--space-6);
 }
 
+/* Small frosted chip so the breadcrumb stays readable on the gradient. */
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  width: fit-content;
   margin-bottom: var(--space-6);
+  padding: 6px 14px;
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
 }
 
-/* Hero is now theme-aware, so the breadcrumb follows the theme tokens. */
+/* Hero is theme-aware; My Learning matches the current-page color. */
 .breadcrumbLink {
   font-size: 13px;
-  color: var(--color-text-tertiary);
+  color: var(--color-text-secondary);
   text-decoration: none;
   transition: color 0.15s;
 }
@@ -510,8 +518,6 @@
 
 .lessonDone .lessonTitle {
   color: var(--color-text-secondary);
-  text-decoration: line-through;
-  text-decoration-color: var(--color-border);
 }
 
 .lessonDuration {
