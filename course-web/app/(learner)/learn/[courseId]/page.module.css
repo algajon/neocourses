@@ -134,7 +134,7 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   background: var(--color-accent);
   padding: 5px 12px;
   border-radius: var(--radius-sm);
@@ -324,7 +324,7 @@
   display: block;
   width: 100%;
   background: var(--gradient-accent);
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   font-size: 14px;
   font-weight: 700;
   padding: 12px 20px;

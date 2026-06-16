@@ -619,7 +619,7 @@
   gap: var(--space-2);
   font-size: 14px;
   font-weight: 700;
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   background: var(--gradient-accent);
   border: none;
   cursor: pointer;

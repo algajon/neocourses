@@ -93,7 +93,7 @@
   gap: var(--space-1);
   background: var(--gradient-accent);
   border: none;
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;

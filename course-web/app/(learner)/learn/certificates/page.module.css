@@ -233,7 +233,7 @@
   align-items: center;
   gap: var(--space-1);
   background: var(--gradient-accent);
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   font-size: 13px;
   font-weight: 700;
   padding: 8px 20px;

@@ -348,7 +348,7 @@
 .btnAccent {
   display: inline-block;
   background: var(--gradient-accent);
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   font-size: 14px;
   font-weight: 700;
   padding: 10px 24px;
