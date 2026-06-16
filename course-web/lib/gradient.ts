@@ -38,3 +38,25 @@ export function courseAccent(seed: string): string {
   const h = hash(seed || 'courseneo')
   return PALETTES[h % PALETTES.length][1]
 }
+
+// Vibrant hue pairs for THEME-AWARE surfaces (e.g. the course hero). These are
+// meant to be mixed with the current theme's background via CSS color-mix, so
+// the result is a rich dark gradient in dark mode and a soft light one in light
+// mode — instead of a fixed dark band that clashes with the light theme.
+const TINT_PAIRS: [string, string][] = [
+  ['#3b82f6', '#8b5cf6'], // blue → violet
+  ['#14b8a6', '#3b82f6'], // teal → blue
+  ['#8b5cf6', '#ec4899'], // violet → pink
+  ['#f59e0b', '#ef4444'], // amber → red
+  ['#10b981', '#14b8a6'], // emerald → teal
+  ['#6366f1', '#8b5cf6'], // indigo → violet
+  ['#0ea5e9', '#06b6d4'], // sky → cyan
+  ['#ec4899', '#8b5cf6'], // pink → violet
+]
+
+/** Deterministic vibrant tint pair + angle for a course, to mix over the theme bg. */
+export function courseTints(seed: string): { a: string; b: string; angle: number } {
+  const h = hash(seed || 'courseneo')
+  const [a, b] = TINT_PAIRS[h % TINT_PAIRS.length]
+  return { a, b, angle: 120 + (h % 60) }
+}

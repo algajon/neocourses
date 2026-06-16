@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { getServerSession } from 'next-auth'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -14,7 +15,7 @@ import { eq, and } from 'drizzle-orm'
 import { Icon } from '@/components/Icon'
 import { EnrollButton } from '@/components/EnrollButton'
 import { priceModelOf, pricingLabel, formatPrice, hasFullAccess } from '@/lib/pricing'
-import { courseGradient } from '@/lib/gradient'
+import { courseTints } from '@/lib/gradient'
 import styles from './page.module.css'
 
 interface PageProps {
@@ -106,8 +107,12 @@ export default async function CourseOverviewPage({ params }: PageProps) {
         className={styles.hero}
         style={
           course.thumbnailUrl
-            ? { backgroundImage: `url(${course.thumbnailUrl})` }
-            : { backgroundImage: courseGradient(course.id) }
+            ? ({ backgroundImage: `url(${course.thumbnailUrl})` } as CSSProperties)
+            : ({
+                '--tint-a': courseTints(course.id).a,
+                '--tint-b': courseTints(course.id).b,
+                '--tint-angle': `${courseTints(course.id).angle}deg`,
+              } as CSSProperties)
         }
       >
         <div className={styles.heroInner}>

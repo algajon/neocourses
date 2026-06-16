@@ -2,25 +2,25 @@
   min-height: calc(100vh - 56px);
 }
 
-/* The course gradient (or uploaded image) is the hero background, set inline. */
+/* Theme-aware course gradient: the per-course tint mixed over the CURRENT theme
+   background — rich + dark in dark mode, soft + light in light mode (so it never
+   clashes as a dark band on a light page). An uploaded image overrides via the
+   inline background-image set in the page. */
 .hero {
   position: relative;
-  background-color: var(--color-surface);
+  background-color: var(--color-bg);
+  background-image: linear-gradient(
+    var(--tint-angle, 140deg),
+    color-mix(in srgb, var(--tint-a, var(--color-accent)) 42%, var(--color-bg)) 0%,
+    color-mix(in srgb, var(--tint-b, var(--color-accent)) 26%, var(--color-bg)) 55%,
+    var(--color-bg) 100%
+  );
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-10) 0;
   overflow: hidden;
-}
-
-/* Subtle scrim so an uploaded photo doesn't wash out the frosted panels. */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.34));
-  pointer-events: none;
 }
 
 .heroInner {
@@ -39,26 +39,26 @@
   margin-bottom: var(--space-6);
 }
 
-/* Breadcrumb sits directly on the always-dark gradient → keep it light in both themes. */
+/* Hero is now theme-aware, so the breadcrumb follows the theme tokens. */
 .breadcrumbLink {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--color-text-tertiary);
   text-decoration: none;
   transition: color 0.15s;
 }
 
 .breadcrumbLink:hover {
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--color-text-primary);
 }
 
 .breadcrumbSep {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-border);
 }
 
 .breadcrumbCurrent {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--color-text-secondary);
 }
 
 .heroContent {
@@ -84,7 +84,7 @@
   align-items: flex-start;
   gap: var(--space-4);
   padding: var(--space-6) var(--space-8);
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   backdrop-filter: blur(18px) saturate(140%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -97,7 +97,7 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #0a0a0a;
+  color: var(--color-accent-contrast);
   background: var(--color-accent);
   padding: 5px 12px;
   border-radius: 99px;
@@ -189,7 +189,7 @@
 }
 
 .progressCard {
-  background: color-mix(in srgb, var(--color-surface-2) 84%, transparent);
+  background: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(130%);
   backdrop-filter: blur(16px) saturate(130%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -201,7 +201,7 @@
 }
 
 .enrollCard {
-  background: color-mix(in srgb, var(--color-surface-2) 84%, transparent);
+  background: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
   -webkit-backdrop-filter: blur(16px) saturate(130%);
   backdrop-filter: blur(16px) saturate(130%);
   border: 1px solid rgba(255, 255, 255, 0.1);
