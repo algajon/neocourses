@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { NotificationList } from '@/components/NotificationList'
 import { useNotifications } from '@/components/useNotifications'
+import { useToast } from '@/components/Toast/ToastProvider'
 import { Icon } from '@/components/Icon'
 import styles from './LearnerNav.module.css'
 
@@ -17,6 +18,11 @@ interface LearnerNavProps {
     role: string
   }
 }
+
+// Notification types that represent an earned award/milestone worth a transient
+// in-app toast (in addition to living in the notification bell).
+const AWARD_TYPES = new Set(['badge', 'milestone', 'completion', 'achievement'])
+const TOASTED_KEY = 'courseneo-toasted-notifs'
 
 const LINKS = [
   { href: '/learn', label: 'My Learning' },
@@ -29,7 +35,48 @@ export function LearnerNav({ user }: LearnerNavProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-  const { items, unreadCount, markRead, markAllRead } = useNotifications()
+  const { items, unreadCount, loaded, markRead, markAllRead } = useNotifications()
+  const { toast } = useToast()
+
+  // Track which notification ids we've already handled, persisted across reloads
+  // so a refresh doesn't re-pop the same award. Clock-free by design: we never
+  // compare server timestamps to the client clock (they can be skewed).
+  const toastedRef = useRef<Set<string>>(new Set())
+  const seededRef = useRef(false)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(TOASTED_KEY)
+      if (raw) for (const id of JSON.parse(raw) as string[]) toastedRef.current.add(id)
+    } catch {
+      /* ignore */
+    }
+  }, [])
+
+  // Bridge new award notifications → in-app toasts. On the first real server
+  // response we seed the backlog as "already handled" (no toast); after that,
+  // any award id we haven't seen pops a toast exactly once.
+  useEffect(() => {
+    if (!loaded) return
+
+    let changed = false
+    for (const n of items) {
+      if (toastedRef.current.has(n.id)) continue
+      if (seededRef.current && AWARD_TYPES.has(n.type)) {
+        toast({ type: 'success', title: n.title, description: n.body })
+      }
+      toastedRef.current.add(n.id)
+      changed = true
+    }
+    seededRef.current = true
+
+    if (changed) {
+      try {
+        localStorage.setItem(TOASTED_KEY, JSON.stringify([...toastedRef.current].slice(-200)))
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [items, loaded, toast])
 
   useEffect(() => {
     if (!menuOpen) return

@@ -13,6 +13,18 @@ export interface NotificationItem {
 }
 
 const POLL_INTERVAL_MS = 30_000
+const REFRESH_EVENT = 'notifications:refresh'
+
+/**
+ * Nudge the notification poller to reload now (instead of waiting for the 30s
+ * tick). Call right after an action that may have created an award notification
+ * server-side — e.g. completing a lesson, finishing a quiz, opening a lesson.
+ */
+export function pingNotifications(): void {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(REFRESH_EVENT))
+  }
+}
 
 export function relativeTime(iso: string): string {
   const then = new Date(iso).getTime()
@@ -34,6 +46,9 @@ export function relativeTime(iso: string): string {
 export function useNotifications() {
   const [items, setItems] = useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
+  // Flips true after the first fetch resolves, so consumers can seed a baseline
+  // off the real server response instead of the empty initial state.
+  const [loaded, setLoaded] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -44,13 +59,28 @@ export function useNotifications() {
       setUnreadCount(data.unreadCount ?? 0)
     } catch {
       // transient — keep last known state
+    } finally {
+      setLoaded(true)
     }
   }, [])
 
   useEffect(() => {
     load()
     const id = setInterval(load, POLL_INTERVAL_MS)
-    return () => clearInterval(id)
+
+    // Reload on demand after award-generating actions. A second delayed reload
+    // covers the brief window where the notification row is still being written
+    // (createNotification is fire-and-forget on the server).
+    function onRefresh() {
+      load()
+      setTimeout(load, 1800)
+    }
+    window.addEventListener(REFRESH_EVENT, onRefresh)
+
+    return () => {
+      clearInterval(id)
+      window.removeEventListener(REFRESH_EVENT, onRefresh)
+    }
   }, [load])
 
   const markRead = useCallback(async (ids: string[]) => {
@@ -83,5 +113,5 @@ export function useNotifications() {
     }
   }, [load])
 
-  return { items, unreadCount, markRead, markAllRead, reload: load }
+  return { items, unreadCount, loaded, markRead, markAllRead, reload: load }
 }

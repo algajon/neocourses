@@ -9,6 +9,7 @@ import { FitSlide } from '@/components/FitSlide'
 import { ListenButton } from '@/components/ListenButton'
 import { LessonNotes } from '@/components/LessonNotes'
 import { EnrollButton } from '@/components/EnrollButton'
+import { pingNotifications } from '@/components/useNotifications'
 import { formatPrice, isLessonLocked } from '@/lib/pricing'
 import type { LessonContent } from '@/lib/ai/types'
 import styles from './page.module.css'
@@ -81,6 +82,14 @@ export default function LessonPage({ params }: PageProps) {
       .catch(() => {})
   }, [params.courseId])
 
+  // Opening a lesson is a small milestone — fire the explorer award (idempotent
+  // server-side) and nudge the bell so the toast pops right away.
+  useEffect(() => {
+    fetch('/api/awards/lesson-open', { method: 'POST' })
+      .then(() => pingNotifications())
+      .catch(() => {})
+  }, [params.lessonId])
+
   const handleNext = useCallback(async () => {
     if (!lesson) return
     if (
@@ -100,6 +109,8 @@ export default function LessonPage({ params }: PageProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lessonId: lesson.id, courseId: lesson.courseId }),
       })
+      // Surface any award/milestone (first lesson, halfway, course complete) as a toast.
+      pingNotifications()
     } catch {}
 
     if (lesson.nextIsQuiz && lesson.quizModuleId) {

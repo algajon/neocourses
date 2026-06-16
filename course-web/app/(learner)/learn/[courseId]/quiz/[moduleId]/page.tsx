@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
+import { pingNotifications } from '@/components/useNotifications'
 import styles from './page.module.css'
 
 interface QuizOption {
@@ -106,6 +107,8 @@ export default function QuizPage({ params }: PageProps) {
       })
       const data = await res.json()
       if (data.attemptId) {
+        // Finishing a quiz can earn awards (Quiz Taker, Quiz Ace) — surface them.
+        pingNotifications()
         router.push(
           `/learn/${params.courseId}/quiz/${params.moduleId}/results?attempt=${data.attemptId}`,
         )

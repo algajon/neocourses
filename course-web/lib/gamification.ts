@@ -37,22 +37,22 @@ export interface BadgeDef {
  */
 export const BADGES: BadgeDef[] = [
   {
+    key: 'lesson_explorer',
+    label: 'Curious Mind',
+    description: 'Open your first lesson',
+    icon: 'sparkles',
+  },
+  {
     key: 'first_lesson',
     label: 'First Steps',
     description: 'Complete your first lesson',
     icon: 'play',
   },
   {
-    key: 'first_course',
-    label: 'Course Complete',
-    description: 'Finish your first course',
-    icon: 'certificate',
-  },
-  {
-    key: 'streak_7',
-    label: 'On a Roll',
-    description: 'Keep a 7-day learning streak',
-    icon: 'target',
+    key: 'first_quiz',
+    label: 'Quiz Taker',
+    description: 'Complete your first quiz',
+    icon: 'edit',
   },
   {
     key: 'quiz_ace',
@@ -65,6 +65,18 @@ export const BADGES: BadgeDef[] = [
     label: 'Fast Learner',
     description: 'Complete 10 lessons',
     icon: 'trendingUp',
+  },
+  {
+    key: 'first_course',
+    label: 'Course Complete',
+    description: 'Finish your first course',
+    icon: 'certificate',
+  },
+  {
+    key: 'streak_7',
+    label: 'On a Roll',
+    description: 'Keep a 7-day learning streak',
+    icon: 'target',
   },
 ]
 
@@ -90,7 +102,9 @@ function diffInDays(fromKey: string, toKey: string): number {
 // ---------------------------------------------------------------------------
 
 export interface ActivityInput {
-  kind: 'lesson' | 'quiz'
+  // 'lesson_open' is a lightweight event fired when a learner opens a lesson; it
+  // grants the explorer badge but does not award points or touch the streak.
+  kind: 'lesson' | 'quiz' | 'lesson_open'
   // score is a 0..1 fraction (matches quizAttempts.score). Only meaningful for quizzes.
   score?: number
   // Whether the quiz attempt passed. Lessons ignore this.
@@ -116,6 +130,14 @@ export async function recordActivity(
 
 async function recordActivityInner(userId: string, activity: ActivityInput): Promise<void> {
   const now = new Date()
+
+  // Opening a lesson is not "learning activity" worth points or a streak day — it
+  // only unlocks the one-time explorer badge. Handle it before any stats writes.
+  if (activity.kind === 'lesson_open') {
+    await notifyBadges(userId, await grantBadges(userId, ['lesson_explorer'], now))
+    return
+  }
+
   const today = dayKey(now)
 
   // Quiz points only count on a pass; lessons always count.
@@ -176,9 +198,33 @@ async function recordActivityInner(userId: string, activity: ActivityInput): Pro
   }
 
   const newlyEarned = await evaluateBadges(userId, activity, currentStreak, now)
+  await notifyBadges(userId, newlyEarned)
+}
 
-  // Best-effort: announce only badges that were genuinely earned just now.
-  for (const key of newlyEarned) {
+/**
+ * Idempotently grants the given badge keys to a learner. The unique
+ * (userId, badgeKey) index makes re-awards a no-op; `returning` yields only the
+ * rows actually inserted — i.e. badges the learner did not already hold.
+ */
+async function grantBadges(userId: string, keys: string[], now: Date): Promise<string[]> {
+  const rows = [...new Set(keys)]
+    .filter((key) => BADGE_KEYS.has(key))
+    .map((key) => ({ id: randomUUID(), userId, badgeKey: key, earnedAt: now }))
+
+  if (rows.length === 0) return []
+
+  const inserted = await db
+    .insert(learnerBadges)
+    .values(rows)
+    .onConflictDoNothing()
+    .returning({ badgeKey: learnerBadges.badgeKey })
+
+  return inserted.map((r) => r.badgeKey)
+}
+
+/** Fires a best-effort in-app notification for each genuinely-earned badge. */
+async function notifyBadges(userId: string, earnedKeys: string[]): Promise<void> {
+  for (const key of earnedKeys) {
     const badge = BADGE_BY_KEY.get(key)
     if (!badge) continue
     void createNotification({
@@ -215,8 +261,10 @@ async function evaluateBadges(
     if (lessonCount >= 10) toAward.add('fast_learner')
   }
 
-  if (activity.kind === 'quiz' && (activity.score ?? 0) >= 1) {
-    toAward.add('quiz_ace')
+  if (activity.kind === 'quiz') {
+    // Finishing any quiz (pass or fail) earns the Quiz Taker badge once.
+    toAward.add('first_quiz')
+    if ((activity.score ?? 0) >= 1) toAward.add('quiz_ace')
   }
 
   if (currentStreak >= 7) toAward.add('streak_7')
@@ -229,23 +277,7 @@ async function evaluateBadges(
 
   if (completedCourses >= 1) toAward.add('first_course')
 
-  if (toAward.size === 0) return []
-
-  const rows = [...toAward]
-    .filter((key) => BADGE_KEYS.has(key))
-    .map((key) => ({ id: randomUUID(), userId, badgeKey: key, earnedAt: now }))
-
-  if (rows.length === 0) return []
-
-  // Unique (userId, badgeKey) makes re-awards a no-op. `returning` yields only the
-  // rows that were actually inserted — i.e. badges the learner did not already hold.
-  const inserted = await db
-    .insert(learnerBadges)
-    .values(rows)
-    .onConflictDoNothing()
-    .returning({ badgeKey: learnerBadges.badgeKey })
-
-  return inserted.map((r) => r.badgeKey)
+  return grantBadges(userId, [...toAward], now)
 }
 
 // ---------------------------------------------------------------------------
