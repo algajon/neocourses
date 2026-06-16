@@ -1,12 +1,10 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { Icon } from '@/components/Icon'
-import { CertificatePreview } from '@/components/CertificatePreview'
 import { authOptions } from '@/lib/auth/config'
 import { db } from '@/lib/db'
 import { certificates, courses } from '@/lib/db/schema'
 import { eq, and, desc } from 'drizzle-orm'
+import { CertificatesView } from './CertificatesView'
 import styles from './page.module.css'
 
 async function getCertificates(userId: string) {
@@ -27,6 +25,8 @@ async function getEarnableCourses(organizationId: string) {
       id: courses.id,
       title: courses.title,
       thumbnailUrl: courses.thumbnailUrl,
+      description: courses.description,
+      difficultyLevel: courses.difficultyLevel,
     })
     .from(courses)
     .where(
@@ -59,6 +59,23 @@ export default async function CertificatesPage() {
       )
     : []
 
+  const earned = rows.map(({ certificate, course }) => ({
+    courseId: course.id,
+    courseTitle: course.title,
+    description: course.description,
+    difficultyLevel: course.difficultyLevel,
+    issuedDate: dateFormatter.format(certificate.issuedAt),
+    verificationCode: certificate.verificationCode,
+  }))
+
+  const earnableView = earnable.map((course) => ({
+    courseId: course.id,
+    courseTitle: course.title,
+    thumbnailUrl: course.thumbnailUrl,
+    description: course.description,
+    difficultyLevel: course.difficultyLevel,
+  }))
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -69,89 +86,11 @@ export default async function CertificatesPage() {
         </p>
       </div>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Earned</h2>
-
-      {rows.length > 0 ? (
-        <div className={styles.grid}>
-          {rows.map(({ certificate, course }) => (
-            <div key={certificate.id} className={styles.card}>
-              <div className={styles.cardTop}>
-                <span className={styles.badge}>
-                  <Icon name="certificate" size={20} />
-                </span>
-                <span className={styles.issued}>
-                  {dateFormatter.format(certificate.issuedAt)}
-                </span>
-              </div>
-              <div className={styles.cardBody}>
-                <h3 className={styles.cardTitle}>{course.title}</h3>
-                <div className={styles.codeRow}>
-                  <span className={styles.codeLabel}>Verification</span>
-                  <span className={styles.code}>{certificate.verificationCode}</span>
-                </div>
-              </div>
-              <div className={styles.cardFooter}>
-                <Link href={`/learn/${course.id}/certificate`} className={styles.btnPrimary}>
-                  View certificate
-                  <Icon name="arrowRight" size={14} />
-                </Link>
-                <Link
-                  href={`/verify/${certificate.verificationCode}`}
-                  className={styles.verifyLink}
-                >
-                  <Icon name="eye" size={14} />
-                  Public link
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className={styles.empty}>
-          <div className={styles.emptyIcon}>
-            <Icon name="certificate" size={32} />
-          </div>
-          <p className={styles.emptyText}>No certificates yet.</p>
-          <p className={styles.emptySubtext}>
-            Complete a course to earn one.
-          </p>
-          <Link href="/learn/catalog" className={styles.btnAccent}>
-            Browse catalog
-            <Icon name="arrowRight" size={14} />
-          </Link>
-        </div>
-      )}
-      </section>
-
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Certificates you can earn</h2>
-
-        {earnable.length > 0 ? (
-          <div className={styles.grid}>
-            {earnable.map((course) => (
-              <CertificatePreview
-                key={course.id}
-                courseId={course.id}
-                title={course.title}
-                thumbnailUrl={course.thumbnailUrl}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.emptyInline}>
-            <div className={styles.emptyIconSmall}>
-              <Icon name="lock" size={24} />
-            </div>
-            <p className={styles.emptyInlineText}>
-              No certificates available to earn right now.
-            </p>
-            <p className={styles.emptyInlineSubtext}>
-              Certificate-eligible courses you haven&apos;t completed will show up here.
-            </p>
-          </div>
-        )}
-      </section>
+      <CertificatesView
+        recipientName={session.user.name ?? 'Learner'}
+        earned={earned}
+        earnable={earnableView}
+      />
     </div>
   )
 }

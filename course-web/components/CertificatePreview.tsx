@@ -1,4 +1,5 @@
-import Link from 'next/link'
+'use client'
+
 import { Icon } from '@/components/Icon'
 import { courseGradient } from '@/lib/gradient'
 import styles from './CertificatePreview.module.css'
@@ -7,15 +8,16 @@ interface CertificatePreviewProps {
   courseId: string
   title: string
   thumbnailUrl?: string | null
+  onSelect: () => void
 }
 
-export function CertificatePreview({ courseId, title, thumbnailUrl }: CertificatePreviewProps) {
+export function CertificatePreview({ courseId, title, thumbnailUrl, onSelect }: CertificatePreviewProps) {
   const accent = thumbnailUrl
     ? `center / cover no-repeat url(${JSON.stringify(thumbnailUrl)})`
     : courseGradient(courseId)
 
   return (
-    <Link href={`/learn/${courseId}`} className={styles.card}>
+    <button type="button" className={styles.card} onClick={onSelect}>
       <div className={styles.accent} style={{ background: accent }}>
         <span className={styles.lock}>
           <Icon name="lock" size={16} />
@@ -34,10 +36,10 @@ export function CertificatePreview({ courseId, title, thumbnailUrl }: Certificat
       </div>
       <div className={styles.footer}>
         <span className={styles.cta}>
-          Go to course
+          Preview certificate
           <Icon name="arrowRight" size={14} />
         </span>
       </div>
-    </Link>
+    </button>
   )
 }
