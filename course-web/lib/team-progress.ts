@@ -1,6 +1,15 @@
 import { db } from '@/lib/db'
-import { enrollments, courses, users, quizAttempts, quizzes } from '@/lib/db/schema'
-import { eq, inArray } from 'drizzle-orm'
+import { enrollments, courses, users, quizAttempts, quizzes, teamMembers } from '@/lib/db/schema'
+import { eq, and, inArray } from 'drizzle-orm'
+
+/** The user ids belonging to a team (used to scope team-progress analytics). */
+export async function getTeamMemberIds(teamId: string): Promise<string[]> {
+  const rows = await db
+    .select({ userId: teamMembers.userId })
+    .from(teamMembers)
+    .where(eq(teamMembers.teamId, teamId))
+  return rows.map((r) => r.userId)
+}
 
 export interface TeamLearnerRow {
   userId: string
@@ -27,13 +36,40 @@ export interface TeamProgressData {
   courses: TeamCourseRow[]
 }
 
-export async function buildTeamProgress(organizationId: string): Promise<TeamProgressData> {
+/**
+ * Builds team-progress analytics for an org. When `memberUserIds` is provided
+ * (a team selection), learners AND course stats are scoped to just those users;
+ * otherwise it covers the whole organization.
+ */
+export async function buildTeamProgress(
+  organizationId: string,
+  memberUserIds?: string[] | null,
+): Promise<TeamProgressData> {
   const now = new Date()
+  const scoped = Array.isArray(memberUserIds)
+
+  // An empty team selection → no learners (don't fall back to the whole org).
+  if (scoped && memberUserIds!.length === 0) {
+    const orgCourses = await db
+      .select({ id: courses.id, title: courses.title })
+      .from(courses)
+      .where(eq(courses.organizationId, organizationId))
+    return {
+      learners: [],
+      courses: orgCourses.map((c) => ({
+        courseId: c.id, title: c.title, enrolled: 0, completed: 0, completionRate: 0, avgScore: null,
+      })),
+    }
+  }
 
   const orgUsers = await db
     .select({ id: users.id, name: users.name, email: users.email })
     .from(users)
-    .where(eq(users.organizationId, organizationId))
+    .where(
+      scoped
+        ? and(eq(users.organizationId, organizationId), inArray(users.id, memberUserIds!))
+        : eq(users.organizationId, organizationId),
+    )
 
   const orgCourses = await db
     .select({ id: courses.id, title: courses.title })
@@ -41,8 +77,11 @@ export async function buildTeamProgress(organizationId: string): Promise<TeamPro
     .where(eq(courses.organizationId, organizationId))
 
   const courseIds = orgCourses.map((c) => c.id)
+  const userIds = orgUsers.map((u) => u.id)
 
-  const enrollRows = courseIds.length
+  // Scope enrollments to the resolved user set so the per-course table reflects
+  // the selected team (when org-wide, userIds already covers every org user).
+  const enrollRows = courseIds.length && userIds.length
     ? await db
         .select({
           userId: enrollments.userId,
@@ -52,10 +91,8 @@ export async function buildTeamProgress(organizationId: string): Promise<TeamPro
           lastAccessedAt: enrollments.lastAccessedAt,
         })
         .from(enrollments)
-        .where(inArray(enrollments.courseId, courseIds))
+        .where(and(inArray(enrollments.courseId, courseIds), inArray(enrollments.userId, userIds)))
     : []
-
-  const userIds = orgUsers.map((u) => u.id)
 
   const attemptRows = userIds.length
     ? await db

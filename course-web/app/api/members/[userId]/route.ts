@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 
-export async function PUT(
+export async function PATCH(
   req: NextRequest,
   { params }: { params: { userId: string } }
 ) {
@@ -15,7 +15,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { role, organizationId } = session.user
+    const { role, organizationId, id: requesterId } = session.user
     if (role !== 'owner' && role !== 'admin') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
@@ -44,6 +44,19 @@ export async function PUT(
     const validRoles = ['owner', 'admin', 'reviewer', 'learner']
     if (!validRoles.includes(newRole)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+    }
+
+    // Don't let someone change their own role (avoids self-lockout / self-promotion).
+    if (params.userId === requesterId) {
+      return NextResponse.json({ error: 'You cannot change your own role' }, { status: 400 })
+    }
+
+    // Only an owner may grant or revoke owner/admin roles.
+    if ((newRole === 'owner' || newRole === 'admin') && role !== 'owner') {
+      return NextResponse.json(
+        { error: 'Only an owner can assign the owner or admin role' },
+        { status: 403 },
+      )
     }
 
     const now = new Date()

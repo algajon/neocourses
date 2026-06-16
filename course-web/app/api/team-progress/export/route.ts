@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
+import { eq, and } from 'drizzle-orm'
 import { authOptions } from '@/lib/auth/config'
-import { buildTeamProgress } from '@/lib/team-progress'
+import { db } from '@/lib/db'
+import { teams } from '@/lib/db/schema'
+import { buildTeamProgress, getTeamMemberIds } from '@/lib/team-progress'
 
 function csvCell(value: string | number | null): string {
   if (value == null) return ''
@@ -12,7 +15,7 @@ function csvCell(value: string | number | null): string {
   return str
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -27,7 +30,19 @@ export async function GET() {
       return NextResponse.json({ error: 'No organization' }, { status: 400 })
     }
 
-    const { learners, courses } = await buildTeamProgress(organizationId)
+    // Scope to a team only if it belongs to the caller's org (tenant safety).
+    const teamId = req.nextUrl.searchParams.get('team')
+    let memberIds: string[] | null = null
+    if (teamId) {
+      const [t] = await db
+        .select({ id: teams.id })
+        .from(teams)
+        .where(and(eq(teams.id, teamId), eq(teams.organizationId, organizationId)))
+        .limit(1)
+      memberIds = t ? await getTeamMemberIds(teamId) : []
+    }
+
+    const { learners, courses } = await buildTeamProgress(organizationId, memberIds)
 
     const lines: string[] = []
     lines.push('Learners')

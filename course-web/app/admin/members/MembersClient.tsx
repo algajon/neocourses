@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, FormEvent } from 'react'
+import { useToast } from '@/components/Toast/ToastProvider'
 import styles from './page.module.css'
 
 interface Member {
@@ -32,6 +33,7 @@ function rolePillClass(role: string) {
 }
 
 export function MembersClient({ members: initialMembers, currentUserId }: MembersClientProps) {
+  const { toast } = useToast()
   const [members, setMembers] = useState(initialMembers)
   const [inviteName, setInviteName] = useState('')
   const [inviteEmail, setInviteEmail] = useState('')
@@ -85,6 +87,7 @@ export function MembersClient({ members: initialMembers, currentUserId }: Member
   }
 
   async function handleRoleChange(memberId: string, newRole: string) {
+    const prevRole = members.find((m) => m.id === memberId)?.role
     setRoleChanging(memberId)
     try {
       const res = await fetch(`/api/members/${memberId}`, {
@@ -92,10 +95,16 @@ export function MembersClient({ members: initialMembers, currentUserId }: Member
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: newRole }),
       })
-      if (!res.ok) throw new Error('Failed to update role')
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error ?? 'Failed to update role')
+      }
       setMembers((prev) => prev.map((m) => (m.id === memberId ? { ...m, role: newRole } : m)))
-    } catch {
-      // silently fail — in production would show a toast
+      toast({ type: 'success', title: `Role updated to ${newRole}` })
+    } catch (e) {
+      // Revert the select to the previous value and tell the user why.
+      if (prevRole) setMembers((prev) => prev.map((m) => (m.id === memberId ? { ...m, role: prevRole } : m)))
+      toast({ type: 'error', title: 'Could not update role', description: e instanceof Error ? e.message : undefined })
     } finally {
       setRoleChanging(null)
     }

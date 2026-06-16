@@ -22,6 +22,49 @@
   margin-bottom: var(--space-6);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.scopeNote {
+  font-size: 13px;
+  color: var(--color-accent-text);
+  font-weight: 600;
+}
+
+.teamSelect {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  height: 38px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+}
+
+.teamSelectLabel {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}
+
+.teamSelect select {
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  padding: var(--space-1) 0;
+  max-width: 200px;
+}
+
 .headerLeft {
   display: flex;
   flex-direction: column;

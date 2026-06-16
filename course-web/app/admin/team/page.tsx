@@ -1,8 +1,12 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
+import { eq } from 'drizzle-orm'
 import { Icon } from '@/components/Icon'
 import { authOptions } from '@/lib/auth/config'
-import { buildTeamProgress } from '@/lib/team-progress'
+import { db } from '@/lib/db'
+import { teams } from '@/lib/db/schema'
+import { buildTeamProgress, getTeamMemberIds } from '@/lib/team-progress'
+import { TeamSelector } from './TeamSelector'
 import styles from './page.module.css'
 
 function formatDate(iso: string | null) {
@@ -18,7 +22,11 @@ function formatScore(score: number | null) {
   return score == null ? '—' : `${score}%`
 }
 
-export default async function TeamProgressPage() {
+interface PageProps {
+  searchParams: Promise<{ team?: string }>
+}
+
+export default async function TeamProgressPage({ searchParams }: PageProps) {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
@@ -26,7 +34,20 @@ export default async function TeamProgressPage() {
   if (role !== 'admin' && role !== 'owner') redirect('/admin/dashboard')
   if (!organizationId) redirect('/admin/dashboard')
 
-  const { learners, courses } = await buildTeamProgress(organizationId)
+  // Teams in this org, for the selector.
+  const orgTeams = await db
+    .select({ id: teams.id, name: teams.name })
+    .from(teams)
+    .where(eq(teams.organizationId, organizationId))
+
+  // Only honor a team id that actually belongs to this org (tenant safety).
+  const { team: requestedTeam } = await searchParams
+  const selectedTeamId =
+    requestedTeam && orgTeams.some((t) => t.id === requestedTeam) ? requestedTeam : null
+
+  const memberIds = selectedTeamId ? await getTeamMemberIds(selectedTeamId) : null
+  const { learners, courses } = await buildTeamProgress(organizationId, memberIds)
+  const selectedTeamName = orgTeams.find((t) => t.id === selectedTeamId)?.name ?? null
 
   const totalLearners = learners.length
   const totalAssigned = learners.reduce((s, l) => s + l.coursesAssigned, 0)
@@ -47,11 +68,23 @@ export default async function TeamProgressPage() {
         <div className={styles.headerLeft}>
           <div className={styles.breadcrumb}>Admin</div>
           <h1>Team Progress</h1>
+          {selectedTeamName && (
+            <div className={styles.scopeNote}>Showing {selectedTeamName}</div>
+          )}
         </div>
-        <a href="/api/team-progress/export" className="btn-secondary" download>
-          <Icon name="upload" size={15} />
-          <span>Download CSV</span>
-        </a>
+        <div className={styles.headerActions}>
+          {orgTeams.length > 0 && (
+            <TeamSelector teams={orgTeams} selectedTeamId={selectedTeamId} />
+          )}
+          <a
+            href={selectedTeamId ? `/api/team-progress/export?team=${selectedTeamId}` : '/api/team-progress/export'}
+            className="btn-secondary"
+            download
+          >
+            <Icon name="upload" size={15} />
+            <span>Download CSV</span>
+          </a>
+        </div>
       </div>
 
       <div className={styles.stats}>
@@ -109,7 +142,9 @@ export default async function TeamProgressPage() {
               {learners.length === 0 ? (
                 <tr>
                   <td colSpan={5} className={styles.empty}>
-                    No learners in your organization yet.
+                    {selectedTeamName
+                      ? `No learners in ${selectedTeamName} yet.`
+                      : 'No learners in your organization yet.'}
                   </td>
                 </tr>
               ) : (
