@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!isTTSEnabled()) {
-    // No OpenAI key configured — the client falls back to the browser voice.
+    // No ElevenLabs key configured — the client falls back to the browser voice.
     return NextResponse.json({ error: 'TTS not configured' }, { status: 501 })
   }
 

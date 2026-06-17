@@ -1,25 +1,35 @@
 import { createHash } from 'crypto'
 import { getStorage } from '@/lib/storage'
 
-const ENDPOINT = 'https://api.openai.com/v1/audio/speech'
-const MAX_INPUT_CHARS = 8_000 // hard cap per lesson to keep usage tiny
-const CHUNK_CHARS = 3_800 // OpenAI TTS input limit is 4096; stay safely under
+// ElevenLabs text-to-speech. One POST per chunk → MP3; results are cached in
+// storage so identical lesson text is only ever billed once.
+const ENDPOINT = 'https://api.elevenlabs.io/v1/text-to-speech'
+const OUTPUT_FORMAT = 'mp3_44100_128'
+const MAX_INPUT_CHARS = 8_000 // hard cap per lesson to keep credit usage tiny
+const CHUNK_CHARS = 2_400 // stay well under every ElevenLabs model's per-request cap
+
+// "Alice — Clear, Engaging Educator", part of the current default voice set that
+// ships in every new account's library (so it works on the free tier via API).
+// Override with ELEVENLABS_VOICE_ID (find ids under Voices in the ElevenLabs app).
+const DEFAULT_VOICE_ID = 'Xb7hH8MSUJpSbSDYk0k2'
 
 export function isTTSEnabled(): boolean {
-  return !!process.env.OPENAI_API_KEY?.trim()
+  return !!process.env.ELEVENLABS_API_KEY?.trim()
 }
 
 function model(): string {
-  return process.env.TTS_MODEL?.trim() || 'gpt-4o-mini-tts'
+  // multilingual_v2 = best quality; eleven_turbo_v2_5 / eleven_flash_v2_5 are
+  // cheaper (≈half the credits) if you need to stretch the free tier.
+  return process.env.ELEVENLABS_MODEL?.trim() || 'eleven_multilingual_v2'
 }
 
-function voice(): string {
-  return process.env.TTS_VOICE?.trim() || 'nova'
+function voiceId(): string {
+  return process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID
 }
 
 function cacheKey(text: string): string {
   const hash = createHash('sha256')
-    .update(`${model()}:${voice()}:${text}`)
+    .update(`${model()}:${voiceId()}:${text}`)
     .digest('hex')
   return `tts/${hash}.mp3`
 }
@@ -43,17 +53,16 @@ function chunk(text: string): string[] {
 }
 
 async function synthesizeChunk(input: string): Promise<Buffer> {
-  const res = await fetch(ENDPOINT, {
+  const res = await fetch(`${ENDPOINT}/${voiceId()}?output_format=${OUTPUT_FORMAT}`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY!.trim()}`,
+      'xi-api-key': process.env.ELEVENLABS_API_KEY!.trim(),
       'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
     },
     body: JSON.stringify({
-      model: model(),
-      voice: voice(),
-      input,
-      response_format: 'mp3',
+      text: input,
+      model_id: model(),
     }),
   })
   if (!res.ok) {
@@ -64,8 +73,8 @@ async function synthesizeChunk(input: string): Promise<Buffer> {
 }
 
 /**
- * Returns spoken-audio MP3 for the given text. Synthesizes via OpenAI only on a
- * cache miss; identical text is billed at most once, then served from storage.
+ * Returns spoken-audio MP3 for the given text. Synthesizes via ElevenLabs only on
+ * a cache miss; identical text is billed at most once, then served from storage.
  */
 export async function getSpeech(rawText: string): Promise<Buffer> {
   const text = rawText.replace(/\s+/g, ' ').trim().slice(0, MAX_INPUT_CHARS)
