@@ -507,6 +507,20 @@
     grid-template-columns: 1fr;
   }
 
+  /* Stats strip: stack the badges onto their own full-width line so the pills
+     wrap instead of overflowing off the right edge; drop the vertical dividers. */
+  .statsStrip {
+    gap: var(--space-4);
+  }
+
+  .badgesBlock {
+    flex-basis: 100%;
+  }
+
+  .statDivider {
+    display: none;
+  }
+
   .resumeCard {
     flex-direction: column;
     align-items: flex-start;

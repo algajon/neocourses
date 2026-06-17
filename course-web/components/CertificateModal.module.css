@@ -53,6 +53,12 @@
     top: var(--space-3);
     right: var(--space-3);
   }
+
+  /* Keep the PREVIEW pill clear of the close button, which sits inside the
+     modal at this width. */
+  .certHeader {
+    padding-right: var(--space-8);
+  }
 }
 
 /* ── Certificate artwork ── */

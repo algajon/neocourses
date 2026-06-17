@@ -124,7 +124,7 @@ export class MockAIProvider implements AIProvider {
     return lessonTitles.map(title => ({
       title,
       content: {
-        intro: chooseIntro(`${title}|${moduleTitle}`),
+        intro: chooseIntro(title),
         concepts: [
           {
             title: 'Foundational Understanding',
