@@ -14,7 +14,7 @@ type Status = 'idle' | 'loading' | 'playing' | 'paused'
 export function ListenButton({ text }: ListenButtonProps) {
   const [status, setStatus] = useState<Status>('idle')
   const [rate, setRate] = useState<number>(1)
-  // 'audio' = OpenAI voice via /api/tts; 'speech' = browser fallback.
+  // 'audio' = ElevenLabs voice via /api/tts; 'speech' = browser fallback.
   const [mode, setMode] = useState<'audio' | 'speech' | 'unsupported'>('audio')
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -35,9 +35,12 @@ export function ListenButton({ text }: ListenButtonProps) {
     }
   }, [])
 
-  // Reset everything when the lesson (text) changes.
+  // Reset everything when the lesson (text) changes. Also reset mode to 'audio'
+  // so each new lesson re-attempts the ElevenLabs voice rather than inheriting a
+  // previous lesson's browser-voice fallback.
   useEffect(() => {
     setStatus('idle')
+    setMode('audio')
     return cleanup
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text])
@@ -80,7 +83,7 @@ export function ListenButton({ text }: ListenButtonProps) {
       await audio.play()
       setStatus('playing')
     } catch {
-      // No OpenAI key / network error → fall back to the browser voice.
+      // No TTS key / network error → fall back to the browser voice for this play.
       speakWithBrowser()
     }
   }
@@ -113,9 +116,10 @@ export function ListenButton({ text }: ListenButtonProps) {
       return
     }
 
-    // Nothing loaded yet → start. Prefer the OpenAI voice.
-    if (mode === 'speech') speakWithBrowser()
-    else void startAudio()
+    // Nothing loaded yet → always try the ElevenLabs voice first. startAudio()
+    // falls back to the browser voice per-attempt if /api/tts isn't available, so
+    // a transient failure never permanently downgrades the voice for the page.
+    void startAudio()
   }
 
   function handleStop() {
