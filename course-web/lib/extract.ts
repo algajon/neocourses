@@ -6,7 +6,8 @@ import { transcribeAudio } from './transcribe'
 
 const MAX_CHARS = 45_000 // cap per file (~11k tokens) so generation prompts stay within model context and fast
 
-// Audio/video formats Whisper can transcribe. Matched by extension or MIME prefix.
+// Audio/video formats, matched by extension or MIME prefix so they route to the
+// transcription path (currently unavailable in this deployment — see transcribe.ts).
 const MEDIA_EXTS = new Set(['mp3', 'm4a', 'wav', 'mp4', 'mov', 'webm', 'mpeg', 'mpga', 'ogg', 'oga', 'flac'])
 const MEDIA_MIME_PREFIXES = ['audio/', 'video/']
 
@@ -24,7 +25,7 @@ export async function extractText(
     MEDIA_MIME_PREFIXES.some(p => ft.startsWith(p))
   try {
     if (isMedia) {
-      // Route audio/video through Whisper; the transcript becomes the source text.
+      // Route audio/video to transcription; the transcript becomes the source text.
       const { text, error } = await transcribeAudio(buf, fileName)
       return { text: clamp(text), error }
     }

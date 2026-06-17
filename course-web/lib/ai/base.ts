@@ -5,12 +5,55 @@ import { selectRelevantChunks } from './retrieve'
 export const SYSTEM_PROMPT =
   'You are a professional course content creator. Return valid JSON only, no markdown.'
 
+/**
+ * Escapes raw control characters (U+0000–U+001F) that appear *inside* JSON string
+ * literals — a common LLM mistake (an unescaped newline/tab in a value) that makes
+ * JSON.parse throw "Bad control character in string literal". Structural whitespace
+ * between tokens is left untouched, so valid JSON is unaffected.
+ */
+function escapeControlCharsInStrings(s: string): string {
+  let out = ''
+  let inString = false
+  let escaped = false
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i]
+    const code = s.charCodeAt(i)
+    if (inString) {
+      if (escaped) {
+        out += ch
+        escaped = false
+      } else if (ch === '\\') {
+        out += ch
+        escaped = true
+      } else if (ch === '"') {
+        out += ch
+        inString = false
+      } else if (code < 0x20) {
+        out +=
+          ch === '\n' ? '\\n' : ch === '\r' ? '\\r' : ch === '\t' ? '\\t' : `\\u${code.toString(16).padStart(4, '0')}`
+      } else {
+        out += ch
+      }
+    } else {
+      if (ch === '"') inString = true
+      out += ch
+    }
+  }
+  return out
+}
+
 export function parseJSON<T>(text: string): T {
   // Strip optional ```json fences and any leading prose before the first JSON token.
   let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
   const firstBrace = cleaned.search(/[[{]/)
   if (firstBrace > 0) cleaned = cleaned.slice(firstBrace)
-  return JSON.parse(cleaned) as T
+  try {
+    return JSON.parse(cleaned) as T
+  } catch {
+    // Most common cause: the model left a raw newline/tab inside a string value.
+    // Repair just that and retry before giving up (caller falls back to template).
+    return JSON.parse(escapeControlCharsInStrings(cleaned)) as T
+  }
 }
 
 /**

@@ -7,7 +7,7 @@ export function emailFrom(): string {
 /**
  * Logs the email instead of sending it. Used whenever RESEND_API_KEY is absent
  * so the app degrades gracefully in dev / unconfigured deployments — mirrors the
- * /api/tts 501 fallback and lib/ai/mock.ts behaviour.
+ * lib/ai/mock.ts fallback behaviour.
  */
 export class NoopProvider implements EmailProvider {
   readonly name = 'noop'

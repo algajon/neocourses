@@ -3,8 +3,8 @@ import Stripe from 'stripe'
 /**
  * Billing is OPTIONAL. When STRIPE_SECRET_KEY is absent the whole feature runs in
  * "disabled" mode: every org is treated as a generous Free plan, all gates pass,
- * and the UI shows "Billing not configured." This mirrors the /api/tts 501
- * fallback and lib/ai/mock.ts graceful-degradation pattern.
+ * and the UI shows "Billing not configured." This mirrors the lib/ai/mock.ts
+ * graceful-degradation pattern.
  */
 export function isBillingEnabled(): boolean {
   return !!process.env.STRIPE_SECRET_KEY?.trim()

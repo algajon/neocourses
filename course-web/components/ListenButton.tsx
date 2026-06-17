@@ -9,165 +9,91 @@ interface ListenButtonProps {
 }
 
 const RATES = [0.75, 1, 1.25, 1.5] as const
-type Status = 'idle' | 'loading' | 'playing' | 'paused'
+type Status = 'idle' | 'playing' | 'paused'
 
+// Reads lesson text aloud using the device's built-in (OS-native) speech
+// synthesizer. Everything runs locally in the browser — no audio or text is sent
+// to any external service.
 export function ListenButton({ text }: ListenButtonProps) {
   const [status, setStatus] = useState<Status>('idle')
   const [rate, setRate] = useState<number>(1)
-  // 'audio' = ElevenLabs voice via /api/tts; 'speech' = browser fallback.
-  const [mode, setMode] = useState<'audio' | 'speech' | 'unsupported'>('audio')
+  const [supported, setSupported] = useState(true)
+  const rateRef = useRef(1)
 
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const urlRef = useRef<string | null>(null)
+  useEffect(() => {
+    setSupported(typeof window !== 'undefined' && 'speechSynthesis' in window)
+  }, [])
 
-  const cleanup = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.src = ''
-      audioRef.current = null
-    }
-    if (urlRef.current) {
-      URL.revokeObjectURL(urlRef.current)
-      urlRef.current = null
-    }
+  const cancel = useCallback(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel()
     }
   }, [])
 
-  // Reset everything when the lesson (text) changes. Also reset mode to 'audio'
-  // so each new lesson re-attempts the ElevenLabs voice rather than inheriting a
-  // previous lesson's browser-voice fallback.
+  // Stop any in-flight speech when the lesson (text) changes or we unmount.
   useEffect(() => {
     setStatus('idle')
-    setMode('audio')
-    return cleanup
+    return cancel
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text])
 
-  function speakWithBrowser() {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      setMode('unsupported')
-      return
-    }
-    setMode('speech')
+  function speak() {
+    if (!supported) return
     const synth = window.speechSynthesis
     synth.cancel()
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.rate = rate
+    utterance.rate = rateRef.current
     utterance.onend = () => setStatus('idle')
     utterance.onerror = () => setStatus('idle')
     synth.speak(utterance)
     setStatus('playing')
   }
 
-  async function startAudio() {
-    setStatus('loading')
-    try {
-      const res = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      })
-      if (!res.ok) throw new Error(String(res.status))
-
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      urlRef.current = url
-
-      const audio = new Audio(url)
-      audio.playbackRate = rate
-      audio.onended = () => setStatus('idle')
-      audio.onerror = () => setStatus('idle')
-      audioRef.current = audio
-      await audio.play()
-      setStatus('playing')
-    } catch {
-      // No TTS key / network error → fall back to the browser voice for this play.
-      speakWithBrowser()
-    }
-  }
-
   function handlePlayPause() {
-    if (mode === 'unsupported') return
+    if (!supported) return
+    const synth = window.speechSynthesis
 
-    // Resume / pause an already-loaded OpenAI track.
-    if (audioRef.current) {
-      if (status === 'playing') {
-        audioRef.current.pause()
-        setStatus('paused')
-      } else {
-        audioRef.current.play().catch(() => setStatus('idle'))
-        setStatus('playing')
-      }
+    if (status === 'playing') {
+      synth.pause()
+      setStatus('paused')
       return
     }
-
-    // Browser-voice pause/resume.
-    if (mode === 'speech' && status !== 'idle' && 'speechSynthesis' in window) {
-      const synth = window.speechSynthesis
-      if (status === 'playing') {
-        synth.pause()
-        setStatus('paused')
-      } else {
-        synth.resume()
-        setStatus('playing')
-      }
+    if (status === 'paused') {
+      synth.resume()
+      setStatus('playing')
       return
     }
-
-    // Nothing loaded yet → always try the ElevenLabs voice first. startAudio()
-    // falls back to the browser voice per-attempt if /api/tts isn't available, so
-    // a transient failure never permanently downgrades the voice for the page.
-    void startAudio()
+    speak()
   }
 
   function handleStop() {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-    }
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel()
-    }
+    cancel()
     setStatus('idle')
   }
 
   function handleRateChange(next: number) {
     setRate(next)
-    if (audioRef.current) {
-      audioRef.current.playbackRate = next // live on <audio>, no restart needed
-    } else if (mode === 'speech' && status !== 'idle' && 'speechSynthesis' in window) {
-      // Web Speech can't change rate mid-utterance; restart.
-      window.speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.rate = next
-      utterance.onend = () => setStatus('idle')
-      utterance.onerror = () => setStatus('idle')
-      window.speechSynthesis.speak(utterance)
-      setStatus('playing')
-    }
+    rateRef.current = next
+    // Web Speech can't change rate mid-utterance; restart if currently speaking.
+    if (status !== 'idle') speak()
   }
 
   const isPlaying = status === 'playing'
-  const isLoading = status === 'loading'
   const canStop = status === 'playing' || status === 'paused'
 
   return (
     <div
       className={styles.root}
-      title={mode === 'unsupported' ? 'Listen mode is not available in this browser' : undefined}
+      title={!supported ? 'Listen mode is not available in this browser' : undefined}
     >
       <button
         type="button"
         className={styles.control}
         onClick={handlePlayPause}
-        disabled={mode === 'unsupported' || isLoading}
+        disabled={!supported}
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
-        {isLoading ? (
-          <span className={styles.spinner} aria-hidden="true" />
-        ) : isPlaying ? (
+        {isPlaying ? (
           <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <rect x="6" y="5" width="4" height="14" rx="1" />
             <rect x="14" y="5" width="4" height="14" rx="1" />
@@ -176,7 +102,7 @@ export function ListenButton({ text }: ListenButtonProps) {
           <Icon name="play" size={16} />
         )}
         <span className={styles.label}>
-          {isLoading ? 'Loading…' : isPlaying ? 'Pause' : status === 'paused' ? 'Resume' : 'Listen'}
+          {isPlaying ? 'Pause' : status === 'paused' ? 'Resume' : 'Listen'}
         </span>
       </button>
 
@@ -184,7 +110,7 @@ export function ListenButton({ text }: ListenButtonProps) {
         type="button"
         className={styles.iconButton}
         onClick={handleStop}
-        disabled={mode === 'unsupported' || !canStop}
+        disabled={!supported || !canStop}
         aria-label="Stop"
       >
         <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -199,7 +125,7 @@ export function ListenButton({ text }: ListenButtonProps) {
             type="button"
             className={`${styles.speedOption} ${rate === r ? styles.speedActive : ''}`}
             onClick={() => handleRateChange(r)}
-            disabled={mode === 'unsupported'}
+            disabled={!supported}
             aria-pressed={rate === r}
           >
             {r}x
