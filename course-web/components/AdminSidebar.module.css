@@ -259,7 +259,7 @@
 }
 .themeToggle:hover { color: var(--sidebar-accent); border-color: var(--sidebar-accent); }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .sidebar {
     position: fixed;
     top: 0;

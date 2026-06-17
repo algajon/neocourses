@@ -226,8 +226,17 @@ code, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; }
   transform: translateY(0);
 }
 
-/* ─── Responsive: collapse admin sidebar + tighten container padding ─── */
+/* ─── Responsive: tighten container padding ─── */
 @media (max-width: 1024px) {
+  .page-wrap {
+    padding: var(--space-6) var(--space-4) var(--space-10);
+  }
+}
+
+/* ─── Responsive: collapse admin sidebar into its mobile top bar ───
+   Only at true tablet-portrait / phone widths. The admin sidebar is the primary
+   navigation, so it stays a full column on laptops and small desktops. */
+@media (max-width: 768px) {
   /* Admin layout's fixed sidebar + main margin both read this token; zeroing it
      lets the sidebar collapse into the AdminSidebar's own mobile top bar. */
   :root, [data-theme="white"], [data-theme="dark"] {
@@ -237,10 +246,6 @@ code, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; }
   /* Reserve space for the fixed admin top bar so content isn't covered. */
   body:has(.admin-shell-nav) main#main {
     padding-top: 56px;
-  }
-
-  .page-wrap {
-    padding: var(--space-6) var(--space-4) var(--space-10);
   }
 }
 
