@@ -79,6 +79,10 @@ async function runGeneration(courseId: string, jobId: string) {
   const totalModules = outline.modules.length
   let completedModules = 0
 
+  // All lesson titles across the course, in teaching order — passed to lesson
+  // generation so each lesson knows what the others cover (anti-repetition).
+  const courseLessonTitles = outline.modules.flatMap((m) => m.lessons.map((l) => l.title))
+
   // Generate all modules concurrently — vLLM batches the requests, so this is far
   // faster than the previous sequential loop. Each module: generate lessons, persist
   // them, then generate a quiz GROUNDED in those lessons' actual content.
@@ -99,8 +103,15 @@ async function runGeneration(courseId: string, jobId: string) {
 
       const lessonTitles = mod.lessons.map((l) => l.title)
       // Pass the full source so each lesson is grounded in the actual uploaded
-      // material (the provider retrieves the passages relevant to each lesson).
-      const fullLessons = await ai.generateLessons(mod.title, lessonTitles, courseTopic, materialText)
+      // material (the provider retrieves the passages relevant to each lesson),
+      // plus the whole-course lesson list so each lesson avoids repeating others.
+      const fullLessons = await ai.generateLessons(
+        mod.title,
+        lessonTitles,
+        courseTopic,
+        materialText,
+        courseLessonTitles,
+      )
 
       // The model's lesson objects don't always include every field; the outline is
       // the source of truth for titles. Guard all NOT-NULL columns with safe defaults.

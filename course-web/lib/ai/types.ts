@@ -62,7 +62,13 @@ export interface AIProvider {
     moduleTitle: string,
     lessonTitles: string[],
     courseTitle: string,
-    sourceText?: string
+    sourceText?: string,
+    /**
+     * All lesson titles across the whole course, in teaching order. Enables
+     * anti-repetition: each lesson is told what the others cover so it writes
+     * only what's specific to it (and the opening lesson establishes fundamentals).
+     */
+    courseLessonTitles?: string[]
   ): Promise<FullLessonContent[]>
 
   generateQuizQuestions(

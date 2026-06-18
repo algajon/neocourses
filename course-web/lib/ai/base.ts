@@ -42,16 +42,34 @@ function escapeControlCharsInStrings(s: string): string {
   return out
 }
 
+/** Isolate the outermost JSON value: strip ```fences``` and any prose before the
+ * first bracket / after its matching last bracket. */
+function extractJson(text: string): string {
+  let s = text.trim()
+  const fence = /^```(?:json)?\s*([\s\S]*?)\s*```$/i.exec(s)
+  if (fence) s = fence[1].trim()
+  const firstObj = s.indexOf('{')
+  const firstArr = s.indexOf('[')
+  let start = -1
+  let close = '}'
+  if (firstArr !== -1 && (firstObj === -1 || firstArr < firstObj)) {
+    start = firstArr
+    close = ']'
+  } else if (firstObj !== -1) {
+    start = firstObj
+  }
+  if (start === -1) return s
+  const end = s.lastIndexOf(close)
+  return end > start ? s.slice(start, end + 1) : s.slice(start)
+}
+
 export function parseJSON<T>(text: string): T {
-  // Strip optional ```json fences and any leading prose before the first JSON token.
-  let cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
-  const firstBrace = cleaned.search(/[[{]/)
-  if (firstBrace > 0) cleaned = cleaned.slice(firstBrace)
+  const cleaned = extractJson(text)
   try {
     return JSON.parse(cleaned) as T
   } catch {
     // Most common cause: the model left a raw newline/tab inside a string value.
-    // Repair just that and retry before giving up (caller falls back to template).
+    // Repair just that and retry before giving up (caller repairs/falls back).
     return JSON.parse(escapeControlCharsInStrings(cleaned)) as T
   }
 }
@@ -139,15 +157,59 @@ real concepts, terminology, and structure. Do not invent topics that are not pre
     lessonTitles: string[],
     courseTitle: string,
     sourceText?: string,
+    courseLessonTitles?: string[],
   ): Promise<FullLessonContent[]> {
+    // The whole-course lesson list (for anti-repetition); fall back to this
+    // module's lessons when the caller doesn't supply it.
+    const allTitles = courseLessonTitles?.length ? courseLessonTitles : lessonTitles
+    // The very first lesson of the course establishes fundamentals; the rest
+    // build on it and must not re-introduce the subject.
+    const introTitle = allTitles[0]
+
     const out: FullLessonContent[] = []
     for (const t of lessonTitles) {
       // Retrieve the source passages most relevant to THIS lesson so its content
       // is grounded in the uploaded material, not the model's general knowledge.
       const excerpt = sourceText ? selectRelevantChunks(sourceText, `${moduleTitle} ${t}`, 3500) : ''
-      out.push(await this.generateOneLesson(t, moduleTitle, courseTitle, excerpt))
+      out.push(
+        await this.generateOneLesson(t, moduleTitle, courseTitle, excerpt, {
+          allTitles,
+          isIntroduction: t === introTitle,
+        }),
+      )
     }
     return out
+  }
+
+  /**
+   * Anti-repetition context: tell the lesson what the rest of the course covers so
+   * it doesn't re-explain foundations or duplicate sibling lessons. The opening
+   * lesson establishes fundamentals; every other lesson builds on the earlier ones.
+   */
+  private courseContextBlock(
+    lessonTitle: string,
+    courseTopic: string,
+    allTitles: string[],
+    isIntroduction: boolean,
+  ): string {
+    const others = allTitles.filter((t) => t !== lessonTitle)
+    if (others.length === 0) return ''
+    const lines = ['COURSE CONTEXT — the other lessons in this course are:', ...others.map((t) => `- ${t}`)]
+    if (isIntroduction) {
+      lines.push(
+        `This is the opening lesson — clearly establish the fundamentals a newcomer needs` +
+          ` (what ${courseTopic} is, why it matters, key terms). The lessons above go deeper later,` +
+          ` so introduce those topics but leave their detail to them. Don't assume prior knowledge.`,
+      )
+    } else {
+      lines.push(
+        `Write ONLY what is specific to "${lessonTitle}". Assume the learner has already read the` +
+          ` earlier lessons. Do NOT re-introduce or re-define ${courseTopic}, and do not repeat` +
+          ` background or definitions owned by another lesson above — build on them instead.` +
+          ` No generic recaps.`,
+      )
+    }
+    return lines.join('\n')
   }
 
   private async generateOneLesson(
@@ -155,6 +217,7 @@ real concepts, terminology, and structure. Do not invent topics that are not pre
     chapterName: string,
     courseTopic: string,
     sourceExcerpt = '',
+    ctx: { allTitles: string[]; isIntroduction: boolean } = { allTitles: [], isIntroduction: false },
   ): Promise<FullLessonContent> {
     const system = sourceExcerpt
       ? 'You are an educational content writer who writes STRICTLY from provided source material. You never add facts, names, dates, numbers, or claims that are not present in the source. Return only valid JSON with no markdown fences or extra text.'
@@ -162,7 +225,8 @@ real concepts, terminology, and structure. Do not invent topics that are not pre
     const grounding = sourceExcerpt
       ? `\n\nSOURCE MATERIAL — base every concept, example, and takeaway STRICTLY on this. Do NOT introduce facts, names, numbers, tools, history, or claims that are not present below. If the source lacks detail for a point, keep it general rather than inventing specifics. Paraphrase; do not copy verbatim.\n"""\n${sourceExcerpt}\n"""\n`
       : ''
-    const user = `Write lesson content for a lesson titled "${lessonTitle}" in chapter "${chapterName}" of a course about "${courseTopic}".${grounding}
+    const courseContext = this.courseContextBlock(lessonTitle, courseTopic, ctx.allTitles, ctx.isIntroduction)
+    const user = `Write lesson content for a lesson titled "${lessonTitle}" in chapter "${chapterName}" of a course about "${courseTopic}".${grounding}${courseContext ? `\n\n${courseContext}\n` : ''}
 
 Return this exact JSON with no other text:
 {
@@ -181,7 +245,9 @@ Return this exact JSON with no other text:
   "trivia": "One surprising fact or bit of context about ${lessonTitle} that makes it memorable (1 sentence, max 28 words)",
   "tip": "One specific, actionable tip about ${lessonTitle} (1 sentence, max 26 words)"
 }`
-    try {
+    // Parse + validate + map the model output into the web LessonContent shape.
+    // Throws on missing/invalid content so the caller can repair-retry.
+    const attempt = async (prompt: string): Promise<FullLessonContent> => {
       const raw = parseJSON<{
         intro?: string
         concepts?: { title: string; body: string }[]
@@ -189,12 +255,10 @@ Return this exact JSON with no other text:
         example?: string
         trivia?: string
         tip?: string
-      }>(await this.complete(user, system))
+      }>(await this.complete(prompt, system))
       if (!raw || !Array.isArray(raw.concepts) || raw.concepts.length === 0) {
         throw new Error('Lesson response missing concepts')
       }
-      // Map the desktop lesson shape (intro/concepts/keyPoints/example/trivia/tip)
-      // onto the web LessonContent shape used by the views.
       const callouts: { type: 'practice' | 'trivia' | 'tip'; title: string; text: string }[] = []
       if (raw.example) callouts.push({ type: 'practice', title: 'In practice', text: raw.example })
       if (raw.trivia) callouts.push({ type: 'trivia', title: 'Did you know?', text: raw.trivia })
@@ -212,10 +276,21 @@ Return this exact JSON with no other text:
         keyPoints: raw.keyPoints ?? [],
         summary: raw.intro ?? '',
       }
-    } catch (e) {
-      console.warn(`[ai] lesson "${lessonTitle}" fell back to template content:`, e instanceof Error ? e.message : e)
-      const [fallbackLesson] = await this.fallback.generateLessons(chapterName, [lessonTitle], courseTopic)
-      return fallbackLesson
+    }
+
+    try {
+      return await attempt(user)
+    } catch (firstErr) {
+      // One repair retry — feed the failure back before degrading. This keeps
+      // genuine AI content far more often than falling straight to the template.
+      try {
+        const repair = `${user}\n\nYour previous response was invalid (${firstErr instanceof Error ? firstErr.message : 'bad output'}). Return ONLY the corrected JSON matching the shape above — no markdown, no prose.`
+        return await attempt(repair)
+      } catch (e) {
+        console.warn(`[ai] lesson "${lessonTitle}" fell back to template content after repair:`, e instanceof Error ? e.message : e)
+        const [fallbackLesson] = await this.fallback.generateLessons(chapterName, [lessonTitle], courseTopic)
+        return fallbackLesson
+      }
     }
   }
 
@@ -241,6 +316,7 @@ Requirements:
 - Do not truncate or abbreviate any question or answer text — write full, natural sentences.
 - Vary the question style (definitions, application, comparison, best-practice).
 - Base every question strictly on the chapter content above.
+- Add a one-sentence explanation of why the correct option is right.
 
 Return this exact JSON structure with no other text:
 {
@@ -248,7 +324,8 @@ Return this exact JSON structure with no other text:
     {
       "question": "Full question text ending with a question mark?",
       "options": ["First option", "Second option", "Third option", "Fourth option"],
-      "correctIndex": 0
+      "correctIndex": 0,
+      "explanation": "One sentence on why the correct option is right."
     }
   ]
 }
@@ -256,7 +333,7 @@ Return this exact JSON structure with no other text:
 The "questions" array must contain exactly 5 questions. "correctIndex" is the 0-based index of the correct option.`
     try {
       const parsed = parseJSON<unknown>(await this.complete(user, system))
-      const questions = coerceArray<{ question?: string; options?: string[]; correctIndex?: number }>(parsed)
+      const questions = coerceArray<{ question?: string; options?: string[]; correctIndex?: number; explanation?: string }>(parsed)
       const letters = ['a', 'b', 'c', 'd', 'e', 'f']
       const mapped = questions
         .filter((q) => q && q.question && Array.isArray(q.options) && q.options.length >= 2)
@@ -268,7 +345,7 @@ The "questions" array must contain exactly 5 questions. "correctIndex" is the 0-
             questionType: 'multiple_choice' as const,
             options: opts.map((text, i) => ({ id: letters[i], text })),
             correctAnswer: letters[ci],
-            explanation: '',
+            explanation: typeof q.explanation === 'string' ? q.explanation : '',
           }
         })
       if (mapped.length === 0) throw new Error('No valid quiz questions parsed')
