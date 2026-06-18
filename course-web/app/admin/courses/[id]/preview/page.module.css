@@ -194,6 +194,7 @@
 /* ── Main content ── */
 .main {
   flex: 1;
+  min-height: 0; /* let the inner scroll container (.slideBody) actually scroll */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -202,6 +203,7 @@
 /* ── Slide layout (matches learner view) ── */
 .slide {
   flex: 1;
+  min-height: 0; /* required so .slideBody's overflow-y:auto engages instead of growing */
   display: flex;
   flex-direction: column;
   max-width: 860px;
