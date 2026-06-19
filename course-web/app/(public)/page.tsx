@@ -139,14 +139,14 @@ export default function LandingPage() {
             Ready to build your first course?
           </h2>
           <p className={styles.ctaSub}>
-            Get started in minutes. No credit card required.
+            Get started in minutes.
           </p>
           <div className={styles.ctaButtons}>
             <Link href="/signup" className="btn-cta">
               Get started free
             </Link>
             <Link href="/pricing" className={styles.ctaSecondary}>
-              View pricing
+              View plans
             </Link>
           </div>
         </div>

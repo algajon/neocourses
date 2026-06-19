@@ -28,8 +28,6 @@ export async function GET() {
       return {
         id: p.id,
         name: p.name,
-        price: p.price,
-        priceSub: p.priceSub,
         desc: p.desc,
         monthlyGenerations: p.monthlyGenerations,
         seats: p.seats,

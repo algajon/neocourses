@@ -19,13 +19,12 @@ async function getCatalog(organizationId: string, userId: string): Promise<Catal
     .select({
       courseId: enrollments.courseId,
       progressPercent: enrollments.progressPercent,
-      paid: enrollments.paid,
     })
     .from(enrollments)
     .where(eq(enrollments.userId, userId))
 
   const enrolledMap = new Map(
-    enrolled.map(e => [e.courseId, { progress: e.progressPercent ?? 0, paid: !!e.paid }]),
+    enrolled.map(e => [e.courseId, { progress: e.progressPercent ?? 0 }]),
   )
 
   const lessonCounts = new Map<string, number>()
@@ -50,11 +49,8 @@ async function getCatalog(organizationId: string, userId: string): Promise<Catal
       estimatedMinutes: course.estimatedMinutes,
       certificateEnabled: course.certificateEnabled ?? false,
       thumbnailUrl: course.thumbnailUrl,
-      pricingModel: course.pricingModel,
-      priceCents: course.priceCents,
       lessonCount: lessonCounts.get(course.id) ?? 0,
       enrolled: !!enrollment,
-      paid: enrollment?.paid ?? false,
       progressPercent: enrollment?.progress ?? 0,
     }
   })

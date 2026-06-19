@@ -68,7 +68,7 @@ export default function SignupPage() {
           </Link>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.sub}>
-            Start building courses for free — no credit card required.
+            Start building courses in minutes.
           </p>
         </div>
 

@@ -4,10 +4,8 @@ import styles from './page.module.css'
 
 const plans = [
   {
-    name: 'Free',
+    name: 'Starter',
     badge: null,
-    price: '$0',
-    priceSub: 'No credit card required',
     desc: 'Perfect for individuals and small teams experimenting with AI course creation.',
     features: [
       '5 AI course generations / month',
@@ -25,8 +23,6 @@ const plans = [
   {
     name: 'Team',
     badge: 'Most popular',
-    price: '$49',
-    priceSub: 'per month',
     desc: 'For teams that need more generations, seats, advanced import formats, and admin controls.',
     features: [
       '100 AI course generations / month',
@@ -46,8 +42,6 @@ const plans = [
   {
     name: 'Business',
     badge: null,
-    price: '$199',
-    priceSub: 'per month',
     desc: 'For organisations that need unlimited generation, unlimited seats, and dedicated onboarding.',
     features: [
       'Unlimited AI course generations',
@@ -90,11 +84,10 @@ export default function PricingPage() {
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.inner}>
-          <div className={styles.label}>Pricing</div>
-          <h1 className={styles.title}>Simple, honest pricing</h1>
+          <div className={styles.label}>Plans</div>
+          <h1 className={styles.title}>Plans for every team</h1>
           <p className={styles.sub}>
-            Start free and scale when you need to. No surprise usage fees — just flat,
-            predictable pricing for your team.
+            Start free and scale when you need to. Pick the plan that fits your team.
           </p>
         </div>
       </section>
@@ -111,8 +104,6 @@ export default function PricingPage() {
                   <div className={styles.planBadge}>{plan.badge}</div>
                 )}
                 <div className={styles.planName}>{plan.name}</div>
-                <div className={styles.planPrice}>{plan.price}</div>
-                <div className={styles.planPriceSub}>{plan.priceSub}</div>
                 <p className={styles.planDesc}>{plan.desc}</p>
                 <Link href={plan.ctaHref} className={plan.ctaClass}>
                   {plan.cta}
@@ -150,7 +141,7 @@ export default function PricingPage() {
         <div className={styles.inner}>
           <h2 className={styles.ctaTitle}>Not sure which plan is right for you?</h2>
           <p className={styles.ctaSub}>
-            Start with the free Starter plan — no commitment, no credit card. Upgrade when you are ready.
+            Start with the free Starter plan — no commitment. Upgrade when you are ready.
           </p>
           <div className={styles.ctaButtons}>
             <Link href="/signup" className="btn-cta">

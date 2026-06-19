@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
 import { courseGradient } from '@/lib/gradient'
-import type { PricingModel } from '@/lib/pricing'
 import styles from './page.module.css'
 
 // The full course-creation pipeline. Steps 1–2 are this form; 3–6 happen after
@@ -23,16 +22,8 @@ interface Step2Data {
   difficultyLevel: string
   estimatedHours: string
   certificateEnabled: boolean
-  pricingModel: PricingModel
-  price: string
   thumbnailUrl: string
 }
-
-const PRICING_OPTIONS: { value: PricingModel; label: string }[] = [
-  { value: 'free', label: 'Free' },
-  { value: 'paid', label: 'Paid' },
-  { value: 'first_chapter_free', label: 'First chapter free' },
-]
 
 const COURSE_TYPES = [
   { value: 'onboarding', label: 'Onboarding' },
@@ -65,15 +56,12 @@ export default function NewCoursePage() {
     difficultyLevel: 'beginner',
     estimatedHours: '',
     certificateEnabled: true,
-    pricingModel: 'free',
-    price: '',
     thumbnailUrl: '',
   })
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
 
-  const needsPrice = step2.pricingModel !== 'free'
   const previewBackground = step2.thumbnailUrl
     ? `url(${step2.thumbnailUrl}) center / cover no-repeat`
     : courseGradient(step1.title || 'courseneo')
@@ -122,13 +110,6 @@ export default function NewCoursePage() {
   async function handleStep2Submit(e: FormEvent) {
     e.preventDefault()
     setError('')
-
-    const priceCents = needsPrice ? Math.round(Number(step2.price) * 100) : 0
-    if (needsPrice && (!Number.isFinite(priceCents) || priceCents <= 0)) {
-      setError('Enter a price greater than $0 for a paid course.')
-      return
-    }
-
     setSubmitting(true)
 
     try {
@@ -144,8 +125,6 @@ export default function NewCoursePage() {
           difficultyLevel: step2.difficultyLevel,
           estimatedHours: step2.estimatedHours ? Number(step2.estimatedHours) : undefined,
           certificateEnabled: step2.certificateEnabled,
-          pricingModel: step2.pricingModel,
-          priceCents,
           thumbnailUrl: step2.thumbnailUrl || null,
         }),
       })
@@ -294,44 +273,6 @@ export default function NewCoursePage() {
                 />
                 <span className={styles.checkboxLabel}>Issue completion certificate</span>
               </label>
-
-              <div className={styles.field}>
-                <span className="label">Pricing</span>
-                <div className={styles.segmented} role="radiogroup" aria-label="Pricing">
-                  {PRICING_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      role="radio"
-                      aria-checked={step2.pricingModel === opt.value}
-                      className={`${styles.segment} ${step2.pricingModel === opt.value ? styles.segmentActive : ''}`}
-                      onClick={() => setStep2({ ...step2, pricingModel: opt.value })}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-                {needsPrice && (
-                  <div className={styles.priceField}>
-                    <span className={styles.pricePrefix}>$</span>
-                    <input
-                      className="input"
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={step2.price}
-                      onChange={(e) => setStep2({ ...step2, price: e.target.value })}
-                      placeholder="29.00"
-                      aria-label="Price in dollars"
-                    />
-                  </div>
-                )}
-                {step2.pricingModel === 'first_chapter_free' && (
-                  <p className={styles.hint}>
-                    Learners enroll free and can read the first chapter; later chapters unlock after purchase.
-                  </p>
-                )}
-              </div>
 
               <div className={styles.field}>
                 <span className="label">Course image</span>

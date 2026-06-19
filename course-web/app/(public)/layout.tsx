@@ -37,7 +37,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
           </span>
           <div className={styles.footerLinks}>
             <Link href="/features">Features</Link>
-            <Link href="/pricing">Pricing</Link>
+            <Link href="/pricing">Plans</Link>
             <Link href="/login">Sign in</Link>
           </div>
         </div>

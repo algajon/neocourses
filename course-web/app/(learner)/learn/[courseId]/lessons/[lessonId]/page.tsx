@@ -8,9 +8,7 @@ import { LessonSlide } from '@/components/LessonSlide'
 import { FitSlide } from '@/components/FitSlide'
 import { ListenButton } from '@/components/ListenButton'
 import { LessonNotes } from '@/components/LessonNotes'
-import { EnrollButton } from '@/components/EnrollButton'
 import { pingNotifications } from '@/components/useNotifications'
-import { formatPrice, isLessonLocked } from '@/lib/pricing'
 import type { LessonContent } from '@/lib/ai/types'
 import styles from './page.module.css'
 
@@ -46,13 +44,6 @@ interface LessonData {
   content: LessonContent | null
 }
 
-interface AccessInfo {
-  pricingModel: 'free' | 'paid' | 'first_chapter_free'
-  priceCents: number
-  enrolled: boolean
-  paid: boolean
-}
-
 interface PageProps {
   params: { courseId: string; lessonId: string }
 }
@@ -60,7 +51,6 @@ interface PageProps {
 export default function LessonPage({ params }: PageProps) {
   const router = useRouter()
   const [lesson, setLesson] = useState<LessonData | null>(null)
-  const [access, setAccess] = useState<AccessInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [marking, setMarking] = useState(false)
 
@@ -75,13 +65,6 @@ export default function LessonPage({ params }: PageProps) {
       .catch(() => setLoading(false))
   }, [params.lessonId, params.courseId])
 
-  useEffect(() => {
-    fetch(`/api/courses/${params.courseId}/purchase`)
-      .then(r => (r.ok ? r.json() : null))
-      .then((data: AccessInfo | null) => setAccess(data))
-      .catch(() => {})
-  }, [params.courseId])
-
   // Opening a lesson is a small milestone — fire the explorer award (idempotent
   // server-side) and nudge the bell so the toast pops right away.
   useEffect(() => {
@@ -92,16 +75,6 @@ export default function LessonPage({ params }: PageProps) {
 
   const handleNext = useCallback(async () => {
     if (!lesson) return
-    if (
-      access &&
-      isLessonLocked(
-        { pricingModel: access.pricingModel, priceCents: access.priceCents },
-        { paid: access.paid },
-        lesson.moduleNumber - 1,
-      )
-    ) {
-      return
-    }
     setMarking(true)
     try {
       await fetch('/api/progress/lessons', {
@@ -121,7 +94,7 @@ export default function LessonPage({ params }: PageProps) {
       router.push(`/learn/${lesson.courseId}`)
     }
     setMarking(false)
-  }, [lesson, access, router])
+  }, [lesson, router])
 
   const goPrev = useCallback(() => {
     if (lesson?.prevLessonId) {
@@ -166,14 +139,6 @@ export default function LessonPage({ params }: PageProps) {
   }
 
   const content = lesson.content
-  const moduleIndex = lesson.moduleNumber - 1
-  const locked = access
-    ? isLessonLocked(
-        { pricingModel: access.pricingModel, priceCents: access.priceCents },
-        { paid: access.paid },
-        moduleIndex,
-      )
-    : false
 
   return (
     <div className={styles.shell}>
@@ -198,30 +163,7 @@ export default function LessonPage({ params }: PageProps) {
         </header>
 
         <div className={styles.body}>
-          {locked ? (
-            <div className={styles.lockedWrap}>
-              <div className={styles.lockedCard}>
-                <div className={styles.lockedIcon}>
-                  <Icon name="lock" size={28} />
-                </div>
-                <h2 className={styles.lockedTitle}>This chapter is locked</h2>
-                <p className={styles.lockedText}>
-                  The first chapter is free. Unlock the full course to continue with
-                  {' '}{lesson.moduleTitle} and every chapter after it.
-                </p>
-                <EnrollButton
-                  courseId={lesson.courseId}
-                  action="unlock"
-                  priceLabel={formatPrice(access?.priceCents)}
-                  className={styles.lockedCta}
-                  redirectTo={`/learn/${lesson.courseId}/lessons/${lesson.id}`}
-                />
-                <Link href={`/learn/${lesson.courseId}`} className={styles.lockedBack}>
-                  Back to course
-                </Link>
-              </div>
-            </div>
-          ) : content ? (
+          {content ? (
             <FitSlide>
               <LessonSlide
                 content={content}
@@ -265,7 +207,7 @@ export default function LessonPage({ params }: PageProps) {
           <div className={styles.footerRight}>
             <button
               onClick={handleNext}
-              disabled={marking || locked}
+              disabled={marking}
               className={styles.navBtnPrimary}
             >
               {marking ? (

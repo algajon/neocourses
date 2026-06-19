@@ -99,7 +99,7 @@ export default function FeaturesPage() {
               Get started free
             </Link>
             <Link href="/pricing" className={styles.secondaryLink}>
-              View pricing <Icon name="arrowRight" size={15} style={{ verticalAlign: 'middle' }} />
+              View plans <Icon name="arrowRight" size={15} style={{ verticalAlign: 'middle' }} />
             </Link>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function FeaturesPage() {
         <div className={styles.inner}>
           <h2 className={styles.ctaTitle}>Ready to see it in action?</h2>
           <p className={styles.ctaSub}>
-            Create your account in 30 seconds — no credit card required.
+            Create your account in 30 seconds.
           </p>
           <Link href="/signup" className="btn-cta">
             Get started free

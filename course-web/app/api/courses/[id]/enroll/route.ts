@@ -5,7 +5,6 @@ import { db } from '@/lib/db'
 import { enrollments, courses } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { randomUUID } from 'crypto'
-import { priceModelOf } from '@/lib/pricing'
 import { createNotification } from '@/lib/notify'
 
 export async function POST(
@@ -39,8 +38,6 @@ export async function POST(
       title: courses.title,
       status: courses.status,
       organizationId: courses.organizationId,
-      pricingModel: courses.pricingModel,
-      priceCents: courses.priceCents,
     })
     .from(courses)
     .where(eq(courses.id, courseId))
@@ -53,19 +50,6 @@ export async function POST(
   if (course.status !== 'published') {
     return NextResponse.json({ error: 'Course is not published' }, { status: 400 })
   }
-
-  const model = priceModelOf(course)
-
-  // Paid courses can't be entered with a free enroll — they must be purchased.
-  if (model === 'paid') {
-    return NextResponse.json(
-      { error: 'This course requires purchase. Use Get for the listed price.' },
-      { status: 402 },
-    )
-  }
-
-  // free → full access; first_chapter_free → enrolled but locked until purchase.
-  const paid = model === 'free'
 
   const [existing] = await db
     .select({ id: enrollments.id })
@@ -86,7 +70,7 @@ export async function POST(
       enrolledAt: new Date(),
       progressPercent: 0,
       status: 'active',
-      paid,
+      paid: true,
     })
     .returning()
 

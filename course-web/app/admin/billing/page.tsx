@@ -7,8 +7,6 @@ import styles from './page.module.css'
 interface PlanCard {
   id: 'free' | 'team' | 'business'
   name: string
-  price: string
-  priceSub: string
   desc: string
   monthlyGenerations: number | null
   seats: number | null
@@ -151,8 +149,6 @@ export default function BillingPage() {
             >
               {isCurrent && <div className={styles.currentBadge}>Current</div>}
               <div className={styles.planName}>{plan.name}</div>
-              <div className={styles.planPrice}>{plan.price}</div>
-              <div className={styles.planPriceSub}>{plan.priceSub}</div>
               <p className={styles.planDesc}>{plan.desc}</p>
 
               {plan.id === 'free' || isCurrent ? (

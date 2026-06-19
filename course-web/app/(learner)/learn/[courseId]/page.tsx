@@ -14,7 +14,6 @@ import {
 import { eq, and } from 'drizzle-orm'
 import { Icon } from '@/components/Icon'
 import { EnrollButton } from '@/components/EnrollButton'
-import { priceModelOf, pricingLabel, formatPrice, hasFullAccess } from '@/lib/pricing'
 import { courseTints } from '@/lib/gradient'
 import styles from './page.module.css'
 
@@ -96,10 +95,7 @@ export default async function CourseOverviewPage({ params }: PageProps) {
     advanced: 'Advanced',
   }
 
-  const model = priceModelOf(course)
-  const priceText = formatPrice(course.priceCents)
   const isEnrolled = !!enrollment
-  const hasAccess = hasFullAccess(course, enrollment)
 
   return (
     <div className={styles.page}>
@@ -124,9 +120,6 @@ export default async function CourseOverviewPage({ params }: PageProps) {
 
           <div className={styles.heroContent}>
             <div className={styles.heroLeft}>
-              <span className={`${styles.heroBadge} ${model === 'free' ? styles.heroBadgeFree : ''}`}>
-                {pricingLabel(course)}
-              </span>
               <div className={styles.tags}>
                 <span className={styles.tag}>{difficultyLabel[course.difficultyLevel] ?? course.difficultyLevel}</span>
                 <span className={styles.tag}>{course.courseType}</span>
@@ -143,48 +136,8 @@ export default async function CourseOverviewPage({ params }: PageProps) {
             <div className={styles.heroRight}>
               {!isEnrolled ? (
                 <div className={styles.enrollCard}>
-                  <div className={styles.priceRow}>
-                    <span className={styles.priceValue}>
-                      {model === 'free' ? 'Free' : priceText}
-                    </span>
-                    <span className={styles.priceModel}>{pricingLabel(course)}</span>
-                  </div>
-
-                  {model === 'paid' ? (
-                    <>
-                      <EnrollButton
-                        courseId={course.id}
-                        action="purchase"
-                        priceLabel={priceText}
-                        courseTitle={course.title}
-                        className={styles.ctaBtn}
-                      />
-                      <p className={styles.enrollNote}>
-                        Purchase to enroll and unlock every chapter.
-                      </p>
-                    </>
-                  ) : model === 'first_chapter_free' ? (
-                    <>
-                      <EnrollButton
-                        courseId={course.id}
-                        action="start-free"
-                        courseTitle={course.title}
-                        className={styles.ctaBtn}
-                      />
-                      <p className={styles.enrollNote}>
-                        Chapters 2+ unlock for {priceText}.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <EnrollButton
-                        courseId={course.id}
-                        action="enroll"
-                        className={styles.ctaBtn}
-                      />
-                      <p className={styles.enrollNote}>Enroll free to start learning.</p>
-                    </>
-                  )}
+                  <EnrollButton courseId={course.id} className={styles.ctaBtn} />
+                  <p className={styles.enrollNote}>Enroll to start learning.</p>
                 </div>
               ) : (
                 <div className={styles.progressCard}>
@@ -208,21 +161,6 @@ export default async function CourseOverviewPage({ params }: PageProps) {
                     <Link href={`/learn/${course.id}/certificate`} className={styles.ctaBtn}>
                       View Certificate
                     </Link>
-                  )}
-
-                  {!hasAccess && (
-                    <>
-                      <EnrollButton
-                        courseId={course.id}
-                        action="unlock"
-                        priceLabel={priceText}
-                        courseTitle={course.title}
-                        className={styles.unlockBtn}
-                      />
-                      <p className={styles.progressSub}>
-                        Chapters 2+ are locked. Unlock the full course for {priceText}.
-                      </p>
-                    </>
                   )}
 
                   <Link href={`/learn/${course.id}/flashcards`} className={styles.flashcardsLink}>
