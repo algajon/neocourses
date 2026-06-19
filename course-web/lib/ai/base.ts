@@ -230,7 +230,7 @@ real concepts, terminology, and structure. Do not invent topics that are not pre
 
 Return this exact JSON with no other text:
 {
-  "intro": "An engaging 2-sentence hook (max 38 words total) that draws the reader in — open with a vivid question, a surprising fact, a concrete real-world scenario, or a striking stake. Make it specific to ${lessonTitle}. Do NOT begin with 'This lesson', 'In this lesson', 'Welcome', or 'Understanding'",
+  "intro": "An engaging 2-sentence hook (max 38 words total) that draws the reader in with a concrete fact, a vivid real-world scenario, a surprising detail, or what's at stake. Make it specific to ${lessonTitle}. Open with a declarative statement — do NOT open with a question, and do NOT begin with 'This lesson', 'In this lesson', 'Welcome', 'Imagine', 'Have you ever', or 'Understanding'",
   "concepts": [
     {"title": "Short concept title (2-4 words)", "body": "Exactly 2 short sentences (max 30 words TOTAL) of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing. Keep it tight; brevity is mandatory"},
     {"title": "Short concept title (2-4 words)", "body": "Exactly 2 short sentences (max 30 words TOTAL) of specific, concrete content about ${lessonTitle} — no filler, no hedging, no 'in general' phrasing. Keep it tight; brevity is mandatory"},
